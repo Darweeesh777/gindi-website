@@ -39,9 +39,10 @@ that serves `dist/` with the same `_headers`, `_redirects` and nearest
 | Non-production branch deploy command | `npx wrangler versions upload` (default) |
 | Root directory | `/` |
 
-Address: `https://gindi-website.<your-subdomain>.workers.dev`. Set
-`SITE_URL` to it (Settings > Build > Variables and secrets) so that the
-English/Arabic links use it.
+**Live preview:** https://gindi-website.ah-darwesh.workers.dev (Arabic: `/ar/`).
+This is the default `SITE_URL` in `cloudflare-build.sh`. Change it there, or
+set `SITE_URL` under Settings > Build > Variables and secrets, if the
+address changes.
 
 ## Cloudflare Pages settings (exact values)
 
@@ -67,7 +68,7 @@ None are required for the preview. Optional:
 
 | Variable | Default | Effect |
 |---|---|---|
-| `SITE_URL` | `https://gindi-website.pages.dev` | Public address used in links between the English and Arabic pages. Set it if Cloudflare gives the project a different `*.pages.dev` name, or for a custom domain |
+| `SITE_URL` | `https://gindi-website.ah-darwesh.workers.dev` | Public address used in links between the English and Arabic pages. Set it if Cloudflare gives the project a different `*.pages.dev` name, or for a custom domain |
 | `SITE_NOINDEX` | `true` | `false` only at the official launch |
 | `SHOW_PLACEHOLDER_BADGES` | `true` | `false` only once the copy is final |
 | `ENQUIRY_FORM_ACTION` | *(empty)* | Enquiry form endpoint (a form service URL). Empty: the form says it is not connected |
@@ -95,7 +96,11 @@ exported pages are public.
     `Cross-Origin-Opener-Policy`;
   - static files cached for a year, which is safe because their names
     change with their content.
-- HTTPS everywhere. `*.pages.dev` addresses are HTTPS only.
+- HTTPS: browsers always use HTTPS on `*.workers.dev` and `*.pages.dev`,
+  because the whole `.dev` domain is on the browsers' built-in HTTPS-only
+  (HSTS preload) list. A non-browser client that asks for plain `http://` on
+  `workers.dev` gets the page without a redirect. With a custom domain,
+  turn on Cloudflare's "Always Use HTTPS".
 - "Placeholder" badges, "Illustrative image" labels, the not-connected
   enquiry form and "Coming soon" tools, all unchanged.
 

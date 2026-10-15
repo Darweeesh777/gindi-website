@@ -17,6 +17,6 @@ if [[ -z "${DJANGO_SECRET_KEY:-}" ]]; then
 fi
 
 # Public address used in links between the English and Arabic pages.
-export SITE_URL="${SITE_URL:-https://gindi-website.pages.dev}"
+export SITE_URL="${SITE_URL:-https://gindi-website.ah-darwesh.workers.dev}"
 
 DJANGO_SETTINGS_MODULE=config.settings.static_export python manage.py export_static --output dist
