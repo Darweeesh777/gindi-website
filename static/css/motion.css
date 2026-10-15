@@ -1,0 +1,154 @@
+/*
+ * Gindi Innovations — motion
+ *
+ * Calm and one-shot: nothing loops except the hero scroll cue, and nothing
+ * hijacks scrolling. Scroll reveals only hide content once main.js has added
+ * `.reveal-ready` (i.e. it is running and can reveal it again), so content is
+ * never lost if JavaScript fails. Reduced-motion users get no movement.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ---------- Hero entrance ---------- */
+  .js .hero__media > * {
+    animation: hero-settle 2.6s var(--ease-out) both;
+  }
+
+  .js .hero-intro {
+    animation: rise var(--dur-slow) var(--ease-out) both;
+    animation-delay: calc(350ms + var(--i, 0) * 140ms);
+  }
+
+  .hero__scroll-line::after {
+    animation: scroll-cue 2.8s var(--ease-in-out) 2.4s infinite;
+  }
+
+  /* ---------- Scroll reveals ---------- */
+  .reveal-ready [data-reveal]:not([data-reveal="media"], [data-reveal="rule"], [data-reveal="process"]) {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity var(--dur-slow) var(--ease-out),
+      transform var(--dur-slow) var(--ease-out);
+    transition-delay: calc(var(--d, 0) * 110ms);
+  }
+
+  .reveal-ready [data-reveal].is-revealed:not([data-reveal="media"], [data-reveal="rule"], [data-reveal="process"]) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Section rule draws out from the centre. */
+  .reveal-ready [data-reveal="rule"] {
+    transform: scaleX(0);
+    transition: transform var(--dur-cinematic) var(--ease-out);
+  }
+
+  .reveal-ready [data-reveal="rule"].is-revealed {
+    transform: scaleX(1);
+  }
+
+  /* Image curtain: a section-coloured cover slides away in reading direction
+     while the image settles. (A cover rather than clip-path, so the element
+     keeps a visible area for IntersectionObserver.) */
+  .reveal-ready [data-reveal="media"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--bg);
+    transform-origin: right;
+    transition: transform var(--dur-cinematic) var(--ease-in-out);
+  }
+
+  .reveal-ready[dir="rtl"] [data-reveal="media"]::after {
+    transform-origin: left;
+  }
+
+  .reveal-ready [data-reveal="media"].is-revealed::after {
+    transform: scaleX(0);
+  }
+
+  .reveal-ready [data-reveal="media"] > img,
+  .reveal-ready [data-reveal="media"] > .placeholder {
+    scale: 1.08;
+    transition:
+      scale 2s var(--ease-out),
+      transform var(--dur-cinematic) var(--ease-out);
+  }
+
+  .reveal-ready [data-reveal="media"].is-revealed > img,
+  .reveal-ready [data-reveal="media"].is-revealed > .placeholder {
+    scale: 1;
+  }
+
+  /* Process: the gold line draws through the steps, which follow it in. */
+  .reveal-ready [data-reveal="process"]::after {
+    transform: scaleX(0);
+    transition: transform 2s var(--ease-in-out);
+  }
+
+  .reveal-ready [data-reveal="process"] .step {
+    opacity: 0;
+    transform: translateY(1rem);
+    transition:
+      opacity var(--dur-slow) var(--ease-out),
+      transform var(--dur-slow) var(--ease-out);
+    transition-delay: calc(200ms + var(--d, 0) * 220ms);
+  }
+
+  .reveal-ready [data-reveal="process"].is-revealed::after {
+    transform: none;
+  }
+
+  .reveal-ready [data-reveal="process"].is-revealed .step {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 64rem) {
+  .reveal-ready [data-reveal="process"]::after {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+@keyframes hero-settle {
+  from {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+}
+
+@keyframes scroll-cue {
+  0% { transform: translateX(-100%) scaleX(0.35); }
+  60%, 100% { transform: translateX(300%) scaleX(0.35); }
+}
+
+/* RTL scroll cue travels the other way. */
+[dir="rtl"] .hero__scroll-line::after {
+  animation-name: scroll-cue-rtl;
+}
+
+@keyframes scroll-cue-rtl {
+  0% { transform: translateX(100%) scaleX(0.35); }
+  60%, 100% { transform: translateX(-300%) scaleX(0.35); }
+}
+
+/* Safety net for anything not covered above. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}

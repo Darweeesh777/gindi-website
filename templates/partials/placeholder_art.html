@@ -1,0 +1,24 @@
+{% comment %}
+Neutral line drawings used inside image placeholders. They are clearly
+schematic, so they cannot be mistaken for real project photography.
+{% endcomment %}
+{% if art == 'arch' %}
+<svg class="placeholder__art" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" opacity=".45">
+    <path d="M130 420V230a70 70 0 0 1 140 0v190" vector-effect="non-scaling-stroke"/>
+    <path d="M0 420h400" vector-effect="non-scaling-stroke"/>
+    <path d="M130 420 60 500M270 420l70 80" vector-effect="non-scaling-stroke"/>
+  </g>
+  <path d="M130 420h140l70 80H60z" fill="currentColor" opacity=".05"/>
+</svg>
+{% else %}
+<svg class="placeholder__art" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="1" opacity=".35">
+    <rect x="520" y="290" width="560" height="420" vector-effect="non-scaling-stroke"/>
+    <path d="M0 0l520 290M1600 0l-520 290M0 1000l520-290M1600 1000l-520-290" vector-effect="non-scaling-stroke"/>
+    <path d="M720 710V470a80 80 0 0 1 160 0v240" vector-effect="non-scaling-stroke"/>
+    <path d="M800 710 800 1000M660 710 520 1000M940 710l140 290M590 710 260 1000M1010 710l330 290" vector-effect="non-scaling-stroke" opacity=".5"/>
+  </g>
+  <path d="M720 710h160l150 290H570z" fill="currentColor" opacity=".06"/>
+</svg>
+{% endif %}

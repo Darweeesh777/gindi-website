@@ -1,0 +1,22 @@
+<section class="section about theme-light" id="about" aria-labelledby="about-title">
+  <div class="container">
+    {% include "partials/section_head.html" with num="04" eyebrow=c.about.eyebrow %}
+
+    <div class="about__layout">
+      <div class="about__media">
+        {% include "partials/emblem_reveal.html" with image=c.about.image sizes="(min-width: 90rem) 535px, (min-width: 60.01rem) 37vw, (min-width: 40.01rem) 56vw, 75vw" %}
+      </div>
+
+      <div class="about__body">
+        <h2 class="heading about__title" id="about-title" data-reveal>{{ c.about.title }}</h2>
+        {# The studio's text: content.py → about.paragraphs. #}
+        {% for paragraph in c.about.paragraphs %}
+          <p class="about__text{% if forloop.first %} lead{% endif %}" data-reveal>{{ paragraph }}</p>
+        {% endfor %}
+        <div class="about__actions" data-reveal>
+          <a class="btn btn--primary about__more" href="{{ about_url }}">{{ c.about.more }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{% url 'core:home' %}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{% url 'core:home_ar' %}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{% url 'core:home' %}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  {# Featured projects carousel (Projects section). #}
+  <script src="{% static 'js/projects-carousel.js' %}" defer></script>
+  {# Design/reality comparison ("From Vision to Reality"). #}
+  <script src="{% static 'js/compare-slider.js' %}" defer></script>
+  {# The Geometric G reveal in the Gindi Innovations section. #}
+  <link rel="stylesheet" href="{% static 'css/emblem-reveal.css' %}">
+  {# GSAP 3.13.0 (vendored; GreenSock standard no-charge licence). Deferred scripts run in order. #}
+  <script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
+  <script src="{% static 'vendor/gsap/ScrollTrigger.min.js' %}" defer></script>
+  <script src="{% static 'js/emblem-reveal.js' %}" defer></script>
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    {% include "core/sections/hero.html" %}
+    {% include "core/sections/projects.html" %}
+    {% include "core/sections/vision.html" %}
+    {% include "core/sections/services.html" %}
+    {% include "core/sections/process.html" %}
+    {% include "core/sections/about.html" %}
+    {% include "core/sections/contact.html" %}
+  </main>
+
+  {% include "partials/footer.html" %}
+{% endblock %}

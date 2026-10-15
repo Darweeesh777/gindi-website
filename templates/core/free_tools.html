@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% comment %}
+Free tools overview (/free-tools/, /ar/free-tools/): every tool from
+apps/core/tools.py, each opening its own page. /free-estimate/ redirects here.
+{% endcomment %}
+
+{% block title %}{{ c.tools_page.meta_title }}{% endblock %}
+{% block description %}{{ c.tools_page.meta_description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/services-page.css' %}">
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    <section class="section estimate tools-overview theme-light" id="top" aria-labelledby="tools-title">
+      <div class="container estimate__layout">
+        <a class="link-arrow svc-back" href="{{ services_url }}">{% include "partials/arrow.html" %}<span>{{ c.tools_page.back_services }}</span></a>
+        <header class="estimate__head">
+          <p class="svc-eyebrow label" data-reveal>{{ c.tools_page.eyebrow }}</p>
+          <h1 class="estimate__title" id="tools-title" data-reveal>{{ c.tools_page.title }}</h1>
+          <p class="estimate__lead" data-reveal>{{ c.tools_page.lead }}</p>
+        </header>
+        {% include "partials/tool_cards.html" %}
+      </div>
+    </section>
+  </main>
+
+  {% include "partials/footer.html" %}
+{% endblock %}

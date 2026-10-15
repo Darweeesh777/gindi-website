@@ -1,0 +1,9 @@
+{% if noindex %}# Preview deployment: not for search engines.
+# Every page and file is sent with "X-Robots-Tag: noindex, nofollow" (and a
+# robots meta tag). Crawling is left allowed on purpose: a crawler blocked
+# here would never see that noindex rule.
+User-agent: *
+Disallow:
+{% else %}User-agent: *
+Allow: /
+{% endif %}

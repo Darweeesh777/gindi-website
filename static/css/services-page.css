@@ -1,0 +1,739 @@
+/*
+ * Gindi Innovations — Services page (/services/) and the Electrical Wire
+ * Estimator page (/free-estimate/). Behaviour: static/js/services-page.js.
+ * Reveal-on-scroll uses the site's data-reveal (main.js + motion.css).
+ */
+
+.svc-eyebrow {
+  color: var(--gindi-gold);
+}
+
+/* Navy text, gold underline that thickens on hover, arrow nudges. */
+.svc-link {
+  min-height: 2.75rem;
+  color: var(--fg);
+  background-image: linear-gradient(var(--gindi-gold), var(--gindi-gold));
+  background-size: 100% 1px;
+}
+
+.svc-link .link-arrow__icon {
+  color: var(--gindi-gold);
+}
+
+.svc-link:hover {
+  background-size: 100% 2px;
+}
+
+/* ---------- Hero ---------- */
+.svc-hero {
+  padding-block: calc(var(--header-h) + var(--space-md)) var(--space-lg);
+}
+
+.svc-hero__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.svc-hero__text {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+}
+
+.svc-hero__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.75rem, 1.5rem + 4vw, 5.25rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.02;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+:lang(ar) .svc-hero__title {
+  line-height: 1.3;
+}
+
+.svc-hero__lead {
+  font-size: var(--fs-lead);
+  color: var(--muted);
+}
+
+.svc-hero__media {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--placeholder-bg);
+}
+
+.svc-hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 64rem) {
+  .svc-hero__layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: var(--space-lg);
+  }
+}
+
+/* ---------- Accordion ---------- */
+.svc-list {
+  padding-block: var(--space-lg) var(--space-xl);
+}
+
+.svc-list__title {
+  margin-block-end: var(--space-md);
+  font-family: var(--font-heading);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-heading);
+}
+
+.accordion {
+  border-block-start: 1px solid var(--line);
+}
+
+.accordion__item {
+  border-block-end: 1px solid var(--line);
+  /* /services/#<slug> lands with the item clear of the fixed header. */
+  scroll-margin-top: 1rem;
+}
+
+.accordion__heading {
+  font-size: inherit;
+}
+
+.accordion__trigger {
+  display: grid;
+  grid-template-columns: 4rem 1px minmax(0, 1fr) auto 2rem;
+  align-items: center;
+  column-gap: clamp(1rem, 2vw, 1.75rem);
+  width: 100%;
+  min-height: 4.5rem;
+  padding-block: 1.25rem;
+  text-align: start;
+  color: var(--fg);
+  border-block-end: 1px solid transparent;
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+/* Gold number, then a thin gold rule. */
+.accordion__num {
+  grid-column: 1;
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  letter-spacing: 0;
+  color: var(--gindi-gold);
+}
+
+.accordion__trigger::before {
+  content: "";
+  grid-column: 2;
+  grid-row: 1;
+  width: 1px;
+  height: 2rem;
+  background: var(--gindi-gold);
+  opacity: 0.6;
+}
+
+.accordion__name {
+  grid-column: 3;
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+  line-height: 1.15;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+/* The logo's keystone marks the open service. */
+.accordion__keystone {
+  grid-column: 4;
+  width: 1.1rem;
+  height: 1.4rem;
+  background: var(--gindi-gold);
+  clip-path: polygon(0 0, 100% 0, 83% 100%, 17% 100%);
+  opacity: 0;
+  transform: translateY(-0.25rem);
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+
+/* Plus that turns into a minus. */
+.accordion__icon {
+  grid-column: 5;
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+  justify-self: end;
+}
+
+.accordion__icon::before,
+.accordion__icon::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1.5px;
+  background: currentColor;
+  translate: 0 -50%;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.accordion__icon::after {
+  transform: rotate(90deg);
+}
+
+.accordion__item.is-open .accordion__trigger {
+  border-block-end-color: var(--gindi-gold);
+}
+
+.accordion__item.is-open .accordion__keystone {
+  opacity: 1;
+  transform: none;
+}
+
+.accordion__item.is-open .accordion__icon::after {
+  transform: rotate(0deg);
+}
+
+@media (hover: hover) {
+  .accordion__trigger:hover .accordion__name {
+    transform: translateX(0.375rem);
+  }
+
+  [dir="rtl"] .accordion__trigger:hover .accordion__name {
+    transform: translateX(-0.375rem);
+  }
+}
+
+.accordion__trigger:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Panels open by height (0fr -> 1fr). Without JS every panel is open. */
+.accordion__panel {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.js .accordion__panel {
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 420ms var(--ease-out);
+}
+
+.js .accordion__item.is-open .accordion__panel {
+  grid-template-rows: 1fr;
+}
+
+.accordion__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Closed panels can't be reached by keyboard or read out. */
+.js .accordion__item:not(.is-open) .accordion__inner {
+  visibility: hidden;
+  transition: visibility 0s linear 420ms;
+}
+
+.accordion__body {
+  display: grid;
+  justify-items: start;
+  gap: 1.25rem;
+  padding-block: 1.5rem 2.25rem;
+  padding-inline-start: calc(4rem + 1px + 2 * clamp(1rem, 2vw, 1.75rem));
+  opacity: 1;
+  transform: none;
+  transition: opacity 360ms var(--ease-out) 80ms, transform 360ms var(--ease-out) 80ms;
+}
+
+.js .accordion__item:not(.is-open) .accordion__body {
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+
+.accordion__summary {
+  font-size: var(--fs-lead);
+  color: var(--fg);
+}
+
+.accordion__deliverables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0;
+  list-style: none;
+  color: var(--muted);
+}
+
+.accordion__deliverables li + li {
+  margin-inline-start: 1.25rem;
+  padding-inline-start: 1.25rem;
+  border-inline-start: 1px solid var(--gindi-gold);
+}
+
+.accordion__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2rem;
+  margin-block-start: 0.5rem;
+}
+
+/* Turned off during the first layout (opening an item from the URL). */
+.accordion.is-settling *,
+.accordion.is-settling *::before,
+.accordion.is-settling *::after {
+  transition: none !important;
+}
+
+/* ---------- Free Tools ---------- */
+.svc-tool {
+  padding-block: var(--space-xl);
+}
+
+.svc-tool__layout {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.svc-tool__head {
+  display: grid;
+  justify-items: start;
+  gap: 0.875rem;
+}
+
+.svc-tool__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-heading);
+}
+
+.svc-tool__text {
+  max-width: 34rem;
+  color: var(--muted);
+}
+
+.svc-tool__all {
+  color: var(--fg);
+  background-image: linear-gradient(var(--gindi-gold), var(--gindi-gold));
+  background-size: 1.75rem 1px;
+}
+
+.svc-tool__all:hover {
+  background-size: 100% 1px;
+}
+
+/* Compact tool cards: 4 across on desktop, 2 on tablets, 1 on phones. */
+.tool-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  width: 100%;
+  list-style: none;
+}
+
+@media (min-width: 40rem) {
+  .tool-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .tool-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.5rem 1.375rem;
+  border: 1px solid var(--line);
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+.tool-card:hover {
+  border-color: var(--gindi-gold);
+}
+
+.tool-card__name {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: var(--fw-medium);
+  line-height: 1.2;
+}
+
+.tool-card__text {
+  flex: 1 1 auto;
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.tool-card__status {
+  color: var(--gindi-gold);
+}
+
+.tool-card__cta {
+  margin-block-start: 0.25rem;
+}
+
+.tools-overview .tool-cards {
+  margin-block-start: var(--space-sm);
+}
+
+/* ---------- Ready to discuss ---------- */
+.svc-ready {
+  padding-block: var(--space-lg);
+}
+
+.svc-ready__layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+}
+
+.svc-ready__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 1.5rem + 1.8vw, 3rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.1;
+}
+
+.svc-ready__text {
+  margin-block-start: 0.375rem;
+  color: var(--muted);
+}
+
+/* ---------- Enquiry drawer ---------- */
+.drawer {
+  inset-block: 0;
+  inset-inline: auto 0;
+  width: min(30rem, 100vw);
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: -1rem 0 3rem rgb(28 44 74 / 0.18);
+}
+
+[dir="rtl"] .drawer {
+  inset-inline: auto 0;
+  box-shadow: 1rem 0 3rem rgb(28 44 74 / 0.18);
+}
+
+.drawer::backdrop {
+  background: rgb(28 44 74 / 0.55);
+}
+
+.drawer[open] {
+  animation: drawer-in 360ms var(--ease-out);
+}
+
+.drawer[open]::backdrop {
+  animation: drawer-fade 360ms var(--ease-out);
+}
+
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+}
+
+@keyframes drawer-fade {
+  from { opacity: 0; }
+}
+
+[dir="rtl"] .drawer[open] {
+  animation-name: drawer-in-rtl;
+}
+
+@keyframes drawer-in-rtl {
+  from { transform: translateX(-100%); }
+}
+
+.drawer__panel {
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
+  min-height: 100%;
+  padding: 1.5rem clamp(1.25rem, 4vw, 2.25rem) 2.5rem;
+}
+
+.drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.drawer__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-regular);
+}
+
+.drawer__close {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--line);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.drawer__close:hover {
+  border-color: var(--gindi-gold);
+}
+
+.drawer__close svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.drawer__about {
+  display: grid;
+  gap: 0.25rem;
+  padding-block: 0.875rem;
+  border-block: 1px solid var(--line);
+}
+
+.drawer__about .label {
+  color: var(--muted);
+}
+
+.drawer__about strong {
+  font-family: var(--font-heading);
+  font-size: 1.375rem;
+  font-weight: var(--fw-medium);
+}
+
+.enquiry-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.enquiry-form__field {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.enquiry-form__field label {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+}
+
+.enquiry-form__req {
+  font-weight: var(--fw-regular);
+  color: var(--muted);
+}
+
+.enquiry-form input,
+.enquiry-form select,
+.enquiry-form textarea {
+  width: 100%;
+  min-height: 2.875rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--navy-15);
+  border-radius: 0;
+  background: #fff;
+  color: var(--fg);
+  font: inherit;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.enquiry-form textarea {
+  resize: vertical;
+}
+
+.enquiry-form input:focus-visible,
+.enquiry-form select:focus-visible,
+.enquiry-form textarea:focus-visible {
+  border-color: var(--gindi-navy);
+  outline: 2px solid var(--gindi-navy);
+  outline-offset: 1px;
+}
+
+.enquiry-form__notice {
+  padding: 0.875rem 1rem;
+  border-inline-start: 2px solid var(--gindi-gold);
+  background: var(--navy-08);
+  font-size: var(--fs-small);
+  line-height: 1.55;
+}
+
+.enquiry-form__notice a {
+  font-weight: var(--fw-medium);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.enquiry-form__send:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* "Chat with Us on WhatsApp": the site's button shape, as an outline. */
+.drawer__whatsapp {
+  justify-self: start;
+  border-color: var(--gindi-navy);
+  color: var(--gindi-navy);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.drawer__whatsapp svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
+.drawer__whatsapp:hover {
+  border-color: var(--gindi-gold);
+  background-color: var(--navy-08);
+}
+
+/* ---------- Estimator page ---------- */
+.estimate {
+  padding-block: calc(var(--header-h) + var(--space-lg)) var(--space-xl);
+}
+
+.estimate__layout {
+  display: grid;
+  gap: var(--space-md);
+  justify-items: start;
+}
+
+.estimate__head {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.estimate__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 1.5rem + 3.4vw, 4.5rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.05;
+}
+
+.estimate__lead {
+  font-size: var(--fs-lead);
+  color: var(--muted);
+}
+
+/* ---------- 404 page (reuses the estimator page layout) ---------- */
+.error-page .estimate__layout {
+  min-height: 45vh;
+  align-content: center;
+}
+
+.error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.estimator {
+  width: 100%;
+  min-height: 16rem;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--gindi-ivory) 70%, #fff);
+}
+
+.estimator__soon {
+  display: grid;
+  justify-items: start;
+  gap: 0.875rem;
+  max-width: 36rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.estimator__status {
+  padding: 0.3125rem 0.75rem;
+  background: var(--gindi-navy);
+  color: var(--gindi-ivory);
+}
+
+.estimator__text {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* Back links: the arrow points back. */
+.svc-back {
+  color: var(--fg);
+}
+
+.svc-back .link-arrow__icon {
+  transform: scaleX(-1);
+  color: var(--gindi-gold);
+}
+
+.svc-back:hover .link-arrow__icon {
+  transform: scaleX(-1) translateX(0.25rem);
+}
+
+[dir="rtl"] .svc-back .link-arrow__icon {
+  transform: none;
+}
+
+[dir="rtl"] .svc-back:hover .link-arrow__icon {
+  transform: translateX(-0.25rem);
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 40rem) {
+  .accordion__trigger {
+    grid-template-columns: 2.5rem 1px minmax(0, 1fr) auto 1.5rem;
+    column-gap: 0.875rem;
+  }
+
+  .accordion__body {
+    padding-inline-start: 0;
+  }
+
+  .accordion__deliverables {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .accordion__deliverables li + li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .accordion__panel,
+  .accordion__body,
+  .js .accordion__item:not(.is-open) .accordion__body,
+  .accordion__keystone,
+  .accordion__icon::before,
+  .accordion__icon::after,
+  .accordion__name {
+    transition: none;
+  }
+
+  .js .accordion__item:not(.is-open) .accordion__body {
+    transform: none;
+  }
+
+  .drawer[open],
+  .drawer[open]::backdrop {
+    animation: none;
+  }
+}

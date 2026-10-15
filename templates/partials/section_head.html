@@ -1,0 +1,18 @@
+{% comment %}
+Section heading: rule, numbered eyebrow, title and optional intro.
+Parameters: num, eyebrow, title, intro, title_id, badge (bool).
+{% endcomment %}
+<header class="section-head">
+  <span class="section-head__rule" data-reveal="rule" aria-hidden="true"></span>
+  <p class="eyebrow label" data-reveal>
+    <span class="num">{{ num }}</span>
+    <span class="keystone" aria-hidden="true"></span>
+    <span>{{ eyebrow }}</span>
+  </p>
+  {% if title %}
+  <div class="section-head__body">
+    <h2 class="heading" id="{{ title_id }}" data-reveal>{{ title }}{% if badge and show_placeholders %}<span class="ph-badge">{{ c.ui.placeholder_badge }}</span>{% endif %}</h2>
+    {% if intro %}<p class="section-head__intro" data-reveal>{{ intro }}</p>{% endif %}
+  </div>
+  {% endif %}
+</header>

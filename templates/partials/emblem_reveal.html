@@ -1,0 +1,52 @@
+{% comment %}
+The Gindi Innovations image area with the Geometric G reveal: the arched 3:4
+frame of partials/media.html, plus an SVG (geometry: apps/core/emblem.py,
+motion: static/js/emblem-reveal.js) that shows the same photograph through the
+emblem, then through an arch window that opens to the whole frame.
+
+The <img> is the photograph as it is shown with reduced motion, without JS, and
+to assistive technology; while the reveal plays it is transparent and the SVG
+draws the very same file in the same place (cover crop, centred).
+
+Parameters: image (resolved), sizes.
+{% endcomment %}
+<figure class="media media--tall media--arch emblem-reveal" data-emblem-reveal
+        data-window-start="{{ emblem.window_start }}" data-window-end="{{ emblem.window_end }}">
+  <img class="emblem-reveal__photo" src="{{ image.src }}" srcset="{{ image.srcset }}" sizes="{{ sizes }}"
+       width="{{ image.width }}" height="{{ image.height }}" alt="{{ image.alt }}" loading="lazy" decoding="async"
+       data-emblem-photo>
+
+  <svg class="emblem-reveal__svg" viewBox="{{ emblem.viewbox }}" aria-hidden="true" focusable="false">
+    <defs>
+      {# Rises from the emblem's base: the photograph fills its body bottom-up. #}
+      <linearGradient id="emblem-rise" gradientUnits="userSpaceOnUse" x1="0" y1="357" x2="0" y2="0">
+        <stop offset="0" stop-color="#fff" data-emblem-rise></stop>
+        <stop offset="0" stop-color="#000" data-emblem-rise></stop>
+      </linearGradient>
+      {# Reveal areas only — never drawn: the emblem's filled shape, and the arch window. #}
+      <mask id="emblem-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="{{ emblem.frame.w }}" height="{{ emblem.frame.h }}">
+        <path d="{{ emblem.paths.main }} {{ emblem.paths.arm }} {{ emblem.paths.keystone }}"
+              transform="{{ emblem.place }}" fill="url(#emblem-rise)"></path>
+        <path d="{{ emblem.window }}" fill="#fff" opacity="0" data-emblem-window></path>
+      </mask>
+    </defs>
+    <image width="{{ emblem.frame.w }}" height="{{ emblem.frame.h }}" preserveAspectRatio="xMidYMid slice"
+           mask="url(#emblem-mask)" data-emblem-image></image>
+    {# The visible emblem, outline only: a faint full outline from the start, and the stroke that draws over it. #}
+    <g class="emblem-reveal__ghost" transform="{{ emblem.place }}" fill="none" stroke-width="1.1" data-emblem-ghost>
+      <path d="{{ emblem.paths.main }}"></path>
+      <path d="{{ emblem.paths.arm }}"></path>
+      <path d="{{ emblem.paths.keystone }}"></path>
+    </g>
+    <g class="emblem-reveal__outline" transform="{{ emblem.place }}" fill="none" stroke-width="1.1" data-emblem-outline>
+      <path d="{{ emblem.paths.main }}" pathLength="1" data-emblem-draw="main"></path>
+      <path d="{{ emblem.paths.arm }}" pathLength="1" data-emblem-draw="arm"></path>
+      <path d="{{ emblem.paths.keystone }}" pathLength="1" data-emblem-draw="keystone"></path>
+    </g>
+  </svg>
+
+  {% if image.illustrative %}
+    {# Temporary image: must never read as a real studio project. #}
+    <figcaption class="media__tag" aria-hidden="true">{{ c.ui.illustrative }}</figcaption>
+  {% endif %}
+</figure>

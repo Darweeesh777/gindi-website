@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% comment %}
+One free tool's page (/free-tools/<slug>/): wire, tiles, bricks, cement.
+
+INTEGRATION AREA — each tool has its own, independent agent:
+- Set FREE_TOOL_<SLUG>_SCRIPT_URL (environment / .env), e.g.
+  FREE_TOOL_TILES_SCRIPT_URL; it reaches this page as tool.script
+  (settings.FREE_TOOL_SCRIPTS). The page then loads that script, deferred.
+- The agent renders into #tool-<slug> ([data-tool-root="<slug>"]) and should
+  replace or remove [data-tool-placeholder], the "Coming soon" state.
+- Nothing on this page calculates anything by itself.
+{% endcomment %}
+
+{% block title %}{{ tool.name }} — {{ c.tools_page.meta_title }}{% endblock %}
+{% block description %}{{ tool.description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/services-page.css' %}">
+  {% if tool.script %}<script src="{{ tool.script }}" defer data-tool-script="{{ tool.slug }}"></script>{% endif %}
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    <section class="section estimate theme-light" id="top" aria-labelledby="tool-title">
+      <div class="container estimate__layout">
+        <a class="link-arrow svc-back" href="{{ tools_url }}">{% include "partials/arrow.html" %}<span>{{ c.tools_page.back }}</span></a>
+        <header class="estimate__head">
+          <p class="svc-eyebrow label" data-reveal>{{ c.tools_page.eyebrow }}</p>
+          <h1 class="estimate__title" id="tool-title" data-reveal>{{ tool.name }}</h1>
+          <p class="estimate__lead" data-reveal>{{ tool.description }}</p>
+        </header>
+
+        {# This tool's agent mounts here. #}
+        <div class="estimator" id="tool-{{ tool.slug }}" aria-live="polite" data-tool-root="{{ tool.slug }}">
+          <div class="estimator__soon" data-tool-placeholder>
+            <span class="estimator__status label">{{ c.tools_page.status }}</span>
+            <p class="estimator__text">{{ c.tools_page.soon }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% include "partials/footer.html" %}
+{% endblock %}

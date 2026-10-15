@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %}
+About Gindi (/about/, /ar/about/). All text and image references:
+apps/core/about.py. Styles: static/css/about-page.css. Motion (reveals,
+chapter line): static/js/about-page.js; the hero entrance is CSS-only.
+Content is visible without JS: hidden "before reveal" states only apply once
+about-page.js has started (html.ab-motion), and never with reduced motion.
+{% endcomment %}
+
+{% block title %}{{ about.meta_title }}{% endblock %}
+{% block description %}{{ about.meta_description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  {# services-page.css/js: the shared enquiry drawer. #}
+  <link rel="stylesheet" href="{% static 'css/services-page.css' %}">
+  <link rel="stylesheet" href="{% static 'css/about-page.css' %}">
+  <script src="{% static 'js/services-page.js' %}" defer></script>
+  <script src="{% static 'js/about-page.js' %}" defer></script>
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    {# ---------- Hero ---------- #}
+    <section class="ab-hero theme-dark" id="top" aria-labelledby="about-title">
+      <figure class="ab-hero__media">
+        <img src="{{ about.hero.image.src }}" srcset="{{ about.hero.image.srcset }}" sizes="100vw"
+             width="{{ about.hero.image.width }}" height="{{ about.hero.image.height }}" alt="{{ about.hero.image.alt }}"
+             fetchpriority="high" decoding="async">
+      </figure>
+      <div class="ab-hero__shade" aria-hidden="true"></div>
+      <div class="container ab-hero__inner">
+        <p class="ab-hero__eyebrow label">{{ about.hero.eyebrow }}</p>
+        <h1 class="ab-hero__title" id="about-title">{% for line in about.hero.title_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</h1>
+        <a class="ab-hero__scroll label" href="#chapter-1">{{ about.hero.scroll }}<span class="ab-hero__scroll-line" aria-hidden="true"></span></a>
+      </div>
+    </section>
+
+    {# ---------- Chapters 01–03, joined by the chapter line ---------- #}
+    <div class="ab-story" data-story>
+      <div class="ab-story__rail" aria-hidden="true">
+        <div class="container ab-story__rail-box">
+          <span class="ab-line ab-line--base"></span>
+          <span class="ab-line ab-line--accent" data-story-line></span>
+        </div>
+      </div>
+
+      {# Chapter 01 — Who We Are #}
+      <section class="ab-chapter theme-light" id="chapter-1" aria-labelledby="chapter-1-title" data-chapter>
+        <div class="container ab-chapter__wrap">
+          <span class="ab-marker" aria-hidden="true" data-marker></span>
+          <div class="ab-chapter__grid">
+            <div class="ab-chapter__text">
+              <p class="ab-chapter__label label rv rv--sm">{{ about.chapter_label }} <span class="num">01</span></p>
+              <p class="ab-eyebrow label rv rv--sm">{{ about.who.eyebrow }}</p>
+              <h2 class="ab-chapter__title rv rv--head" id="chapter-1-title" data-marker-anchor>{{ about.who.title }}</h2>
+              <p class="ab-chapter__lead rv rv--text">{{ about.who.text }}</p>
+            </div>
+            <figure class="ab-chapter__media rv rv--img">
+              <img src="{{ about.who.image.src }}" srcset="{{ about.who.image.srcset }}"
+                   sizes="(min-width: 64rem) 46vw, 100vw" width="{{ about.who.image.width }}" height="{{ about.who.image.height }}"
+                   alt="{{ about.who.image.alt }}" loading="lazy" decoding="async">
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      {# Chapter 02 — What We Do (image left, text right) #}
+      <section class="ab-chapter ab-chapter--reverse theme-light" id="chapter-2" aria-labelledby="chapter-2-title" data-chapter>
+        <div class="container ab-chapter__wrap">
+          <span class="ab-marker" aria-hidden="true" data-marker></span>
+          <div class="ab-chapter__grid">
+            <div class="ab-chapter__text">
+              <p class="ab-chapter__label label rv rv--sm">{{ about.chapter_label }} <span class="num">02</span></p>
+              <h2 class="ab-chapter__title rv rv--head" id="chapter-2-title" data-marker-anchor>{{ about.what.title }}</h2>
+              <p class="ab-chapter__lead rv rv--text">{{ about.what.text }}</p>
+              <ul class="ab-services" role="list">
+                {% for service in about.what.services %}
+                  <li class="rv rv--item" style="--i: {{ forloop.counter0 }}">
+                    <a class="ab-service" href="{{ service.url }}">
+                      {% include "partials/about_icon.html" with icon=service.icon %}
+                      <span>{{ service.name }}</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+              <a class="ab-arrow-link rv rv--text" href="{{ services_url }}">{{ about.what.link }}<span class="ab-arrow" aria-hidden="true">→</span></a>
+            </div>
+            <figure class="ab-chapter__media rv rv--img">
+              <img src="{{ about.what.image.src }}" srcset="{{ about.what.image.srcset }}"
+                   sizes="(min-width: 64rem) 46vw, 100vw" width="{{ about.what.image.width }}" height="{{ about.what.image.height }}"
+                   alt="{{ about.what.image.alt }}" loading="lazy" decoding="async">
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      {# Chapter 03 — How We Work (contrasting band) #}
+      <section class="ab-chapter ab-chapter--how theme-dark" id="chapter-3" aria-labelledby="chapter-3-title" data-chapter>
+        <div class="container ab-chapter__wrap">
+          <span class="ab-marker" aria-hidden="true" data-marker></span>
+          <div class="ab-how">
+            <div class="ab-how__head">
+              <p class="ab-chapter__label label rv rv--sm">{{ about.chapter_label }} <span class="num">03</span></p>
+              <p class="ab-eyebrow label rv rv--sm">{{ about.how.eyebrow }}</p>
+              <h2 class="ab-chapter__title ab-how__title rv rv--head" id="chapter-3-title" data-marker-anchor>{% for line in about.how.title_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</h2>
+            </div>
+            <div class="ab-how__steps">
+              <ol class="ab-timeline" role="list">
+                {% for step in about.how.steps %}
+                  <li class="ab-step" data-step>
+                    <span class="ab-step__dot" aria-hidden="true"></span>
+                    <div class="ab-step__body">
+                      <h3 class="ab-step__title"><span class="ab-step__num num">{{ step.number }}</span> {{ step.title }}</h3>
+                      <p class="ab-step__text">{{ step.text }}</p>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ol>
+              <p class="ab-how__note rv rv--text">{{ about.how.note }}</p>
+            </div>
+            <figure class="ab-how__media rv rv--portrait">
+              <img src="{{ about.how.image.src }}" srcset="{{ about.how.image.srcset }}"
+                   sizes="(min-width: 64rem) 22vw, (min-width: 40rem) 40vw, 100vw" width="{{ about.how.image.width }}"
+                   height="{{ about.how.image.height }}" alt="{{ about.how.image.alt }}" loading="lazy" decoding="async">
+            </figure>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    {# ---------- Detail photography ---------- #}
+    <section class="ab-details theme-light" aria-label="{{ about.details.caption }}" data-reveal-group>
+      <div class="container">
+        <div class="ab-details__grid">
+          {% for image in about.details.images %}
+            <figure class="ab-details__item rv rv--detail" style="--i: {{ forloop.counter0 }}">
+              <img src="{{ image.src }}" srcset="{{ image.srcset }}" sizes="(min-width: 48rem) 45vw, 100vw"
+                   width="{{ image.width }}" height="{{ image.height }}" alt="{{ image.alt }}" loading="lazy" decoding="async">
+            </figure>
+          {% endfor %}
+        </div>
+        <p class="ab-details__caption rv rv--caption"><span class="ab-details__line" aria-hidden="true"></span>{{ about.details.caption }}</p>
+      </div>
+    </section>
+
+    {# ---------- Closing call to action ---------- #}
+    <section class="ab-closing theme-light" aria-labelledby="closing-title" data-reveal-group>
+      <div class="container ab-closing__inner">
+        <img class="ab-closing__mark" src="{% static 'images/brand/gindi-monogram-transparent.png' %}"
+             width="1109" height="1419" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <h2 class="ab-closing__title rv rv--closing" id="closing-title">{{ about.closing.title }}</h2>
+        <div class="ab-closing__actions rv rv--buttons">
+          {# Opens the shared enquiry drawer (no service preselected); without JS, goes to the homepage contact section. #}
+          <a class="btn btn--primary" href="{{ nav_base }}#contact" aria-haspopup="dialog" data-enquire="">{{ about.closing.discuss }}</a>
+          {% if whatsapp_url %}
+            <a class="ab-arrow-link" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{{ about.closing.whatsapp }}<span class="ab-arrow" aria-hidden="true">→</span><span class="visually-hidden"> ({{ c.enquiry.new_window }})</span></a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% include "partials/enquiry_drawer.html" %}
+  {% include "partials/footer.html" %}
+{% endblock %}

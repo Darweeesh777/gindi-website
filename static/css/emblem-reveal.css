@@ -1,0 +1,51 @@
+/*
+ * Gindi Innovations — the Geometric G reveal in the Gindi Innovations section
+ *
+ * The figure is the section's arched 3:4 image area (base.css .media--arch).
+ * With motion allowed and JS running, the SVG draws the photograph through
+ * the emblem (static/js/emblem-reveal.js) and the <img> stays transparent but
+ * in place, for layout and assistive technology. Otherwise the <img> shows the
+ * completed image and the SVG is not rendered.
+ */
+
+.emblem-reveal__svg {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  /* The same arched clip as the image. */
+  border-radius: 50cqi 50cqi 0 0;
+  overflow: hidden;
+}
+
+/* Thin muted-bronze outline. The ghost is the faint full outline shown from
+   the start; the outline draws over it with dash offsets (pathLength = 1).
+   JS keeps both strokes near 1.25px at any frame size. */
+.emblem-reveal__ghost,
+.emblem-reveal__outline {
+  stroke: #9c7646;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.emblem-reveal__ghost {
+  stroke-opacity: 0.32;
+}
+
+.emblem-reveal__outline path {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .emblem-reveal:not(.is-reveal-off) .emblem-reveal__svg {
+    display: block;
+  }
+
+  .js .emblem-reveal:not(.is-reveal-off) .emblem-reveal__photo {
+    opacity: 0;
+  }
+}

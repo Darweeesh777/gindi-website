@@ -1,0 +1,50 @@
+{% load static %}
+<section class="hero theme-dark" id="top" aria-labelledby="hero-title">
+  <div class="hero__media" data-parallax>
+    {% if c.hero.image %}
+      {# Portrait screens (phones, portrait tablets) get the vertical composition. #}
+      <picture>
+        <source media="(orientation: portrait)" srcset="{{ c.hero.image_mobile.srcset }}" sizes="100vw"
+                width="{{ c.hero.image_mobile.width }}" height="{{ c.hero.image_mobile.height }}">
+        <img src="{{ c.hero.image.src }}" srcset="{{ c.hero.image.srcset }}" sizes="100vw"
+             width="{{ c.hero.image.width }}" height="{{ c.hero.image.height }}" alt="{{ c.hero.image.alt }}"
+             fetchpriority="high" decoding="async">
+      </picture>
+    {% else %}
+      <div class="hero__placeholder placeholder" aria-hidden="true">
+        {% include "partials/placeholder_art.html" with art="room" %}
+      </div>
+    {% endif %}
+  </div>
+  <div class="hero__shade" aria-hidden="true"></div>
+
+  <div class="hero__inner container">
+    <p class="hero__eyebrow label hero-intro" style="--i: 0">
+      <span class="keystone" aria-hidden="true"></span>
+      <span>{{ c.hero.eyebrow }}</span>
+    </p>
+    <h1 class="hero__title display hero-intro" id="hero-title" style="--i: 1">
+      {{ c.hero.title|safe }}{% if show_placeholders %}<span class="ph-badge">{{ c.ui.placeholder_badge }}</span>{% endif %}
+    </h1>
+    <p class="hero__lead lead hero-intro" style="--i: 2">{{ c.hero.lead }}</p>
+    <div class="hero__actions hero-intro" style="--i: 3">
+      <a class="btn hero__quote" href="#contact">{{ c.hero.cta_primary }}</a>
+      <a class="link-arrow hero__services" href="{{ tools_url }}">{{ c.hero.cta_secondary }}{% include "partials/arrow.html" %}</a>
+    </div>
+  </div>
+
+  <div class="hero__meta container hero-intro" style="--i: 4">
+    <p class="label">{{ c.hero.location }}</p>
+    {% if not c.hero.image %}
+      <p class="hero__image-note">
+        <span class="placeholder__kind">{{ c.ui.image_placeholder }}</span>
+        <span>{{ c.hero.image_label }} · <span class="num">{{ c.hero.image_spec }}</span></span>
+      </p>
+    {% elif c.hero.image.illustrative %}
+      <p class="hero__image-note"><span class="placeholder__kind">{{ c.ui.illustrative_note }}</span></p>
+    {% endif %}
+    <a class="hero__scroll label" href="#projects" aria-hidden="true" tabindex="-1">
+      <span>{{ c.ui.scroll }}</span><span class="hero__scroll-line"></span>
+    </a>
+  </div>
+</section>

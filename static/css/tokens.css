@@ -1,0 +1,92 @@
+/*
+ * Gindi Innovations — design tokens
+ *
+ * Brand colours come from logo/Gindi-Innovations-Brand-Guide.svg
+ * (see docs/brand-guidelines.md). Everything else here (type, spacing,
+ * motion) is a website design decision, not a documented brand rule.
+ *
+ * Contrast (WCAG 2):
+ *   Off-white on navy 12.4:1 · Yellow on navy 9.1:1 · Gold on navy 4.7:1
+ *   Navy on off-white 12.4:1
+ *   Gold on off-white 2.6:1 and yellow on off-white 1.4:1 — never use as
+ *   text or focus colours on light backgrounds.
+ */
+
+:root {
+  /* Brand colours */
+  --gindi-navy: #1c2c4a;   /* Primary background and large surfaces */
+  --gindi-gold: #c8892b;   /* Architectural gold: emblem, restrained accents */
+  --gindi-ivory: #f4f1ec;  /* Warm off-white: light background, light text */
+  --gindi-yellow: #ffca36; /* Bright accent: small highlights only */
+
+  /* Neutral tints derived from the brand colours (opacity only) */
+  --ivory-72: rgb(244 241 236 / 0.72);
+  --ivory-18: rgb(244 241 236 / 0.18);
+  --ivory-10: rgb(244 241 236 / 0.1);
+  --navy-75: rgb(28 44 74 / 0.75);
+  --navy-15: rgb(28 44 74 / 0.15);
+  --navy-08: rgb(28 44 74 / 0.08);
+
+  /* Typography */
+  --font-serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-sans: "Manrope", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --font-heading: var(--font-serif);
+  --font-body: var(--font-sans);
+
+  --fs-display: clamp(2.75rem, 1.4rem + 5.6vw, 6.75rem);
+  --fs-h2: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
+  --fs-h3: clamp(1.5rem, 1.2rem + 1.1vw, 2.125rem);
+  --fs-statement: clamp(1.875rem, 1.25rem + 2.6vw, 3.5rem);
+  --fs-lead: clamp(1.0625rem, 0.98rem + 0.35vw, 1.3125rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.75rem;
+
+  --lh-display: 1.02;
+  --lh-heading: 1.1;
+  --lh-body: 1.7;
+  --tracking-label: 0.22em;
+  --tracking-display: -0.015em;
+
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+
+  /* Layout */
+  --container: 90rem;
+  --gutter: clamp(1.25rem, 0.6rem + 3.2vw, 4.5rem);
+  --grid-gap: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+  --space-section: clamp(6rem, 3.5rem + 9vw, 12rem);
+  --space-xl: clamp(3.5rem, 2.5rem + 4vw, 6.5rem);
+  --space-lg: clamp(2.25rem, 1.75rem + 2vw, 4rem);
+  --space-md: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+  --space-sm: 1rem;
+  --space-xs: 0.5rem;
+  --header-h: 5rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 240ms;
+  --dur-base: 600ms;
+  --dur-slow: 1100ms;
+  --dur-cinematic: 1600ms;
+}
+
+/* Arabic: its own typefaces, no letter-spacing, roomier line heights. */
+:root:lang(ar) {
+  --font-serif: "Noto Naskh Arabic", "Cormorant Garamond", "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans Arabic", "Manrope", "Segoe UI", Tahoma, sans-serif;
+
+  --fs-display: clamp(2.5rem, 1.4rem + 4.6vw, 5.75rem);
+  --fs-h2: clamp(2rem, 1.4rem + 2.5vw, 3.625rem);
+  --fs-statement: clamp(1.625rem, 1.15rem + 2vw, 2.875rem);
+  --fs-body: 1.125rem;
+  --fs-label: 0.9375rem;
+
+  --lh-display: 1.35;
+  --lh-heading: 1.4;
+  --lh-body: 1.9;
+  --tracking-label: 0;
+  --tracking-display: 0;
+}

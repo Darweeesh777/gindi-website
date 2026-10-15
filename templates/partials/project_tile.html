@@ -1,0 +1,35 @@
+{% comment %}
+One image in a project's group on the Projects page.
+Parameters: tile (from projects.py: kind photo|video|placeholder), project,
+size (large|small), more (count for the "+N photos" link, optional).
+{% endcomment %}
+<figure class="tile tile--{{ size }}{% if tile.kind == 'placeholder' %} tile--placeholder{% endif %}">
+  {% if tile.kind == 'photo' %}
+    <img src="{{ tile.image.src }}" srcset="{{ tile.image.srcset }}"
+         sizes="{% if size == 'large' %}(min-width: 64rem) 60vw, 100vw{% else %}(min-width: 64rem) 30vw, 50vw{% endif %}"
+         width="{{ tile.image.width }}" height="{{ tile.image.height }}" alt="{{ tile.image.alt }}"
+         {% if size == 'large' %}style="object-position: {{ project.focus }};"{% endif %} loading="lazy" decoding="async">
+    {% if tile.image.illustrative %}
+      {# Temporary image: must never read as a real studio project. #}
+      <span class="media__tag" aria-hidden="true">{{ c.ui.illustrative }}</span>
+    {% endif %}
+  {% elif tile.kind == 'video' %}
+    {# Film preview: the poster until the visitor presses play (no autoplay). #}
+    <div class="tile__video" data-video-tile data-src="{{ tile.src }}">
+      {% if tile.poster %}
+        <img src="{{ tile.poster.src }}" srcset="{{ tile.poster.srcset }}" sizes="(min-width: 64rem) 60vw, 100vw"
+             width="{{ tile.poster.width }}" height="{{ tile.poster.height }}" alt="" loading="lazy" decoding="async">
+      {% endif %}
+      <button class="tile__play" type="button" data-play aria-label="{{ c.projects_page.play }}: {{ project.name }}">
+        <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="23" fill="rgb(28 44 74 / .55)" stroke="#f4f1ec" stroke-width="1.5"/><path d="M20 16v16l13-8z" fill="#f4f1ec"/></svg>
+      </button>
+      <span class="tile__film">{{ tile.title|default:c.projects_page.film }}</span>
+    </div>
+  {% else %}
+    <div class="placeholder" aria-hidden="true">{% include "partials/placeholder_art.html" with art="room" %}</div>
+    <figcaption class="tile__missing label">{{ c.projects_page.photo_missing }}</figcaption>
+  {% endif %}
+  {% if more %}
+    <a class="tile__more" href="{{ project.detail_url }}">+{{ more }} {{ c.projects_page.more }}<span class="visually-hidden">: {{ project.name }}, {{ c.projects_page.more_label }}</span></a>
+  {% endif %}
+</figure>

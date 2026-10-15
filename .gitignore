@@ -1,0 +1,53 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables / secrets (only the placeholder template is tracked)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+client_secret*.json
+
+# Python caches and build output
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local databases
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+*.sqlite3-journal
+
+# User-uploaded media and collected static files (built on the server)
+/media/
+/staticfiles/
+
+# Source image masters: kept locally, not deployed. The site only uses the
+# derivatives in static/images/site/ and static/images/brand/ (sub-folders
+# stay tracked); the originals at the root of static/images/ are excluded.
+/static/images/*
+!/static/images/*/
+
+# Tooling / test output
+.coverage
+htmlcov/
+*.log
+
+# Editor / OS / local agent settings
+.vscode/
+.idea/
+.claude/
+Thumbs.db
+Desktop.ini
+.DS_Store

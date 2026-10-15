@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% comment %}
+Services page (/services/, /ar/services/). Services: apps/core/services.py;
+copy: content.py (services_page, enquiry). Each accordion item's id is the
+service slug, so /services/#<slug> opens it (static/js/services-page.js).
+Without JS every item is open and "Enquire" links go to the homepage contact
+section; with JS they open the enquiry drawer with the service prefilled.
+{% endcomment %}
+
+{% block title %}{{ c.services_page.meta_title }}{% endblock %}
+{% block description %}{{ c.services_page.meta_description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/services-page.css' %}">
+  <script src="{% static 'js/services-page.js' %}" defer></script>
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    <section class="svc-hero theme-light" id="top" aria-labelledby="services-title">
+      <div class="container svc-hero__layout">
+        <div class="svc-hero__text">
+          <p class="svc-eyebrow label" data-reveal>{{ c.services_page.eyebrow }}</p>
+          <h1 class="svc-hero__title" id="services-title" data-reveal>{{ c.services_page.title }}</h1>
+          <p class="svc-hero__lead" data-reveal>{{ c.services_page.lead }}</p>
+          <a class="link-arrow svc-link" href="{{ nav_base }}#contact" aria-haspopup="dialog" data-enquire="" data-reveal>
+            {{ c.services_page.discuss }}{% include "partials/arrow.html" %}
+          </a>
+        </div>
+        <figure class="svc-hero__media" data-reveal>
+          <img src="{{ hero_image.src }}" srcset="{{ hero_image.srcset }}" sizes="(min-width: 64rem) 52vw, 100vw"
+               width="{{ hero_image.width }}" height="{{ hero_image.height }}" alt="{{ hero_image.alt }}"
+               fetchpriority="high" decoding="async">
+          {% if hero_image.illustrative %}<figcaption class="media__tag" aria-hidden="true">{{ c.ui.illustrative }}</figcaption>{% endif %}
+        </figure>
+      </div>
+    </section>
+
+    <section class="svc-list theme-light" aria-labelledby="help-title">
+      <div class="container">
+        <h2 class="svc-list__title" id="help-title" data-reveal>{{ c.services_page.help }}</h2>
+        {% if show_placeholders %}<span class="ph-badge">{{ c.ui.placeholder_badge }}</span>{% endif %}
+
+        <div class="accordion" data-accordion>
+          {% for service in services %}
+            <div class="accordion__item{% if forloop.first %} is-open{% endif %}" id="{{ service.slug }}" data-accordion-item>
+              <h3 class="accordion__heading">
+                <button class="accordion__trigger" type="button" id="{{ service.slug }}-trigger"
+                        aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="{{ service.slug }}-panel"
+                        data-accordion-trigger>
+                  <span class="accordion__num num" aria-hidden="true">{{ service.number }}</span>
+                  <span class="accordion__name">{{ service.name }}</span>
+                  <span class="accordion__keystone" aria-hidden="true"></span>
+                  <span class="accordion__icon" aria-hidden="true"></span>
+                </button>
+              </h3>
+              <div class="accordion__panel" id="{{ service.slug }}-panel" role="region" aria-labelledby="{{ service.slug }}-trigger"
+                   data-accordion-panel>
+                <div class="accordion__inner">
+                  <div class="accordion__body">
+                    {% if service.summary %}<p class="accordion__summary">{{ service.summary }}</p>{% endif %}
+                    {% if service.deliverables %}
+                      <h4 class="visually-hidden">{{ c.services_page.deliverables }}</h4>
+                      <ul class="accordion__deliverables" role="list">
+                        {% for item in service.deliverables %}<li>{{ item }}</li>{% endfor %}
+                      </ul>
+                    {% endif %}
+                    <div class="accordion__actions">
+                      <a class="btn btn--primary" href="{{ nav_base }}#contact" aria-haspopup="dialog" data-enquire="{{ service.slug }}">
+                        {{ c.services_page.enquire }}<span class="visually-hidden">: {{ service.name }}</span>
+                      </a>
+                      {% if service.related_url %}
+                        <a class="link-arrow svc-link" href="{{ service.related_url }}">{{ c.services_page.related }}{% include "partials/arrow.html" %}</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    {# Free Tools: one card per tool (apps/core/tools.py), each opening its own page. No inputs here. #}
+    <section class="svc-tool theme-dark" aria-labelledby="tool-title">
+      <div class="container svc-tool__layout">
+        <div class="svc-tool__head">
+          <p class="svc-eyebrow label" data-reveal>{{ c.tools_page.eyebrow }}</p>
+          <h2 class="svc-tool__title" id="tool-title" data-reveal>{{ c.services_page.tools_title }}</h2>
+          <p class="svc-tool__text" data-reveal>{{ c.services_page.tools_text }}</p>
+          <a class="link-arrow svc-tool__all" href="{{ tools_url }}" data-reveal>{{ c.tools_page.all }}{% include "partials/arrow.html" %}</a>
+        </div>
+        {% include "partials/tool_cards.html" %}
+      </div>
+    </section>
+
+    <section class="svc-ready theme-light" aria-labelledby="ready-title">
+      <div class="container svc-ready__layout">
+        <div>
+          <h2 class="svc-ready__title" id="ready-title">{{ c.services_page.ready_title }}</h2>
+          <p class="svc-ready__text">{{ c.services_page.ready_text }}</p>
+        </div>
+        <a class="btn btn--primary" href="{{ nav_base }}#contact" aria-haspopup="dialog" data-enquire="">{{ c.services_page.ready_cta }}</a>
+      </div>
+    </section>
+  </main>
+
+  {% include "partials/enquiry_drawer.html" %}
+  {% include "partials/footer.html" %}
+{% endblock %}

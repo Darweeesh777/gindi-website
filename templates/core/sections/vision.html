@@ -1,0 +1,62 @@
+{% comment %}
+"From Vision to Reality": the design and the finished space in one frame.
+Data: apps/core/vision.py (project name, images, alt text); labels:
+content.py (c.vision). Both layers fill the same frame with the same crop;
+dragging only changes how much of the design layer is clipped
+(static/js/compare-slider.js). Without JS it rests at 50%.
+{% endcomment %}
+<section class="section vision theme-light" id="vision" aria-labelledby="vision-title">
+  <div class="container">
+    <header class="vision__head">
+      <h2 class="heading vision__title" id="vision-title" data-reveal>{{ c.vision.title }}</h2>
+      <p class="vision__project" data-reveal>{{ vision.project_name }}</p>
+    </header>
+
+    <div class="compare" data-compare data-label-design="{{ c.vision.design_short }}"
+         data-label-reality="{{ c.vision.reality_short }}">
+      <div class="compare__frame" data-compare-frame>
+        <figure class="compare__layer compare__layer--reality">
+          {% if vision.reality.image %}
+            <img src="{{ vision.reality.image.src }}" srcset="{{ vision.reality.image.srcset }}"
+                 sizes="(min-width: 90rem) 1312px, calc(100vw - 2.5rem)" width="{{ vision.reality.image.width }}"
+                 height="{{ vision.reality.image.height }}" alt="{{ vision.reality.alt }}"
+                 style="object-position: {{ vision.focus }};" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/vision_placeholder.html" with kind="reality" %}
+            <figcaption class="compare__missing compare__missing--reality">{{ c.vision.reality_missing }}</figcaption>
+          {% endif %}
+        </figure>
+        <figure class="compare__layer compare__layer--design">
+          {% if vision.design.image %}
+            <img src="{{ vision.design.image.src }}" srcset="{{ vision.design.image.srcset }}"
+                 sizes="(min-width: 90rem) 1312px, calc(100vw - 2.5rem)" width="{{ vision.design.image.width }}"
+                 height="{{ vision.design.image.height }}" alt="{{ vision.design.alt }}"
+                 style="object-position: {{ vision.focus }};" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/vision_placeholder.html" with kind="design" %}
+            <figcaption class="compare__missing compare__missing--design">{{ c.vision.design_missing }}</figcaption>
+          {% endif %}
+        </figure>
+
+        <div class="compare__divider">
+          {# The handle is the slider: drag it, or focus it and use the arrow keys. #}
+          <div class="compare__handle" role="slider" tabindex="0" aria-label="{{ c.vision.slider }}"
+               aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+               aria-valuetext="50% {{ c.vision.design_short }}, 50% {{ c.vision.reality_short }}" data-compare-handle>
+            <svg viewBox="0 0 56 60" aria-hidden="true" focusable="false">
+              {# The logo's keystone, with left/right arrows. #}
+              <path d="M4 4h48l-8 52H12z" fill="#f4f1ec" stroke="#c8892b" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="m24 23-6 7 6 7M32 23l6 7-6 7" fill="none" stroke="#1c2c4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare__labels">
+        <span class="label">{{ c.vision.design }}</span>
+        <span class="label">{{ c.vision.reality }}</span>
+      </div>
+      <p class="compare__hint label">{{ c.vision.hint }}</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,40 @@
+{% load static %}
+<footer class="site-footer theme-dark">
+  <div class="container">
+    <div class="site-footer__divider" aria-hidden="true">
+      <span></span><span class="keystone"></span><span></span>
+    </div>
+
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <a href="{% url url_name %}#top" aria-label="{{ c.ui.home }}">
+          <img class="site-footer__logo" src="{% static 'images/brand/gindi-logo.png' %}" alt="Gindi Innovations"
+               width="435" height="585" loading="lazy">
+        </a>
+        <p class="site-footer__tagline">{{ c.footer.tagline }}</p>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="{{ c.ui.footer_nav }}">
+        <ul role="list">
+          {% for item in nav %}
+            <li><a href="{{ item.href }}">{{ item.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      {# PLACEHOLDER: contact and social details. #}
+      <div class="site-footer__contact">
+        {% for item in c.contact.details %}
+          <p><span class="label">{{ item.label }}</span><span class="is-placeholder">{{ item.value }}</span></p>
+        {% endfor %}
+        <p><span class="label">{{ c.contact.social_label }}</span><span class="is-placeholder">{{ c.contact.social }}</span></p>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>&copy; <span class="num">{% now "Y" %}</span> Gindi Innovations. {{ c.ui.rights }}</p>
+      {% include "partials/lang_switch.html" %}
+      <a class="site-footer__top" href="#top">{{ c.ui.back_to_top }}</a>
+    </div>
+  </div>
+</footer>

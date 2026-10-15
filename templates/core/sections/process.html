@@ -1,0 +1,17 @@
+<section class="section process theme-dark" id="process" aria-labelledby="process-title">
+  <div class="container">
+    {% include "partials/section_head.html" with num="03" eyebrow=c.process.eyebrow title=c.process.title intro=c.process.intro title_id="process-title" badge=True %}
+
+    {# PLACEHOLDER: illustrative stages until the studio confirms its workflow. #}
+    <ol class="process__steps" role="list" data-reveal="process">
+      {% for step in c.process.steps %}
+        <li class="step" style="--d: {{ forloop.counter0 }}">
+          <span class="step__marker" aria-hidden="true"><span class="keystone"></span></span>
+          <span class="num step__index">{{ forloop.counter|stringformat:"02d" }}</span>
+          <h3 class="step__title">{{ step.title }}</h3>
+          <p class="step__text">{{ step.text }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>

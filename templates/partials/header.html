@@ -1,0 +1,37 @@
+{% load static %}
+<a class="skip-link" href="#main">{{ c.ui.skip }}</a>
+
+{# Other pages have no dark hero under the header, so it is solid there. #}
+<header class="site-header theme-dark{% if page != 'home' %} is-solid{% endif %}" data-header>
+  <div class="site-header__bar container">
+    <a class="site-header__logo" href="{% url url_name %}#top" aria-label="{{ c.ui.home }}">
+      {# Monogram only: at header height the full lockup's tagline would be illegible. #}
+      <img src="{% static 'images/brand/gindi-monogram.png' %}" alt="" width="279" height="357">
+    </a>
+
+    <button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="site-menu"
+            data-menu-toggle data-label-open="{{ c.ui.menu_open }}" data-label-close="{{ c.ui.menu_close }}">
+      <span class="visually-hidden" data-menu-toggle-label>{{ c.ui.menu_open }}</span>
+      <span class="site-header__toggle-lines" aria-hidden="true"><span></span><span></span></span>
+    </button>
+
+    <div class="site-header__panel" id="site-menu" data-menu>
+      <img class="site-header__panel-logo" src="{% static 'images/brand/gindi-logo.png' %}" alt=""
+           width="435" height="585" loading="lazy">
+
+      <nav class="site-nav" aria-label="{{ c.ui.primary_nav }}">
+        <ul class="site-nav__list">
+          {# Built in views._context: sections with their own page link there; the rest to homepage sections. #}
+          {% for item in nav %}
+            <li><a class="site-nav__link" href="{{ item.href }}"{% if item.current %} aria-current="{{ item.current }}"{% endif %}{% if item.section %} data-nav-link{% endif %}>{{ item.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <div class="site-header__actions">
+        {% include "partials/lang_switch.html" %}
+        <a class="btn btn--primary site-header__cta" href="{{ nav_base }}#contact" data-nav-link>{{ c.ui.enquire }}</a>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,1230 @@
+/* Gindi Innovations — homepage sections, in page order */
+
+/* ---------- 1. Hero ---------- */
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.hero__media {
+  position: absolute;
+  inset: -4% 0 0;
+  z-index: -2;
+  will-change: transform;
+}
+
+.hero__media > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__placeholder {
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 62%, rgb(244 241 236 / 0.09), transparent 70%),
+    var(--placeholder-bg);
+}
+
+.hero__placeholder .placeholder__art {
+  opacity: 0.6;
+}
+
+/* Navy shade: a veil at the top for the header, deep at the base and along the
+   reading-start side where the text sits, leaving the image's centre bright. */
+.hero__shade {
+  --shade-side: to right;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to bottom, rgb(28 44 74 / 0.6), rgb(28 44 74 / 0) 24%),
+    linear-gradient(to top, rgb(28 44 74 / 0.95), rgb(28 44 74 / 0.78) 30%, rgb(28 44 74 / 0.5) 55%,
+                    rgb(28 44 74 / 0.12) 80%, rgb(28 44 74 / 0) 92%),
+    linear-gradient(var(--shade-side), rgb(28 44 74 / 0.55), rgb(28 44 74 / 0.2) 45%, rgb(28 44 74 / 0) 65%);
+}
+
+[dir="rtl"] .hero__shade {
+  --shade-side: to left;
+}
+
+/* Portrait screens: the text covers the lower two-thirds. */
+@media (orientation: portrait) {
+  .hero__shade {
+    background:
+      linear-gradient(to bottom, rgb(28 44 74 / 0.55), rgb(28 44 74 / 0) 18%),
+      linear-gradient(to top, rgb(28 44 74 / 0.96), rgb(28 44 74 / 0.86) 40%, rgb(28 44 74 / 0.62) 60%,
+                      rgb(28 44 74 / 0) 82%);
+  }
+}
+
+.hero__inner {
+  align-self: end;
+  display: grid;
+  justify-items: start;
+  gap: var(--space-md);
+  padding-block: calc(var(--header-h) + var(--space-xl)) var(--space-lg);
+}
+
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  color: var(--gindi-yellow);
+}
+
+.hero__title {
+  max-width: 20ch;
+}
+
+.hero__lead {
+  max-width: 32rem;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2rem;
+  margin-block-start: 0.5rem;
+}
+
+/* "Get Quotation": solid ivory, navy text, square corners, gold base line. */
+.hero__quote {
+  background: var(--gindi-ivory);
+  color: var(--gindi-navy);
+  border-width: 0 0 2px;
+  border-color: var(--gindi-gold);
+  border-radius: 0;
+}
+
+.hero__quote:hover {
+  background: #fff;
+  border-color: var(--gindi-yellow);
+}
+
+/* "Free Services": light text and arrow; a short gold underline that runs
+   the full width on hover (the arrow nudges forward, from .link-arrow). */
+.hero__services {
+  min-height: 2.75rem;
+  color: var(--fg);
+  background-image: linear-gradient(var(--gindi-gold), var(--gindi-gold));
+  background-size: 1.75rem 1px;
+}
+
+.hero__services:hover {
+  background-size: 100% 1px;
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding-block: 1.25rem 1.75rem;
+  border-block-start: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.hero__meta > .label {
+  color: var(--muted);
+}
+
+.hero__image-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+}
+
+.hero__scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  color: var(--muted);
+}
+
+.hero__scroll-line {
+  position: relative;
+  width: 3rem;
+  height: 1px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.hero__scroll-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gindi-gold);
+  transform: scaleX(0.35);
+  transform-origin: left;
+}
+
+[dir="rtl"] .hero__scroll-line::after {
+  transform-origin: right;
+}
+
+@media (max-width: 40rem) {
+  .hero__inner {
+    padding-block-end: var(--space-md);
+  }
+
+  .hero__actions .btn {
+    width: 100%;
+  }
+
+  .hero__scroll {
+    display: none;
+  }
+}
+
+/* ---------- 2. Projects: featured carousel ---------- */
+/*
+ * Desktop: project details on the left (35%), the image and its thumbnails on
+ * the right (65%). Below 64rem the details stack above the image. Colours come
+ * from the section theme (theme-dark here), so switching it to theme-light
+ * also works. Behaviour: static/js/projects-carousel.js.
+ */
+.featured {
+  padding-block: var(--space-xl);
+  overflow: clip; /* the oversized monogram never widens the page */
+}
+
+.featured__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+}
+
+/* ----- Details ----- */
+.featured__info {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/* The real monogram (transparent PNG), faint and oversized behind the text. */
+.featured__mark {
+  position: absolute;
+  z-index: -1;
+  inset-block-start: -1.5rem;
+  inset-inline-end: -6%;
+  width: min(17rem, 62%);
+  height: auto;
+  opacity: 0.07;
+  pointer-events: none;
+  user-select: none;
+}
+
+.featured__eyebrow {
+  color: var(--label);
+}
+
+/* All panels share one cell: the block keeps the tallest panel's height, so
+   switching projects never moves what follows. */
+.featured__panels {
+  display: grid;
+  width: 100%;
+}
+
+/* Switching: the outgoing panel fades out in place; then the incoming name,
+   description and button fade in and rise 10px, slightly staggered. */
+.featured__panel {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  min-width: 0;
+  visibility: hidden;
+  transition: visibility 0s linear 200ms;
+}
+
+.featured__panel.is-active {
+  visibility: visible;
+  transition: none;
+}
+
+.featured__panel > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 160ms var(--ease-out),
+    transform 0s linear 200ms; /* reset once hidden */
+}
+
+.featured__panel.is-active > * {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 380ms var(--ease-out) var(--stagger, 140ms),
+    transform 380ms var(--ease-out) var(--stagger, 140ms);
+}
+
+.featured__panel.is-active > :nth-child(2) { --stagger: 200ms; }
+.featured__panel.is-active > :nth-child(3) { --stagger: 260ms; }
+
+.featured__name {
+  max-width: 100%;
+  font-family: var(--font-heading);
+  font-size: clamp(2.75rem, 1.4rem + 3.6vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: var(--tracking-display);
+  color: var(--fg);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+:lang(ar) .featured__name {
+  font-size: clamp(2.25rem, 1.4rem + 2.6vw, 4rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Long names (set in the template): smaller, so they wrap to a sensible height. */
+.featured__name--long,
+:lang(ar) .featured__name--long {
+  font-size: clamp(2rem, 1.3rem + 1.9vw, 3.25rem);
+  line-height: 1.1;
+}
+
+:lang(ar) .featured__name--long {
+  line-height: 1.4;
+}
+
+.featured__work {
+  max-width: 30rem;
+  font-size: var(--fs-lead);
+  font-weight: var(--fw-regular);
+  line-height: 1.65;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* "Explore Project": the site's primary button, with its arrow. */
+.featured__explore {
+  margin-block-start: 0.5rem;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.featured__explore .link-arrow__icon {
+  transition: transform 300ms var(--ease-out);
+}
+
+.featured__explore:hover .link-arrow__icon {
+  transform: translateX(0.25rem);
+}
+
+[dir="rtl"] .featured__explore .link-arrow__icon {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .featured__explore:hover .link-arrow__icon {
+  transform: scaleX(-1) translateX(0.25rem);
+}
+
+/* "View All Projects": light text, gold underline (as in the hero). */
+.featured__all {
+  min-height: 2.75rem;
+  color: var(--fg);
+  background-image: linear-gradient(var(--gindi-gold), var(--gindi-gold));
+  background-size: 1.75rem 1px;
+}
+
+.featured__all:hover {
+  background-size: 100% 1px;
+}
+
+.featured__counter {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-block-start: auto;
+  padding-block-start: var(--space-sm);
+}
+
+.featured__current.num {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 2.2rem + 2.4vw, 4.5rem);
+  font-weight: var(--fw-light);
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--accent);
+}
+
+.featured__total.num {
+  font-family: var(--font-heading);
+  font-size: 1.625rem;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.featured__slash {
+  margin-inline-end: 0.375rem;
+  font-size: 0.85em;
+}
+
+/* ----- Image ----- */
+.featured__visual {
+  display: grid;
+  align-content: start; /* thumbnails stay under the image even beside long text */
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.featured__stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--placeholder-bg);
+  touch-action: pan-y; /* horizontal swipes change project; vertical ones scroll */
+}
+
+.featured__slide {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+}
+
+.featured__slide.is-active {
+  z-index: 1;
+  opacity: 1;
+}
+
+.featured__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.015);
+  transition: transform 450ms var(--ease-out);
+}
+
+.featured__slide.is-active .featured__image {
+  transform: none;
+}
+
+/* Missing or failed image: the branded placeholder underneath shows. */
+.featured__slide.is-broken .featured__image,
+.featured__slide.is-broken .media__tag {
+  display: none;
+}
+
+.featured__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem 1.25rem;
+  background: var(--placeholder-bg);
+}
+
+.featured__placeholder-label {
+  position: relative;
+  color: var(--muted);
+}
+
+/* ----- Thumbnails and arrows ----- */
+.featured__nav {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+  min-width: 0;
+}
+
+.featured__thumbs {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(7.5rem, calc((100% - 3rem) / 4));
+  gap: 1rem;
+  /* Room above for the keystone, and around for focus rings, inside the scroller. */
+  margin: 0 -0.375rem;
+  padding: 1rem 0.375rem 0.375rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  list-style: none;
+}
+
+.featured__thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 1px solid var(--line-soft);
+  background: var(--placeholder-bg);
+  scroll-snap-align: start;
+  transition: border-color 300ms var(--ease-out);
+}
+
+.featured__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+  transition: opacity 300ms var(--ease-out);
+}
+
+/* Shade under the number. */
+.featured__thumb::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(to top, rgb(28 44 74 / 0.55), rgb(28 44 74 / 0));
+  pointer-events: none;
+}
+
+.featured__thumb-num {
+  position: absolute;
+  z-index: 1;
+  inset-block-end: 0.5rem;
+  inset-inline-start: 0.625rem;
+  font-size: 0.75rem;
+  color: var(--gindi-ivory);
+}
+
+.featured__thumb:hover img,
+.featured__thumb[aria-current="true"] img {
+  opacity: 1;
+}
+
+.featured__thumb:hover {
+  border-color: var(--line);
+}
+
+.featured__thumb[aria-current="true"] {
+  border-color: var(--accent);
+}
+
+/* The logo's keystone marks the active project, set into the top edge. */
+.featured__thumb::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: -0.7rem;
+  left: 50%;
+  width: 1.1rem;
+  height: 1.4rem;
+  background: var(--gindi-ivory);
+  clip-path: polygon(0 0, 100% 0, 83% 100%, 17% 100%);
+  opacity: 0;
+  transform: translate(-50%, -0.375rem);
+  transition:
+    opacity 300ms var(--ease-out),
+    transform 350ms var(--ease-out);
+}
+
+.featured__thumb[aria-current="true"]::before {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.featured__thumb:focus-visible {
+  outline-offset: 3px;
+}
+
+.featured__arrows {
+  display: flex;
+  flex: none;
+  gap: 0.875rem;
+  padding-block-end: 0.375rem;
+}
+
+.featured__arrow {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid var(--accent);
+  color: var(--fg);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.featured__arrow:hover {
+  background-color: rgb(200 137 43 / 0.12);
+  color: var(--gindi-yellow);
+}
+
+.featured__arrow svg {
+  width: 0.625rem;
+  height: 1.0625rem;
+}
+
+[dir="rtl"] .featured__arrow svg {
+  transform: scaleX(-1);
+}
+
+/* Without JS only the first project shows; its controls would do nothing. */
+.no-js .featured__nav,
+.no-js .featured__counter {
+  display: none;
+}
+
+/* ----- Desktop: side by side ----- */
+@media (min-width: 64rem) {
+  .featured__layout {
+    grid-template-columns: minmax(0, 35fr) minmax(0, 65fr);
+    column-gap: clamp(2.5rem, 4.5vw, 5rem);
+  }
+
+  .featured__info {
+    padding-block-start: clamp(2rem, 6vw, 6rem);
+  }
+
+  .featured__mark {
+    inset-block-start: -1rem;
+    inset-inline-start: 22%;
+    inset-inline-end: auto;
+    width: min(26rem, 88%);
+  }
+
+  /* Aligns the counter with the thumbnail row. */
+  .featured__counter {
+    padding-block-end: 0.75rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .featured__stage {
+    aspect-ratio: 4 / 3;
+  }
+
+  .featured__nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .featured__arrows {
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Content changes at once, with no movement. */
+  .featured__panel,
+  .featured__panel.is-active,
+  .featured__panel > *,
+  .featured__panel.is-active > *,
+  .featured__slide,
+  .featured__image,
+  .featured__thumb,
+  .featured__thumb img,
+  .featured__thumb::before,
+  .featured__explore .link-arrow__icon {
+    transition: none;
+  }
+
+  .featured__panel > *,
+  .featured__image {
+    transform: none;
+  }
+}
+
+/* ---------- 2b. From Vision to Reality: design/reality comparison ---------- */
+/*
+ * Two layers fill one frame with identical cropping; --pos (set by
+ * static/js/compare-slider.js) is how much of the frame the design layer
+ * covers, from the reading-start edge. Only the clip changes: the images
+ * never move or resize.
+ */
+/* One screen below the navbar: the section is at least that tall, padding
+   included, and the comparison frame takes whatever height is left. When the
+   content needs more (very small screens, zoomed text) the section simply
+   grows; nothing is clipped. */
+.vision {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-h));
+  min-height: calc(100dvh - var(--header-h));
+  padding-block: clamp(1.25rem, 4vh, 3rem);
+}
+
+.vision > .container {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center; /* any spare height goes above and below, evenly */
+  min-height: 0;
+  container-type: inline-size; /* cqw below = the frame's width */
+}
+
+.vision__head {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 2.5rem;
+  margin-block-end: clamp(1rem, 3vh, 2rem);
+}
+
+.vision__title {
+  font-size: min(var(--fs-h2), 9vh);
+}
+
+.vision__project {
+  max-width: 26rem;
+  padding-block-end: 0.5rem;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: end;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+:lang(ar) .vision__project {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 1rem;
+}
+
+/* Grows into the height left under the heading, but no further than the
+   frame's cap plus the labels, so the heading stays with the image. */
+.compare {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: calc(75cqw + 5rem);
+}
+
+/* The frame fills the height left over. Both layers cover it with the same
+   object-fit/position, so they stay aligned and are cropped, never stretched.
+   It never gets taller than 4:3 (portrait phones) or shorter than 14rem. */
+.compare__frame {
+  --pos: 50%;
+  position: relative;
+  flex: 1 1 0;
+  min-height: 14rem;
+  max-height: 75cqw;
+  overflow: hidden;
+  background: var(--placeholder-bg);
+  cursor: ew-resize;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y; /* vertical swipes scroll the page; horizontal ones drag */
+}
+
+.compare__layer {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.compare__layer img,
+.compare__art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* The design sits at the reading start: left in English, right in Arabic. */
+.compare__layer--design {
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+
+[dir="rtl"] .compare__layer--design {
+  clip-path: inset(0 0 0 calc(100% - var(--pos)));
+}
+
+/* "Placeholder: … to be added", kept on each side's own half. */
+.compare__missing {
+  position: absolute;
+  inset-block-start: 0.875rem;
+  max-width: calc(50% - 2.5rem);
+  padding: 0.3125rem 0.625rem;
+  background: rgb(244 241 236 / 0.9);
+  color: var(--gindi-navy);
+  font-size: 0.6875rem;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+:lang(ar) .compare__missing {
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+}
+
+.compare__missing--design {
+  inset-inline-start: 0.875rem;
+}
+
+.compare__missing--reality {
+  inset-inline-end: 0.875rem;
+}
+
+/* Divider: a thin ivory line through the frame, carrying the handle. */
+.compare__divider {
+  position: absolute;
+  z-index: 2;
+  inset-block: 0;
+  left: var(--pos);
+  width: 0;
+}
+
+[dir="rtl"] .compare__divider {
+  left: calc(100% - var(--pos));
+}
+
+.compare__divider::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: -0.5px;
+  width: 1px;
+  background: var(--gindi-ivory);
+  box-shadow: 0 0 0 0.5px rgb(28 44 74 / 0.22);
+}
+
+.compare__handle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.75rem;
+  translate: -50% -50%;
+  cursor: grab;
+  touch-action: none; /* dragging the handle itself never scrolls */
+}
+
+.compare__handle svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 6px rgb(28 44 74 / 0.35));
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.compare__frame:hover .compare__handle svg,
+.compare.is-dragging .compare__handle svg {
+  transform: scale(1.06);
+}
+
+.compare.is-dragging .compare__frame,
+.compare.is-dragging .compare__handle {
+  cursor: grabbing;
+}
+
+.compare__handle:focus-visible {
+  outline: 2px solid var(--gindi-navy);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--gindi-ivory);
+}
+
+.compare__labels {
+  display: flex;
+  flex: none;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-start: 0.875rem;
+  color: var(--fg);
+}
+
+.compare__hint {
+  flex: none;
+  margin-block-start: 0.375rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.no-js .compare__hint {
+  visibility: hidden;
+}
+
+@media (max-width: 40rem) {
+  /* Phones: up to square, so the frame uses more of the tall screen. */
+  .compare {
+    max-height: calc(100cqw + 5rem);
+  }
+
+  .compare__frame {
+    max-height: 100cqw;
+  }
+
+  .vision__project {
+    text-align: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compare__handle svg {
+    transition: none;
+  }
+}
+
+/* ---------- 3. Services ---------- */
+.services__list {
+  border-block-start: 1px solid var(--line);
+}
+
+.service {
+  position: relative;
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1.1fr) minmax(0, 1fr) 2rem;
+  align-items: baseline;
+  column-gap: var(--grid-gap);
+  padding-block: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
+  border-block-end: 1px solid var(--line);
+}
+
+.service::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -1px;
+  height: 1px;
+  background: var(--gindi-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+[dir="rtl"] .service::after {
+  transform-origin: right;
+}
+
+.service__index {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.service__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-light);
+  line-height: var(--lh-heading);
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+:lang(ar) .service__title {
+  font-weight: var(--fw-regular);
+}
+
+.service__text {
+  color: var(--muted);
+  max-width: 28rem;
+}
+
+/* The whole row opens the service on the Services page. */
+.service__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.service__link:focus-visible {
+  outline: none;
+}
+
+.service:has(.service__link:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.services__all {
+  margin-block-start: var(--space-md);
+  color: var(--fg);
+}
+
+.service__mark {
+  justify-self: end;
+  align-self: center;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .service:hover::after {
+    transform: scaleX(1);
+  }
+
+  .service:hover .service__mark {
+    opacity: 1;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .service:hover .service__title {
+    transform: translateX(0.5rem);
+  }
+
+  [dir="rtl"] .service:hover .service__title {
+    transform: translateX(-0.5rem);
+  }
+}
+
+@media (max-width: 48rem) {
+  .service {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    row-gap: 0.75rem;
+  }
+
+  .service__text {
+    grid-column: 2;
+  }
+
+  .service__mark {
+    display: none;
+  }
+}
+
+/* ---------- 4. Process ---------- */
+.process__steps {
+  --marker: 0.75rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-md) var(--grid-gap);
+}
+
+/* Track and the gold line that draws across it. */
+.process__steps::before,
+.process__steps::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(var(--marker) / 2);
+  height: 1px;
+  background: var(--line);
+}
+
+.process__steps::after {
+  background: var(--gindi-gold);
+  transform-origin: left;
+}
+
+[dir="rtl"] .process__steps::after {
+  transform-origin: right;
+}
+
+.step {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.step__marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: var(--marker);
+  padding-inline-end: 0.75rem;
+  background: var(--bg);
+  margin-block-end: 1.25rem;
+}
+
+.step__marker .keystone {
+  width: var(--marker);
+  height: calc(var(--marker) * 0.8);
+}
+
+.step__index {
+  color: var(--gindi-gold);
+  font-size: 0.8125rem;
+}
+
+.step__title {
+  font-family: var(--font-heading);
+  font-size: 1.625rem;
+  font-weight: var(--fw-regular);
+  line-height: 1.2;
+}
+
+.step__text {
+  color: var(--muted);
+  font-size: var(--fs-small);
+  max-width: 22rem;
+}
+
+@media (max-width: 64rem) {
+  .process__steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .process__steps::before,
+  .process__steps::after {
+    inset-inline: calc(var(--marker) / 2 - 0.5px) auto;
+    inset-block: 0;
+    width: 1px;
+    height: auto;
+  }
+
+  .process__steps::after {
+    transform-origin: top;
+  }
+
+  .step {
+    padding-inline-start: 2.75rem;
+  }
+
+  .step__marker {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.375rem;
+    height: auto;
+    padding: 0.375rem 0;
+    margin: 0;
+  }
+}
+
+/* ---------- 5. About ---------- */
+.about__layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  row-gap: var(--space-xl);
+  align-items: center;
+}
+
+.about__media {
+  grid-column: 1 / span 5;
+}
+
+.about__body {
+  grid-column: 7 / span 5;
+  display: grid;
+  gap: var(--space-md);
+}
+
+.about__text {
+  max-width: 34rem;
+}
+
+.about__text:not(.lead) {
+  color: var(--muted);
+}
+
+/* Compact: the button sits close under the text. */
+.about__body {
+  gap: 1.25rem;
+}
+
+.about__actions {
+  margin-block-start: 0.5rem;
+}
+
+@media (max-width: 60rem) {
+  .about__media {
+    grid-column: 1 / span 7;
+  }
+
+  .about__body {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 40rem) {
+  .about__media {
+    grid-column: 2 / span 10;
+  }
+}
+
+/* ---------- 6. Contact ---------- */
+.contact {
+  padding-block-end: var(--space-xl);
+}
+
+.contact__layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  row-gap: var(--space-xl);
+  align-items: end;
+}
+
+.contact__intro {
+  grid-column: 1 / span 7;
+  display: grid;
+  gap: var(--space-md);
+}
+
+.contact__title {
+  font-size: clamp(2.5rem, 1.5rem + 4vw, 5.5rem);
+  max-width: 14ch;
+}
+
+:lang(ar) .contact__title {
+  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4.5rem);
+}
+
+.contact__details {
+  grid-column: 9 / span 4;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.contact__item {
+  display: grid;
+  gap: 0.375rem;
+  padding-block-start: 1rem;
+  border-block-start: 1px solid var(--line);
+}
+
+.contact__item dt {
+  color: var(--label);
+}
+
+@media (max-width: 60rem) {
+  .contact__intro,
+  .contact__details {
+    grid-column: 1 / -1;
+  }
+
+  .contact__details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem var(--grid-gap);
+  }
+}
+
+@media (max-width: 36rem) {
+  .contact__details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

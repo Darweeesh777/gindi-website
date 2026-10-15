@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% comment %}
+Branded 404 (apps.core.views.page_not_found, handler404): in Arabic for
+/ar/… URLs, English otherwise; same header and footer as every page.
+{% endcomment %}
+
+{% block title %}{{ c.not_found.title }} — {{ c.meta.title }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/services-page.css' %}">
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    <section class="section estimate error-page theme-light" id="top" aria-labelledby="error-title">
+      <div class="container estimate__layout">
+        <header class="estimate__head">
+          <p class="svc-eyebrow label num">404</p>
+          <h1 class="estimate__title" id="error-title">{{ c.not_found.heading }}</h1>
+          <p class="estimate__lead">{{ c.not_found.text }}</p>
+        </header>
+        <div class="error-page__actions">
+          <a class="btn btn--primary" href="{% url url_name %}">{{ c.not_found.home }}</a>
+          <a class="link-arrow" href="{{ projects_url }}">{{ c.not_found.projects }}{% include "partials/arrow.html" %}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% include "partials/footer.html" %}
+{% endblock %}

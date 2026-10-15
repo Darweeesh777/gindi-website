@@ -1,0 +1,24 @@
+{% comment %}
+Reusable image slot. With `image` (resolved by apps/core/images.py), renders a
+responsive WebP image; otherwise a clearly labelled placeholder.
+
+Parameters: image, label, spec, sizes, shape (landscape|portrait|tall|wide),
+arch (bool), art (room|arch), extra (classes).
+{% endcomment %}
+<figure class="media media--{{ shape|default:'landscape' }}{% if arch %} media--arch{% endif %} {{ extra }}" data-reveal="media">
+  {% if image %}
+    <img src="{{ image.src }}" srcset="{{ image.srcset }}" sizes="{{ sizes|default:'100vw' }}"
+         width="{{ image.width }}" height="{{ image.height }}" alt="{{ image.alt }}" loading="lazy" decoding="async">
+    {% if image.illustrative %}
+      {# Temporary image: must never read as a real studio project. #}
+      <figcaption class="media__tag" aria-hidden="true">{{ c.ui.illustrative }}</figcaption>
+    {% endif %}
+  {% else %}
+    <div class="placeholder">{% include "partials/placeholder_art.html" with art=art %}</div>
+    <figcaption class="placeholder__label">
+      <span class="placeholder__kind">{{ c.ui.image_placeholder }}</span>
+      <span>{{ label }}</span>
+      <span class="num">{{ spec }}</span>
+    </figcaption>
+  {% endif %}
+</figure>

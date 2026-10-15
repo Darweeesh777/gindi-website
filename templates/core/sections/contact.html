@@ -1,0 +1,26 @@
+<section class="section contact theme-dark" id="contact" aria-labelledby="contact-title">
+  <div class="container">
+    {% include "partials/section_head.html" with num="05" eyebrow=c.contact.eyebrow %}
+
+    <div class="contact__layout">
+      <div class="contact__intro">
+        <h2 class="display contact__title" id="contact-title" data-reveal>{{ c.contact.title }}</h2>
+        <p class="lead" data-reveal>{{ c.contact.intro }}</p>
+      </div>
+
+      {# PLACEHOLDER: no real contact details yet. Values render as plain text, not links. #}
+      <dl class="contact__details">
+        {% for item in c.contact.details %}
+          <div class="contact__item" data-reveal style="--d: {{ forloop.counter0 }}">
+            <dt class="label">{{ item.label }}</dt>
+            <dd class="contact__value is-placeholder">{{ item.value }}</dd>
+          </div>
+        {% endfor %}
+        <div class="contact__item" data-reveal style="--d: 3">
+          <dt class="label">{{ c.contact.social_label }}</dt>
+          <dd class="contact__value is-placeholder">{{ c.contact.social }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>

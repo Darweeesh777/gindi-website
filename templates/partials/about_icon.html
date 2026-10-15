@@ -1,0 +1,16 @@
+{% comment %}
+Outline service icons for the About page (24×24, 1.5 stroke, currentColor).
+Parameter: icon (plan|cube|roller|tools).
+{% endcomment %}
+<svg class="ab-service__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+{% if icon == 'plan' %}
+  <rect x="3" y="3" width="18" height="18"/><path d="M3 12h7v9M10 3v5M14 12h7M14 12v4"/>
+{% elif icon == 'cube' %}
+  <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>
+{% elif icon == 'roller' %}
+  <rect x="4" y="3" width="14" height="5" rx="1"/><path d="M18 5.5h2v5h-8v3"/><rect x="10.5" y="13.5" width="3" height="7.5" rx="1"/>
+{% else %}
+  <path d="M14.5 6.5a3.5 3.5 0 0 0 4.6 4.6L21 13l-2 2-1.9-1.9a3.5 3.5 0 0 1-4.6-4.6L4 17l3 3 8.5-8.5"/><path d="m3 7 4-4 3 3-4 4z"/>
+{% endif %}
+</svg>

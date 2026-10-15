@@ -1,0 +1,98 @@
+{% load static %}
+{% comment %}
+Featured projects carousel. Projects come from apps/core/projects.py; labels
+from content.py (c.projects). Every project's text and image are rendered
+here: the text panels share one grid cell, so the block keeps the height of
+the longest and never shifts; the images stack in one frame. Only the first
+image loads with the page; static/js/projects-carousel.js shows the others
+on demand. Without JS the first project is shown and the controls are hidden.
+{% endcomment %}
+<section class="section featured theme-dark" id="projects" aria-labelledby="projects-title">
+  <div class="container featured__layout"{% if projects|length > 1 %} data-carousel{% endif %}>
+    <div class="featured__info">
+      {# The real monogram, as a faint oversized watermark behind the text. #}
+      <img class="featured__mark" src="{% static 'images/brand/gindi-monogram-transparent.png' %}"
+           width="1109" height="1419" alt="" aria-hidden="true" loading="lazy" decoding="async">
+
+      <h2 class="featured__eyebrow label" id="projects-title">{{ c.projects.eyebrow }}</h2>
+
+      <div class="featured__panels">
+        {% for project in projects %}
+          <div class="featured__panel{% if forloop.first %} is-active{% endif %}" id="{{ project.slug }}-details"
+               data-panel{% if not forloop.first %} aria-hidden="true" inert{% endif %}>
+            <h3 class="featured__name{% if project.name|length > 28 %} featured__name--long{% endif %}">{{ project.name }}</h3>
+            {% if project.work %}<p class="featured__work">{{ project.work }}</p>{% endif %}
+            {# To this project on the Projects page (/projects/#<slug>). #}
+            <a class="btn btn--primary featured__explore" href="{{ project.index_url }}">
+              <span>{{ c.projects.explore }}<span class="visually-hidden">: {{ project.name }}</span></span>
+              {% include "partials/arrow.html" %}
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+
+      <a class="link-arrow featured__all" href="{{ projects_url }}">{{ c.projects.all }}{% include "partials/arrow.html" %}</a>
+
+      {% if projects|length > 1 %}
+        <p class="featured__counter">
+          <span class="featured__current num" aria-hidden="true" data-counter>01</span>
+          <span class="featured__total num" aria-hidden="true"><span class="featured__slash">/</span> {{ projects|length|stringformat:"02d" }}</span>
+          <span class="visually-hidden" aria-live="polite" data-status>{{ c.projects.show }} 1 {{ c.projects.of }} {{ projects|length }}: {{ projects.0.name }}</span>
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="featured__visual">
+      <div class="featured__stage" data-stage>
+        {% for project in projects %}
+          <figure class="featured__slide{% if forloop.first %} is-active{% endif %}" data-slide{% if not forloop.first %} hidden{% endif %}>
+            {# Branded placeholder: shown when there is no image, or it fails to load. #}
+            <div class="featured__placeholder placeholder" aria-hidden="true">
+              {% include "partials/placeholder_art.html" with art="room" %}
+              <span class="featured__placeholder-label label">{{ c.projects.image_missing }}</span>
+            </div>
+            {% if project.image %}
+              <img class="featured__image" src="{{ project.image.src }}" srcset="{{ project.image.srcset }}"
+                   sizes="(min-width: 90rem) 880px, (min-width: 64rem) 61vw, calc(100vw - 2.5rem)"
+                   width="{{ project.image.width }}" height="{{ project.image.height }}" alt="{{ project.image.alt }}"
+                   style="object-position: {{ project.focus }};" loading="lazy" decoding="async">
+              {% if project.image.illustrative %}
+                {# Temporary image: must never read as a real studio project. #}
+                <figcaption class="media__tag" aria-hidden="true">{{ c.ui.illustrative }}</figcaption>
+              {% endif %}
+            {% endif %}
+          </figure>
+        {% endfor %}
+      </div>
+
+      {% if projects|length > 1 %}
+        <div class="featured__nav">
+          <ul class="featured__thumbs" role="list" aria-label="{{ c.projects.thumbnails }}" data-thumbs>
+            {% for project in projects %}
+              <li>
+                <button class="featured__thumb" type="button" data-thumb="{{ forloop.counter0 }}"
+                        aria-controls="{{ project.slug }}-details" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+                  {% if project.thumbnail %}
+                    <img src="{{ project.thumbnail.src }}" srcset="{{ project.thumbnail.srcset }}" sizes="13rem"
+                         width="{{ project.thumbnail.width }}" height="{{ project.thumbnail.height }}" alt=""
+                         style="object-position: {{ project.focus }};" loading="lazy" decoding="async">
+                  {% endif %}
+                  <span class="featured__thumb-num num" aria-hidden="true">{{ project.number }}</span>
+                  <span class="visually-hidden">{{ c.projects.show }} {{ forloop.counter }} {{ c.projects.of }} {{ projects|length }}: {{ project.name }}</span>
+                </button>
+              </li>
+            {% endfor %}
+          </ul>
+          <div class="featured__arrows">
+            <button class="featured__arrow featured__arrow--prev" type="button" aria-label="{{ c.projects.previous }}" data-prev>
+              <svg viewBox="0 0 12 20" aria-hidden="true" focusable="false"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            </button>
+            <button class="featured__arrow featured__arrow--next" type="button" aria-label="{{ c.projects.next }}" data-next>
+              <svg viewBox="0 0 12 20" aria-hidden="true" focusable="false"><path d="m2 2 8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            </button>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

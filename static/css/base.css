@@ -1,0 +1,498 @@
+/* Gindi Innovations — base: reset, themes, typography, shared components */
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: var(--header-h);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--gindi-ivory);
+  color: var(--gindi-navy);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  font-variant-numeric: lining-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+body.is-menu-open {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+em {
+  font-style: italic;
+}
+
+:lang(ar) em {
+  font-style: normal;
+}
+
+/* ---------- Colour themes (set per section) ---------- */
+.theme-dark {
+  --bg: var(--gindi-navy);
+  --fg: var(--gindi-ivory);
+  --muted: var(--ivory-72);
+  --line: var(--ivory-18);
+  --line-soft: var(--ivory-10);
+  --accent: var(--gindi-gold);
+  --label: var(--gindi-gold);
+  --focus: var(--gindi-yellow);
+  --placeholder-bg: color-mix(in srgb, var(--gindi-navy) 92%, var(--gindi-ivory));
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+.theme-light {
+  --bg: var(--gindi-ivory);
+  --fg: var(--gindi-navy);
+  --muted: var(--navy-75);
+  --line: var(--navy-15);
+  --line-soft: var(--navy-08);
+  --accent: var(--gindi-gold);
+  --label: var(--gindi-navy);
+  --focus: var(--gindi-navy);
+  --placeholder-bg: color-mix(in srgb, var(--gindi-ivory) 92%, var(--gindi-navy));
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+/* ---------- Focus ---------- */
+:focus-visible {
+  outline: 2px solid var(--focus, var(--gindi-navy));
+  outline-offset: 4px;
+}
+
+/* ---------- Accessibility helpers ---------- */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: 1rem;
+  inset-inline-start: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--gindi-ivory);
+  color: var(--gindi-navy);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+  outline-color: var(--gindi-navy);
+}
+
+/* ---------- Layout ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--space-section);
+}
+
+/* ---------- Typography ---------- */
+.display,
+.heading {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-light);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.display {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+}
+
+.heading {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+}
+
+:lang(ar) .display,
+:lang(ar) .heading {
+  font-weight: var(--fw-regular);
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 36rem;
+  text-wrap: pretty;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  line-height: 1.4;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+:lang(ar) .label {
+  text-transform: none;
+  font-weight: var(--fw-regular);
+}
+
+/* Numbers always render as Western digits (123), with even widths. */
+.num {
+  font-family: var(--font-sans);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.08em;
+  unicode-bidi: isolate;
+}
+
+/* ---------- Keystone mark (from the monogram's top cutout) ---------- */
+.keystone {
+  display: inline-block;
+  flex: none;
+  width: 0.75rem;
+  height: 0.6rem;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+}
+
+/* ---------- Eyebrow: "01 ◆ Projects" ---------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  color: var(--label);
+}
+
+.eyebrow .num {
+  color: var(--muted);
+}
+
+/* ---------- Section head ---------- */
+.section-head {
+  display: grid;
+  gap: var(--space-md);
+  margin-block-end: var(--space-xl);
+}
+
+.section-head__rule {
+  display: block;
+  height: 1px;
+  background: var(--line);
+  transform-origin: center;
+}
+
+.section-head__body {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 48rem;
+}
+
+.section-head__intro {
+  color: var(--muted);
+  max-width: 34rem;
+}
+
+/* ---------- Buttons and links ---------- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-sans);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.06em;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+:lang(ar) .btn {
+  letter-spacing: 0;
+  font-size: 1rem;
+}
+
+/* On dark: gold fill, navy text (4.7:1); hover brightens to yellow (9.1:1). */
+.theme-dark .btn--primary {
+  background: var(--gindi-gold);
+  color: var(--gindi-navy);
+}
+
+.theme-dark .btn--primary:hover {
+  background: var(--gindi-yellow);
+}
+
+.theme-light .btn--primary {
+  background: var(--gindi-navy);
+  color: var(--gindi-ivory);
+}
+
+.theme-light .btn--primary:hover {
+  background: color-mix(in srgb, var(--gindi-navy) 86%, var(--gindi-ivory));
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.5rem;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.04em;
+  background: linear-gradient(currentColor, currentColor) no-repeat;
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  transition: background-size var(--dur-base) var(--ease-out);
+}
+
+[dir="rtl"] .link-arrow {
+  background-position: 100% 100%;
+  letter-spacing: 0;
+}
+
+.link-arrow:hover {
+  background-size: 100% 1px;
+}
+
+.link-arrow__icon {
+  width: 1.25rem;
+  height: 0.75rem;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+[dir="rtl"] .link-arrow__icon {
+  transform: scaleX(-1);
+}
+
+.link-arrow:hover .link-arrow__icon {
+  transform: translateX(0.25rem);
+}
+
+[dir="rtl"] .link-arrow:hover .link-arrow__icon {
+  transform: scaleX(-1) translateX(0.25rem);
+}
+
+/* ---------- Media + image placeholders ---------- */
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--placeholder-bg);
+  aspect-ratio: var(--ratio, 3 / 2);
+}
+
+.media--landscape { --ratio: 3 / 2; }
+.media--portrait { --ratio: 4 / 5; }
+.media--tall { --ratio: 3 / 4; }
+.media--wide { --ratio: 16 / 9; }
+
+.media > img,
+.media > .placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.media > img {
+  object-fit: cover;
+}
+
+/* Arch crop echoing the monogram: a semicircular top. */
+.media--arch {
+  container-type: inline-size;
+  background: none;
+}
+
+.media--arch > img,
+.media--arch > .placeholder {
+  border-radius: 50cqi 50cqi 0 0;
+}
+
+.media--arch > .placeholder {
+  background: var(--placeholder-bg);
+}
+
+.placeholder {
+  color: var(--fg);
+  overflow: hidden;
+}
+
+.placeholder__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--fg);
+  opacity: 0.55;
+}
+
+.placeholder__label {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.media--arch .placeholder__label {
+  inset-inline: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.placeholder__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--fg);
+}
+
+.placeholder__kind::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1px solid currentColor;
+}
+
+/* "Illustrative image" tag on temporary photography (always shown). */
+.media__tag {
+  position: absolute;
+  inset-block-end: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 1;
+  padding: 0.25rem 0.625rem;
+  background: rgb(28 44 74 / 0.78);
+  color: var(--gindi-ivory);
+  font-size: 0.6875rem;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+:lang(ar) .media__tag {
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+}
+
+.media--arch .media__tag {
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+[dir="rtl"] .media--arch .media__tag {
+  transform: translateX(50%);
+}
+
+/* ---------- Placeholder badge (DEBUG only) ---------- */
+.ph-badge {
+  display: inline-block;
+  margin-inline-start: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border: 1px dashed currentColor;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: var(--fw-medium);
+  font-style: normal;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  vertical-align: middle;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+:lang(ar) .ph-badge {
+  letter-spacing: 0;
+  font-size: 0.8125rem;
+}

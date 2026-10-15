@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% comment %}
+Projects page (/projects/, /ar/projects/). Projects come from
+apps/core/projects.py; each one's group shows its first three media items,
+the large one alternating sides. Each project's <li> carries its slug as id,
+so /projects/#<slug> lands on it (the fixed header is allowed for in CSS).
+{% endcomment %}
+
+{% block title %}{{ c.projects_page.meta_title }}{% endblock %}
+{% block description %}{{ c.projects_page.meta_description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/projects-page.css' %}">
+  <script src="{% static 'js/projects-page.js' %}" defer></script>
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    <section class="section projects-page theme-light" id="top" aria-labelledby="projects-page-title">
+      <div class="container">
+        <header class="projects-page__head">
+          <p class="projects-page__eyebrow label" data-reveal>{{ c.projects_page.eyebrow }}</p>
+          <h1 class="projects-page__title" id="projects-page-title" data-reveal>{{ c.projects_page.title }}</h1>
+          <p class="projects-page__lead" data-reveal>{{ c.projects_page.lead }}</p>
+        </header>
+
+        <ol class="project-list" role="list">
+          {% for project in projects %}
+            <li class="project-entry{% if forloop.counter|divisibleby:2 %} project-entry--flip{% endif %}" id="{{ project.slug }}">
+              <article class="project-entry__inner" aria-labelledby="{{ project.slug }}-name">
+                <span class="project-entry__num num" aria-hidden="true">{{ project.number }}</span>
+                <div class="project-entry__group" data-reveal>
+                  {% include "partials/project_tile.html" with tile=project.tiles.0 size="large" %}
+                  {% include "partials/project_tile.html" with tile=project.tiles.1 size="small" %}
+                  {% include "partials/project_tile.html" with tile=project.tiles.2 size="small" more=project.more %}
+                </div>
+                <div class="project-entry__foot" data-reveal>
+                  <div class="project-entry__text">
+                    <h2 class="project-entry__name" id="{{ project.slug }}-name">{{ project.name }}</h2>
+                    {% if project.work %}<p class="project-entry__scope">{{ project.work }}</p>{% endif %}
+                  </div>
+                  <a class="link-arrow project-entry__view" href="{{ project.detail_url }}">
+                    <span>{{ c.projects_page.view }}<span class="visually-hidden">: {{ project.name }}</span></span>
+                    {% include "partials/arrow.html" %}
+                  </a>
+                </div>
+              </article>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </section>
+
+    {% include "partials/projects_cta.html" %}
+  </main>
+
+  {% include "partials/footer.html" %}
+{% endblock %}

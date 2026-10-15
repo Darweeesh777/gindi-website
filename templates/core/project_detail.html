@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% comment %}
+A project's own page (/projects/<slug>/): name, scope and description, then
+every photo and film from apps/core/projects.py. Photos open in a full-screen
+gallery (static/js/projects-page.js); films play with their own controls and
+never start by themselves.
+{% endcomment %}
+
+{% block title %}{{ project.name }} — {{ c.projects_page.meta_title }}{% endblock %}
+{% block description %}{{ project.work|default:c.projects_page.meta_description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/projects-page.css' %}">
+  <script src="{% static 'js/projects-page.js' %}" defer></script>
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    <section class="section project-page theme-light" id="top" aria-labelledby="project-title">
+      <div class="container">
+        <a class="link-arrow project-page__back" href="{{ project.index_url }}">
+          {% include "partials/arrow.html" %}<span>{{ c.projects_page.back }}</span>
+        </a>
+
+        <header class="project-page__head">
+          <p class="project-page__eyebrow label" data-reveal>
+            <span class="num">{{ project.number }}</span><span class="keystone" aria-hidden="true"></span><span>{{ c.projects_page.eyebrow }}</span>
+          </p>
+          <h1 class="project-page__title" id="project-title" data-reveal>{{ project.name }}</h1>
+          <div class="project-page__intro" data-reveal>
+            {% if project.work %}
+              <p class="project-page__scope"><span class="label">{{ c.projects_page.scope }}</span> {{ project.work }}</p>
+            {% endif %}
+            {% if project.description %}<p class="project-page__description">{{ project.description }}</p>{% endif %}
+          </div>
+        </header>
+
+        <h2 class="visually-hidden">{{ c.projects_page.gallery }}</h2>
+        <ul class="project-media" role="list">
+          {% for item in project.media %}
+            <li class="project-media__item{% if forloop.first %} project-media__item--lead{% endif %}" data-reveal>
+              {% if item.kind == 'photo' %}
+                <button class="project-media__photo" type="button" data-lightbox-open="{{ item.index }}"
+                        data-src="{{ item.image.src }}" data-srcset="{{ item.image.srcset }}" data-alt="{{ item.image.alt }}"
+                        data-width="{{ item.image.width }}" data-height="{{ item.image.height }}"
+                        aria-label="{{ c.projects_page.open_photo }} {{ item.index|add:1 }} {{ c.projects_page.of }} {{ project.photos|length }}: {{ item.image.alt }}">
+                  <img src="{{ item.image.src }}" srcset="{{ item.image.srcset }}"
+                       sizes="{% if forloop.first %}(min-width: 90rem) 1312px, 100vw{% else %}(min-width: 48rem) 45vw, 100vw{% endif %}"
+                       width="{{ item.image.width }}" height="{{ item.image.height }}" alt=""
+                       {% if forloop.first %}style="object-position: {{ project.focus }};"{% endif %}
+                       loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async">
+                  {% if item.image.illustrative %}<span class="media__tag" aria-hidden="true">{{ c.ui.illustrative }}</span>{% endif %}
+                </button>
+              {% elif item.kind == 'video' %}
+                <figure class="project-media__video">
+                  <video controls preload="metadata" playsinline{% if item.poster %} poster="{{ item.poster.src }}"{% endif %}>
+                    <source src="{{ item.src }}" type="video/mp4">
+                  </video>
+                  <figcaption class="label">{{ item.title|default:c.projects_page.film }}</figcaption>
+                </figure>
+              {% else %}
+                <figure class="tile tile--placeholder project-media__placeholder">
+                  <div class="placeholder" aria-hidden="true">{% include "partials/placeholder_art.html" with art="room" %}</div>
+                  <figcaption class="tile__missing label">{{ c.projects_page.photo_missing }}</figcaption>
+                </figure>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    {% include "partials/projects_cta.html" %}
+  </main>
+
+  {% if project.photos %}
+    {# Full-screen photo gallery. #}
+    <dialog class="lightbox" aria-label="{{ c.projects_page.lightbox }}: {{ project.name }}" data-lightbox>
+      <figure class="lightbox__figure">
+        <img class="lightbox__image" alt="" data-lightbox-image>
+        <figcaption class="lightbox__caption" data-lightbox-caption></figcaption>
+      </figure>
+      <p class="lightbox__count num" aria-live="polite" data-lightbox-count></p>
+      <button class="lightbox__close" type="button" aria-label="{{ c.projects_page.close }}" data-lightbox-close>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5 5 19" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+      {% if project.photos|length > 1 %}
+        <button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="{{ c.projects_page.previous }}" data-lightbox-prev>
+          <svg viewBox="0 0 12 20" aria-hidden="true" focusable="false"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <button class="lightbox__nav lightbox__nav--next" type="button" aria-label="{{ c.projects_page.next }}" data-lightbox-next>
+          <svg viewBox="0 0 12 20" aria-hidden="true" focusable="false"><path d="m2 2 8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+      {% endif %}
+    </dialog>
+  {% endif %}
+
+  {% include "partials/footer.html" %}
+{% endblock %}
