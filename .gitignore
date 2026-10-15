@@ -29,9 +29,11 @@ db.sqlite3-journal
 *.sqlite3
 *.sqlite3-journal
 
-# User-uploaded media and collected static files (built on the server)
+# User-uploaded media, collected static files and the static export
+# (all built on the server)
 /media/
 /staticfiles/
+/dist/
 
 # Source image masters: kept locally, not deployed. The site only uses the
 # derivatives in static/images/site/ and static/images/brand/ (sub-folders

@@ -602,3 +602,43 @@ class DeploymentTests(SimpleTestCase):
                                                'django.middleware.security.SecurityMiddleware',
                                                'whitenoise.middleware.WhiteNoiseMiddleware'])
         self.assertTrue(prod.LOGGING['handlers']['console'])
+
+class StaticExportTests(SimpleTestCase):
+    """manage.py export_static: the Cloudflare Pages preview build."""
+
+    def test_export_writes_every_page_404s_redirects_and_headers(self):
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+        from django.core.management import call_command
+
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            storages = {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+                        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'}}
+            with self.settings(STATIC_ROOT=tmp / 'collected', STORAGES=storages):
+                call_command('export_static', output=str(tmp / 'dist'), base_url='https://preview.example', verbosity=0)
+            dist = tmp / 'dist'
+            for page in ('index.html', 'ar/index.html', 'projects/index.html', 'projects/project-1/index.html',
+                         'ar/projects/project-4/index.html', 'about/index.html', 'services/index.html',
+                         'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/cement/index.html',
+                         '404.html', 'ar/404.html', 'robots.txt'):
+                self.assertTrue((dist / page).is_file(), page)
+            self.assertEqual(len(list(dist.rglob('index.html'))), 26)
+            home = (dist / 'index.html').read_text(encoding='utf-8')
+            self.assertIn('href="https://preview.example/ar/"', home)
+            self.assertRegex(home, r'/static/css/base\.[0-9a-f]{12}\.css')
+            self.assertIn('This page could not be found.', (dist / '404.html').read_text(encoding='utf-8'))
+            self.assertIn('lang="ar"', (dist / 'ar/404.html').read_text(encoding='utf-8'))
+            redirects = (dist / '_redirects').read_text()
+            self.assertIn('/free-estimate/ /free-tools/ 301', redirects)
+            self.assertIn('/ar/free-estimate/ /ar/free-tools/ 301', redirects)
+            self.assertRegex(redirects, r'/favicon.ico /static/images/brand/favicon-32\.[0-9a-f]{12}\.png 302')
+            headers = (dist / '_headers').read_text()
+            self.assertIn('X-Robots-Tag: noindex, nofollow', headers)
+            self.assertIn('X-Frame-Options: DENY', headers)
+            self.assertIn('Cache-Control: public, max-age=31536000, immutable', headers)
+            self.assertFalse((dist / 'static' / 'admin').exists())
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)

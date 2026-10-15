@@ -15,7 +15,8 @@ no models, forms or backend features. See
   for the Geometric G reveal in the Gindi Innovations (About) section only, vendored in
   `static/vendor/gsap/` (GreenSock standard no-charge licence)
 - SQLite for local development · production database from `DATABASE_URL` (SQLite on the Render preview; PostgreSQL supported)
-- Gunicorn + WhiteNoise in production · staging preview on Render (free): see [docs/deployment-render.md](docs/deployment-render.md)
+- Preview: Cloudflare Pages (free), the site exported as static files by `manage.py export_static`; see [docs/deployment-cloudflare.md](docs/deployment-cloudflare.md)
+- Server deployment (ready, not in use): Gunicorn + WhiteNoise, Render Blueprint; see [docs/deployment-render.md](docs/deployment-render.md)
 
 ## Required tools
 
@@ -162,7 +163,8 @@ docs/
   content-placeholders.md
 manage.py
 requirements.txt     Pinned packages (Django, Gunicorn, WhiteNoise, psycopg…)
-render.yaml          Render Blueprint (free staging preview)
+cloudflare-build.sh  Cloudflare Pages build: static export to dist/ (the preview)
+render.yaml          Render Blueprint (server deployment, not in use)
 build.sh             Render build: install, collectstatic, migrate
 gunicorn.conf.py     Gunicorn settings
 .env.example         Environment variables (placeholders only)

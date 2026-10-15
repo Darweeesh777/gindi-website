@@ -1,8 +1,14 @@
-# Staging preview on Render (free)
+# Server deployment on Render
 
-This is a **preview deployment**, not the official launch. It runs on
-Render's free plan from the private GitHub repository `gindi-website`,
-branch `main`, and redeploys automatically on every push to `main`.
+> **Status:** not in use. The free preview runs on Cloudflare Pages instead;
+> see [deployment-cloudflare.md](deployment-cloudflare.md). Render asked for
+> a payment card (a $1 verification) to deploy the Blueprint, even on the
+> free plan. This setup stays ready for when a server host is wanted, e.g.
+> for `/admin/` or to store enquiries.
+
+This setup runs the site as a Django server on Render's free plan, from the
+private GitHub repository `gindi-website`, branch `main`, and redeploys
+automatically on every push to `main`.
 
 Everything Render needs is in the repository:
 
