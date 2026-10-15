@@ -24,6 +24,25 @@ The Django code is unchanged. The same repository still runs as a normal
 Django server (Gunicorn + WhiteNoise, `render.yaml`) when a server host is
 chosen later. See [deployment-render.md](deployment-render.md).
 
+## Cloudflare Workers settings (the dashboard's default "Create" flow)
+
+Cloudflare's dashboard now creates a **Worker** when importing a Git
+repository. That works too: `wrangler.jsonc` makes it an assets-only Worker
+that serves `dist/` with the same `_headers`, `_redirects` and nearest
+`404.html` rules. Requests to static assets are free and unlimited.
+
+| Setting | Value |
+|---|---|
+| Project (Worker) name | `gindi-website` (must match `name` in `wrangler.jsonc`) |
+| Build command | `bash cloudflare-build.sh` |
+| Deploy command | `npx wrangler deploy` |
+| Non-production branch deploy command | `npx wrangler versions upload` (default) |
+| Root directory | `/` |
+
+Address: `https://gindi-website.<your-subdomain>.workers.dev`. Set
+`SITE_URL` to it (Settings > Build > Variables and secrets) so that the
+English/Arabic links use it.
+
 ## Cloudflare Pages settings (exact values)
 
 | Setting | Value |
