@@ -1,6 +1,6 @@
 <section class="section services theme-light" id="services" aria-labelledby="services-title">
   <div class="container">
-    {% include "partials/section_head.html" with num="02" eyebrow=c.services.eyebrow title=c.services.title intro=c.services.intro title_id="services-title" badge=True %}
+    {% include "partials/section_head.html" with num=nums.services eyebrow=c.services.eyebrow title=c.services.title intro=c.services.intro title_id="services-title" %}
 
     {# Services come from apps/core/services.py; each opens its item on the Services page. #}
     <ol class="services__list" role="list">

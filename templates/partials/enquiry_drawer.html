@@ -41,10 +41,7 @@ there is no simulated success.
       </div>
 
       {% if not enquiry_action %}
-        <p class="enquiry-form__notice" id="enquiry-notice">
-          {{ c.enquiry.not_connected }}
-          <a href="{{ nav_base }}#contact">{{ c.enquiry.contact_link }}</a>
-        </p>
+        <p class="enquiry-form__notice" id="enquiry-notice">{{ c.enquiry.not_connected }}</p>
       {% endif %}
       <button class="btn btn--primary enquiry-form__send" type="submit"{% if not enquiry_action %} disabled aria-describedby="enquiry-notice"{% endif %}>{{ c.enquiry.send }}</button>
     </form>

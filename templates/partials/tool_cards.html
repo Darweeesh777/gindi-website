@@ -7,8 +7,12 @@ tool's own page. Used on the Services page and the /free-tools/ overview.
     <li class="tool-card" data-reveal style="--d: {{ forloop.counter0 }}">
       <h3 class="tool-card__name" id="tool-{{ tool.slug }}-name">{{ tool.name }}</h3>
       <p class="tool-card__text">{{ tool.description }}</p>
-      {% if not tool.script %}<p class="tool-card__status label">{{ c.tools_page.status }}</p>{% endif %}
-      <a class="btn btn--primary tool-card__cta" href="{{ tool.url }}" aria-describedby="tool-{{ tool.slug }}-name">{{ c.tools_page.start }}</a>
+      {# A tool without a connected agent shows only "Coming soon": no button that looks usable. #}
+      {% if tool.script %}
+        <a class="btn btn--primary tool-card__cta" href="{{ tool.url }}" aria-describedby="tool-{{ tool.slug }}-name">{{ c.tools_page.start }}</a>
+      {% else %}
+        <p class="tool-card__status label">{{ c.tools_page.status }}</p>
+      {% endif %}
     </li>
   {% endfor %}
 </ul>

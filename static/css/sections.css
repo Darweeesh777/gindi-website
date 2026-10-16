@@ -1012,11 +1012,13 @@
 }
 
 /* ---------- 4. Process ---------- */
+/* Six steps in a row on wide screens; below 80rem (where six columns get
+   too narrow) the vertical timeline. Keep the 80rem in sync with motion.css. */
 .process__steps {
   --marker: 0.75rem;
   position: relative;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--space-md) var(--grid-gap);
 }
 
@@ -1076,13 +1078,18 @@
   line-height: 1.2;
 }
 
+/* Naskh needs more room between lines when a title wraps (six columns). */
+:lang(ar) .step__title {
+  line-height: 1.4;
+}
+
 .step__text {
   color: var(--muted);
   font-size: var(--fs-small);
   max-width: 22rem;
 }
 
-@media (max-width: 64rem) {
+@media (max-width: 80rem) {
   .process__steps {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-lg);

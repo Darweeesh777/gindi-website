@@ -1,8 +1,8 @@
 <section class="section process theme-dark" id="process" aria-labelledby="process-title">
   <div class="container">
-    {% include "partials/section_head.html" with num="03" eyebrow=c.process.eyebrow title=c.process.title intro=c.process.intro title_id="process-title" badge=True %}
+    {% include "partials/section_head.html" with num=nums.process eyebrow=c.process.eyebrow title=c.process.title intro=c.process.intro title_id="process-title" %}
 
-    {# PLACEHOLDER: illustrative stages until the studio confirms its workflow. #}
+    {# The studio's workflow: content.py → process.steps (six steps). #}
     <ol class="process__steps" role="list" data-reveal="process">
       {% for step in c.process.steps %}
         <li class="step" style="--d: {{ forloop.counter0 }}">

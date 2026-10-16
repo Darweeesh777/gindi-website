@@ -158,11 +158,6 @@ FREE_TOOL_SCRIPTS = {
     'cement': os.environ.get('FREE_TOOL_CEMENT_SCRIPT_URL', ''),
 }
 
-# "Placeholder" badges on unfinished copy (hero title, services heading…).
-# Independent of DEBUG: they stay visible on any deployment until the copy is
-# final; set SHOW_PLACEHOLDER_BADGES=false only once it is.
-SHOW_PLACEHOLDER_BADGES = env_bool('SHOW_PLACEHOLDER_BADGES', True)
-
 # Keep search engines out (X-Robots-Tag header, robots meta, robots.txt).
 # On by default so previews are never indexed by accident; set
 # SITE_NOINDEX=false only for the official launch.

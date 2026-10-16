@@ -34,6 +34,12 @@ from django.views.generic import RedirectView
 from apps.core import projects, tools
 from apps.core import urls as core_urls
 
+# Routes left out while their content is not public (URL names without _ar).
+UNPUBLISHED = {
+    'projects': lambda: not projects.PUBLISHED,
+    'project': lambda: not projects.PUBLISHED,
+}
+
 # The values of each <slug> route, by URL name (without the _ar suffix).
 SLUGS = {
     'project': lambda: [project['slug'] for project in projects.PROJECTS],
@@ -126,8 +132,10 @@ class Command(BaseCommand):
                 redirects.append(('/' + str(pattern.pattern), reverse(init['pattern_name']), status))
                 continue
             url_name = f'{core_urls.app_name}:{pattern.name}'
+            key = pattern.name.removesuffix('_ar')
+            if key in UNPUBLISHED and UNPUBLISHED[key]():
+                continue
             if pattern.pattern.converters:
-                key = pattern.name.removesuffix('_ar')
                 if key not in SLUGS:
                     raise CommandError(f'URL "{pattern.name}" takes parameters: add its values to SLUGS.')
                 pages += [reverse(url_name, kwargs={'slug': slug}) for slug in SLUGS[key]()]

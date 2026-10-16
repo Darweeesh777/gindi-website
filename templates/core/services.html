@@ -48,7 +48,6 @@ section; with JS they open the enquiry drawer with the service prefilled.
     <section class="svc-list theme-light" aria-labelledby="help-title">
       <div class="container">
         <h2 class="svc-list__title" id="help-title" data-reveal>{{ c.services_page.help }}</h2>
-        {% if show_placeholders %}<span class="ph-badge">{{ c.ui.placeholder_badge }}</span>{% endif %}
 
         <div class="accordion" data-accordion>
           {% for service in services %}

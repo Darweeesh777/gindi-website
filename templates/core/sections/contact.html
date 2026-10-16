@@ -1,6 +1,6 @@
 <section class="section contact theme-dark" id="contact" aria-labelledby="contact-title">
   <div class="container">
-    {% include "partials/section_head.html" with num="05" eyebrow=c.contact.eyebrow %}
+    {% include "partials/section_head.html" with num=nums.contact eyebrow=c.contact.eyebrow %}
 
     <div class="contact__layout">
       <div class="contact__intro">
@@ -8,19 +8,23 @@
         <p class="lead" data-reveal>{{ c.contact.intro }}</p>
       </div>
 
-      {# PLACEHOLDER: no real contact details yet. Values render as plain text, not links. #}
-      <dl class="contact__details">
-        {% for item in c.contact.details %}
-          <div class="contact__item" data-reveal style="--d: {{ forloop.counter0 }}">
-            <dt class="label">{{ item.label }}</dt>
-            <dd class="contact__value is-placeholder">{{ item.value }}</dd>
-          </div>
-        {% endfor %}
-        <div class="contact__item" data-reveal style="--d: 3">
-          <dt class="label">{{ c.contact.social_label }}</dt>
-          <dd class="contact__value is-placeholder">{{ c.contact.social }}</dd>
-        </div>
-      </dl>
+      {# Confirmed contact details only (content.py → contact.details / social); none yet, so nothing is shown. #}
+      {% if c.contact.details or c.contact.social %}
+        <dl class="contact__details">
+          {% for item in c.contact.details %}
+            <div class="contact__item" data-reveal style="--d: {{ forloop.counter0 }}">
+              <dt class="label">{{ item.label }}</dt>
+              <dd class="contact__value">{{ item.value }}</dd>
+            </div>
+          {% endfor %}
+          {% if c.contact.social %}
+            <div class="contact__item" data-reveal style="--d: {{ c.contact.details|length }}">
+              <dt class="label">{{ c.contact.social_label }}</dt>
+              <dd class="contact__value">{{ c.contact.social }}</dd>
+            </div>
+          {% endif %}
+        </dl>
+      {% endif %}
     </div>
   </div>
 </section>

@@ -106,7 +106,8 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) and (max-width: 64rem) {
+/* Vertical Process timeline (sections.css, below 80rem): the line draws down. */
+@media (prefers-reduced-motion: no-preference) and (max-width: 80rem) {
   .reveal-ready [data-reveal="process"]::after {
     transform: scaleY(0);
   }

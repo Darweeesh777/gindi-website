@@ -1,28 +1,31 @@
-# Homepage placeholders
+# Content still to confirm
 
-Everything below is temporary and must be replaced with content confirmed by
-the studio before launch. Placeholder copy is marked on the page with a dashed
-"Placeholder" badge in every environment, including the Render preview. This
-does not depend on `DEBUG`; turn it off with `SHOW_PLACEHOLDER_BADGES=false`
-only when the copy is final. Image slots are always labelled.
+Visitors see no editorial labels ("Placeholder", "to be added", "temporary").
+Unfinished content is handled in one of three ways instead:
 
-All copy lives in `apps/core/content.py` (English and Arabic side by side).
-Search that file for `PLACEHOLDER`.
+- **Hidden until real:** blocks that would only show dummy content are not
+  rendered at all, and come back on their own once real content is added.
+- **Disclosed:** AI-generated images keep a short "Illustrative image" label
+  (and alt text starting with it), so they are never mistaken for studio work.
+- **Honest availability:** unfinished features say so ("Coming soon", "Online
+  enquiries are not available yet") and offer nothing that looks usable.
 
-| Section | Placeholder | How to replace |
+All copy lives in `apps/core/content.py` (English and Arabic side by side);
+`PLACEHOLDER` comments there mark what still needs confirming.
+
+| Section | Status | How to complete |
 |---|---|---|
-| Hero | Headline and supporting line | Edit `hero.title` / `hero.lead` |
-| Hero | Background photograph (desktop + vertical mobile) | **Illustrative AI image** — see "Images" below |
-| Projects | Four projects ("Project 01"–"Project 04", "Scope of work to be added."), shown on the homepage, /projects/ and /projects/<slug>/ | Edit `PROJECTS` in `apps/core/projects.py` — see "Projects" below |
-| Projects | Four images | **Illustrative AI images** — see "Images" below |
-| Services | Four services: drafts of summaries and deliverables | Edit `SERVICES` in `apps/core/services.py` — see "Services page" below |
-| Process | Five stages (**illustrative only**) | Edit `process.steps` |
-| About | Homepage "Gindi Innovations" text (two paragraphs) and "More About Us" | Edit `about.paragraphs` / `about.more` in `content.py` |
-| About (Gindi Innovations) | Studio image (materials still life), revealed through the emblem | **Illustrative AI image** (`gindi-about-studio-materials.png`); a real studio or founder photo is preferred — see "Gindi Innovations reveal" below |
-| Contact / footer | Email, phone, address, social links | Edit `contact.details` / `contact.social`. Values render as plain text; turn them into `mailto:`/`tel:` links once real |
+| Hero | Headline and supporting line: draft brand copy, shown | Confirm or edit `hero.title` / `hero.lead` |
+| Hero | Background photograph: **illustrative AI image**, labelled | Replace with real photography — see "Images" below |
+| Projects | **Hidden**: no verified projects (only "Project 01"–"04" with AI images). The homepage section, the "Projects" menu links and `/projects/…` pages are off | Add real projects to `PROJECTS` in `apps/core/projects.py`, then set `PUBLISHED = True` there |
+| Services | Four confirmed services; summaries and deliverables are **drafts to confirm**, shown without labels | Edit `SERVICES` in `apps/core/services.py` |
+| About (Gindi Innovations) | Studio image: **illustrative AI image**, labelled | A real studio or founder photo is preferred — see "Gindi Innovations reveal" below |
+| Contact / footer | **No details shown**: none confirmed yet; the Contact section keeps only its heading and invitation | Add real entries to `contact.details` (e.g. `{'label': 'Email', 'value': '…'}`) and `contact.social`; the details block appears in the section and the footer automatically |
 | Meta | Page title and description | Edit `meta` |
 
-When a block is confirmed, also remove its `ph-badge` line in the template.
+Confirmed: the homepage Process section, "From Our First Call to After
+Handover", with six steps, the studio's actual workflow (`process` in
+`content.py`, English and Arabic).
 
 ## Images
 
@@ -92,8 +95,10 @@ To add a photo: export two WebP widths into `static/images/site/` named
 
 The four current projects are placeholders ("Project 01"–"04", "Scope of
 work to be added.") with one illustrative photo each and labelled
-placeholders for their detail photos. `python manage.py test` checks the
-list (unique slugs, known images, alt text, film files present).
+placeholders for their detail photos, so **`PUBLISHED = False`** and none of
+this is public. Replace them with real projects, then set `PUBLISHED = True`.
+`python manage.py test` checks the list (unique slugs, known images, alt
+text, film files present).
 
 ## Services page, enquiry drawer and free tools
 
@@ -137,8 +142,9 @@ tool has its own independent agent:
 2. The agent renders into `#tool-<slug>` (`[data-tool-root="<slug>"]`) and
    removes or replaces `[data-tool-placeholder]`, the "Coming soon" state.
 
-Until then each page shows "Coming soon" and calculates nothing. Template:
-`templates/core/free_tool.html`; copy: `content.py` → `tools_page`.
+Until then each page shows "Coming soon" and calculates nothing, and the
+tool's card shows "Coming soon" with no "Start Free Estimate" button.
+Template: `templates/core/free_tool.html`; copy: `content.py` → `tools_page`.
 
 ## About page
 
@@ -184,8 +190,8 @@ Currently: **KK Barbershop — Sheikh Zayed**, with `Render.png` (the design)
 and `real.JPG` (the photograph) from `static/images/`, exported to
 `static/images/site/kk-barbershop-{design,reality}-{960,1536}.webp` at
 identical sizes and registered in `images.py` as `kk-design` / `kk-reality`.
-If an image is set to `None`, its side shows a labelled placeholder drawing
-("Placeholder: … to be added") instead.
+If an image is set to `None`, its side shows a plain drawing labelled
+"Design image unavailable" / "Photograph unavailable" instead.
 
 To add the images: export the design and the photograph **from the same
 viewpoint and at the same size** (16:9 landscape works best, at least 1672 px

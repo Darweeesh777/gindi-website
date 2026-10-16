@@ -70,7 +70,6 @@ None are required for the preview. Optional:
 |---|---|---|
 | `SITE_URL` | `https://gindi-website.ah-darwesh.workers.dev` | Public address used in links between the English and Arabic pages. Set it if Cloudflare gives the project a different `*.pages.dev` name, or for a custom domain |
 | `SITE_NOINDEX` | `true` | `false` only at the official launch |
-| `SHOW_PLACEHOLDER_BADGES` | `true` | `false` only once the copy is final |
 | `ENQUIRY_FORM_ACTION` | *(empty)* | Enquiry form endpoint (a form service URL). Empty: the form says it is not connected |
 | `WHATSAPP_NUMBER` | *(empty)* | Shows the WhatsApp button (digits, international format) |
 | `FREE_TOOL_WIRE_SCRIPT_URL`, `…_TILES_…`, `…_BRICKS_…`, `…_CEMENT_…` | *(empty)* | Loads that tool's agent. Empty: "Coming soon" |
@@ -101,8 +100,9 @@ exported pages are public.
   (HSTS preload) list. A non-browser client that asks for plain `http://` on
   `workers.dev` gets the page without a redirect. With a custom domain,
   turn on Cloudflare's "Always Use HTTPS".
-- "Placeholder" badges, "Illustrative image" labels, the not-connected
-  enquiry form and "Coming soon" tools, all unchanged.
+- "Illustrative image" labels on generated images, the not-available
+  enquiry form and "Coming soon" tools, all unchanged. The Projects pages are
+  not exported while `apps/core/projects.py` has `PUBLISHED = False`.
 
 ## What a static host does not include
 

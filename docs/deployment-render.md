@@ -50,7 +50,6 @@ Set by `render.yaml` (Render > service > **Environment** shows them):
 | `DATABASE_URL` | `sqlite:///db.sqlite3` | See *Database* below |
 | `WEB_CONCURRENCY` | `2` | Gunicorn worker processes |
 | `SITE_NOINDEX` | `true` | Keep search engines out (preview) |
-| `SHOW_PLACEHOLDER_BADGES` | `true` | Keep unfinished copy marked "Placeholder" |
 | `DJANGO_SECURE_HSTS_SECONDS` | `0` | HSTS off on the preview |
 
 Set automatically by Render: `RENDER_EXTERNAL_HOSTNAME` (the
@@ -177,8 +176,7 @@ previous version stays live.
 ## Before the official launch
 
 - Real contact details, enquiry endpoint, WhatsApp number and project
-  content. Remove the "Placeholder" badges only when the copy is final
-  (`SHOW_PLACEHOLDER_BADGES=false`).
+  content (see docs/content-placeholders.md).
 - Custom domain, `SITE_NOINDEX=false`, then HSTS.
 - A paid (always-on) instance, a persistent database if data must be kept,
   error tracking and uptime monitoring.

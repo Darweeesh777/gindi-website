@@ -25,10 +25,8 @@ services:
         value: sqlite:///db.sqlite3
       - key: WEB_CONCURRENCY
         value: "2"
-      # Preview: keep search engines out and unfinished content marked.
+      # Preview: keep search engines out.
       - key: SITE_NOINDEX
-        value: "true"
-      - key: SHOW_PLACEHOLDER_BADGES
         value: "true"
       # HSTS stays off on the preview; enable only on the real domain.
       - key: DJANGO_SECURE_HSTS_SECONDS

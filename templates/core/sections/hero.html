@@ -24,7 +24,7 @@
       <span>{{ c.hero.eyebrow }}</span>
     </p>
     <h1 class="hero__title display hero-intro" id="hero-title" style="--i: 1">
-      {{ c.hero.title|safe }}{% if show_placeholders %}<span class="ph-badge">{{ c.ui.placeholder_badge }}</span>{% endif %}
+      {{ c.hero.title|safe }}
     </h1>
     <p class="hero__lead lead hero-intro" style="--i: 2">{{ c.hero.lead }}</p>
     <div class="hero__actions hero-intro" style="--i: 3">
@@ -43,7 +43,7 @@
     {% elif c.hero.image.illustrative %}
       <p class="hero__image-note"><span class="placeholder__kind">{{ c.ui.illustrative_note }}</span></p>
     {% endif %}
-    <a class="hero__scroll label" href="#projects" aria-hidden="true" tabindex="-1">
+    <a class="hero__scroll label" href="#{% if show_projects %}projects{% else %}vision{% endif %}" aria-hidden="true" tabindex="-1">
       <span>{{ c.ui.scroll }}</span><span class="hero__scroll-line"></span>
     </a>
   </div>

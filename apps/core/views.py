@@ -35,6 +35,8 @@ def _context(lang, page, view, kwargs=None):
     nav = [{'id': 'home', 'label': CONTENT[lang]['nav']['home'], 'href': '#top' if page == 'home' else home_url,
             'current': '', 'section': False}]
     for section in NAV_SECTIONS:
+        if section == 'projects' and not projects.PUBLISHED:
+            continue  # no verified projects yet: no link to the section or the pages
         label = CONTENT[lang]['nav'][section]
         if section in own_pages and not (section == 'projects' and page == 'home'):
             href, current = own_pages[section]
@@ -57,9 +59,19 @@ def _context(lang, page, view, kwargs=None):
         'about_url': own_pages['about'][0],
         'tools_url': reverse('core:free_tools' + suffix),
         'nav': nav,
-        'show_placeholders': settings.SHOW_PLACEHOLDER_BADGES,
+        'show_projects': projects.PUBLISHED,
         'site_noindex': settings.SITE_NOINDEX,
     }
+
+
+# Homepage sections with a number in their heading, in page order. Projects,
+# when published, comes first (as 01) and is numbered by its own layout.
+NUMBERED_SECTIONS = ('services', 'process', 'about', 'contact')
+
+
+def _section_numbers():
+    first = 2 if projects.PUBLISHED else 1
+    return {name: f'{first + i:02d}' for i, name in enumerate(NUMBERED_SECTIONS)}
 
 
 def home(request, lang='en'):
@@ -71,15 +83,19 @@ def home(request, lang='en'):
     context.update({
         'c': content,
         'emblem': emblem.context(),
-        'projects': projects.for_language(lang),
+        'projects': projects.for_language(lang) if projects.PUBLISHED else [],
         'services': services.for_language(lang),
         'vision': vision.for_language(lang),
+        'nums': _section_numbers(),
     })
     return render(request, 'core/home.html', context)
 
 
 def projects_index(request, lang='en'):
-    """All projects, each with its editorial group of photos (/projects/)."""
+    """All projects, each with its editorial group of photos (/projects/).
+    Not public until projects.PUBLISHED (no verified projects yet)."""
+    if not projects.PUBLISHED:
+        raise Http404('Projects are not published')
     context = _context(lang, 'projects', 'core:projects')
     context.update({'c': CONTENT[lang], 'projects': projects.for_language(lang)})
     return render(request, 'core/projects.html', context)
@@ -87,7 +103,7 @@ def projects_index(request, lang='en'):
 
 def project_detail(request, slug, lang='en'):
     """One project with all its photos and films (/projects/<slug>/)."""
-    project = projects.get(slug, lang)
+    project = projects.get(slug, lang) if projects.PUBLISHED else None
     if project is None:
         raise Http404('No such project')
     context = _context(lang, 'project', 'core:project', {'slug': slug})

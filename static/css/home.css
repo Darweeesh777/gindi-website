@@ -1,0 +1,85 @@
+/*
+ * Gindi Innovations — homepage-only layout adjustments
+ *
+ * Loaded by templates/core/home.html only; everything is scoped under
+ * <main class="home">, so other pages keep their own spacing.
+ */
+
+/* ---------- Spacing between sections ----------
+   Each section gets the same, smaller padding on both sides of every
+   boundary, instead of --space-section (up to 12rem) on both sides, which
+   stacked into ~380px gaps between neighbours. Total separation between two
+   sections' content: about 32px on phones to 64px on desktop. Sections still
+   size to their content; the hero and "From Vision to Reality" keep their
+   one-screen minimum heights. */
+.home {
+  --home-section-space: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+}
+
+.home > .section {
+  padding-block: var(--home-section-space);
+}
+
+/* Projects: the faint monogram sits 1.5rem above the details and the section
+   clips overflow (overflow: clip), so its top padding never goes below
+   1.75rem; otherwise the monogram's top is cut off on phones. */
+.home > .featured {
+  padding-block-start: max(var(--home-section-space), 1.75rem);
+}
+
+/* "From Vision to Reality" keeps its one-screen height (below the navbar) on
+   landscape screens, where the frame grows into it. On portrait screens the
+   frame is limited by the width (4:3 at most), so that height only added
+   empty bands above and below: there the section fits its content and the
+   frame takes its 4:3 height directly. */
+@media (max-aspect-ratio: 1 / 1) {
+  .home > .vision {
+    min-height: 0;
+  }
+
+  .home .vision .compare {
+    flex: none;
+  }
+
+  .home .vision .compare__frame {
+    flex: none;
+    height: 75cqw;
+  }
+}
+
+/* The footer starts with its divider line right at its top edge, so the
+   last section keeps a little more room above it. */
+.home > .contact {
+  padding-block-end: calc(var(--home-section-space) * 1.5);
+}
+
+/* Heading block to content: --space-lg rather than --space-xl. */
+.home .section-head {
+  margin-block-end: var(--space-lg);
+}
+
+/* Stacked layouts (mobile/tablet): image or intro to the next block. */
+.home .about__layout,
+.home .contact__layout {
+  row-gap: var(--space-lg);
+}
+
+/* ---------- Gindi Innovations: the arch image ----------
+   The figure is a 3:4 arch sized by its grid column, which made it taller
+   than the screen on common laptops. Cap its width so its height (4/3 of the
+   width) stays at most 82% of the viewport below the navbar:
+   0.82 * 3/4 = 0.615. The container itself shrinks (no transform), keeping
+   the ratio, the arch and the crop; it stays centred in its column, and the
+   text stays vertically centred beside it (.about__layout align-items). */
+.home .about__media .media--arch {
+  max-width: calc((100vh - var(--header-h)) * 0.615);
+  max-width: calc((100dvh - var(--header-h)) * 0.615);
+  margin-inline: auto;
+}
+
+/* Phones (stacked layout): a smaller image, scaling with the screen. */
+@media (max-width: 40rem) {
+  .home .about__media .media--arch {
+    max-width: min(100%, 60vw + 1rem, 18rem);
+  }
+}

@@ -1,11 +1,17 @@
 import re
+from unittest import mock
 
 from django.test import SimpleTestCase
 from django.urls import reverse
 
+from . import projects as project_data
+
 SECTION_ORDER = ['top', 'projects', 'vision', 'services', 'process', 'about', 'contact']
 
 
+# The whole site as it is once real projects are published (projects.PUBLISHED).
+# The unpublished default is covered by PublicContentTests below.
+@mock.patch.object(project_data, 'PUBLISHED', True)
 class HomepageTests(SimpleTestCase):
     def get(self, name):
         response = self.client.get(reverse(name))
@@ -313,9 +319,10 @@ class HomepageTests(SimpleTestCase):
                 self.assertIn(f'id="{slug}-trigger"\n                        aria-expanded="{expanded}"', html)
                 self.assertIn(f'aria-haspopup="dialog" data-enquire="{slug}"', html)
             self.assertEqual(html.count('accordion__item is-open'), 1)
-            # Free Tools: four cards, each to its own page; no inputs outside the enquiry drawer.
-            for slug in ('wire', 'tiles', 'bricks', 'cement'):
-                self.assertIn(f'class="btn btn--primary tool-card__cta" href="{prefix}/free-tools/{slug}/"', html)
+            # Free Tools: four cards, all "Coming soon" with no button that looks usable
+            # (no agent connected); no inputs outside the enquiry drawer.
+            self.assertEqual(html.count('class="tool-card__status label"'), 4)
+            self.assertNotIn('tool-card__cta', html)
             self.assertIn(f'href="{prefix}/free-tools/"', html)
             body = html[:html.index('<dialog class="drawer')]
             self.assertNotIn('<input', body)
@@ -330,7 +337,8 @@ class HomepageTests(SimpleTestCase):
             self.assertIn('data-not-connected', drawer)
             self.assertIn('type="submit" disabled', drawer)
             self.assertNotIn('action=', drawer)
-            self.assertIn(f'href="{prefix}/#contact"', drawer)
+            self.assertIn('id="enquiry-notice"', drawer)
+            self.assertNotIn('#contact', drawer)  # no contact details to point to yet
             # Header: Services is this page.
             self.assertIn(f'href="{prefix}/services/" aria-current="page"', html)
 
@@ -374,9 +382,8 @@ class HomepageTests(SimpleTestCase):
         self.assertEqual(slugs, ['wire', 'tiles', 'bricks', 'cement'])
         for name, prefix in (('core:free_tools', ''), ('core:free_tools_ar', '/ar')):
             html = self.get(name)
-            for slug in slugs:
-                self.assertIn(f'href="{prefix}/free-tools/{slug}/"', html)
             self.assertEqual(html.count('class="tool-card__status label"'), 4)  # all coming soon
+            self.assertNotIn('tool-card__cta', html)  # ...so no "Start Free Estimate" button
             self.assertIn(f'href="{prefix}/services/" aria-current="true"', html)
             self.assertNotIn('<input', html)
         for slug in slugs:
@@ -401,6 +408,9 @@ class HomepageTests(SimpleTestCase):
         self.assertIn('<script src="https://agents.example.com/tiles.js" defer data-tool-script="tiles"></script>', tiles)
         self.assertNotIn('data-tool-script', wire)
         self.assertEqual(overview.count('class="tool-card__status label"'), 3)
+        # Only the connected tool's card offers to start it.
+        self.assertEqual(overview.count('tool-card__cta'), 1)
+        self.assertIn('class="btn btn--primary tool-card__cta" href="/free-tools/tiles/"', overview)
 
     def test_old_estimate_route_redirects(self):
         response = self.client.get('/free-estimate/')
@@ -511,22 +521,100 @@ class HomepageTests(SimpleTestCase):
             self.assertIn(f'href="{prefix}/about/"', footer)
             self.assertIn(f'<a class="btn btn--primary about__more" href="{prefix}/about/"', html)
 
+    def test_process_has_the_six_step_workflow(self):
+        en_titles = ['A Call &amp; a Free Site Visit', 'Agreement &amp; Initial Design',
+                     'Design Meetings &amp; Revisions', 'Materials &amp; Price Approval',
+                     'Purchasing &amp; Execution', 'Handover &amp; Follow-Up']
+        ar_titles = ['اتصال وزيارة مجانية للموقع', 'الاتفاق والتصميم المبدئي', 'اجتماعات التصميم والتعديلات',
+                     'اعتماد الخامات والأسعار', 'الشراء والتنفيذ', 'التسليم والمتابعة']
+        for name, heading, titles in (('core:home', 'From Our First Call to After Handover', en_titles),
+                                      ('core:home_ar', 'من أول اتصال حتى ما بعد التسليم', ar_titles)):
+            html = self.get(name)
+            section = html[html.index('id="process"'):html.index('id="about"')]
+            self.assertIn(f'id="process-title" data-reveal>{heading}</h2>', section)  # confirmed copy: no badge
+            self.assertEqual(section.count('<li class="step"'), 6)
+            self.assertEqual(re.findall(r'step__index">(\d+)<', section), ['01', '02', '03', '04', '05', '06'])
+            self.assertEqual(re.findall(r'<h3 class="step__title">([^<]+)</h3>', section), titles)
+        en = self.get('core:home')
+        self.assertIn('We work through every stage with you—from understanding your needs and refining the '
+                      'design to approving materials and completing the work.', en)
+        self.assertIn('Then we arrange a free site visit to see the space in person.', en)
+        self.assertIn('we review them with you and follow through on the adjustments.', en)
+
     def test_no_live_contact_links(self):
         for name in ('core:home', 'core:home_ar'):
             html = self.get(name)
             self.assertNotIn('mailto:', html)
             self.assertNotIn('tel:', html)
 
-class DeploymentTests(SimpleTestCase):
-    """Preview/production plumbing: placeholders, noindex, robots, errors."""
+class PublicContentTests(SimpleTestCase):
+    """What visitors see by default: no editorial notes, no dummy blocks, honest states."""
 
-    def test_placeholder_badges_do_not_depend_on_debug(self):
-        # The test runner always runs with DEBUG=False.
-        html = self.client.get(reverse('core:home')).content.decode()
-        self.assertIn('<span class="ph-badge">Placeholder</span>', html)
-        with self.settings(SHOW_PLACEHOLDER_BADGES=False):
-            html = self.client.get(reverse('core:home')).content.decode()
-            self.assertNotIn('class="ph-badge"', html)
+    PAGES = ['/', '/ar/', '/about/', '/ar/about/', '/services/', '/ar/services/', '/free-tools/', '/ar/free-tools/',
+             *[f'{p}/free-tools/{s}/' for p in ('', '/ar') for s in ('wire', 'tiles', 'bricks', 'cement')]]
+    # Editing notes and temporary-content annotations, English and Arabic.
+    EDITORIAL = re.compile(r'(?i)placeholder|ph-badge|to be (?:added|confirmed)|temporary|published here|'
+                           r'replace later|sample image|demo content|lorem|'
+                           r'محتوى مؤقت|قيد التأكيد|ستُضاف|سيُضاف|مؤقتة|ستُنشر|لاحقًا')
+
+    def visible_text(self, html):
+        html = re.sub(r'(?s)<(script|style)\b.*?</\1>|<!--.*?-->', ' ', html)
+        return re.sub(r'<[^>]+>', ' ', html)
+
+    def test_no_editorial_notes_on_any_public_page(self):
+        for path in self.PAGES + ['/no-such-page/', '/ar/no-such-page/']:
+            html = self.client.get(path).content.decode()
+            # Visible text plus alt/title/aria text (class names are styling hooks, never shown).
+            found = self.EDITORIAL.findall(self.visible_text(html)) + self.EDITORIAL.findall(
+                ' '.join(re.findall(r'(?:alt|title|aria-label|placeholder)="([^"]*)"', html)))
+            self.assertEqual(found, [], path)
+
+    def test_projects_are_hidden_until_published(self):
+        self.assertFalse(project_data.PUBLISHED)
+        for home, prefix in (('/', ''), ('/ar/', '/ar')):
+            html = self.client.get(home).content.decode()
+            self.assertNotIn('id="projects"', html)
+            self.assertNotIn('/projects/', html)
+            self.assertNotIn('projects-carousel.js', html)
+            self.assertIn('href="#vision" aria-hidden="true"', html)  # hero scroll cue: next section
+            # Numbered sections start at 01 without Projects.
+            self.assertEqual(re.findall(r'<span class="num">(\d+)</span>\s*<span class="keystone"', html),
+                             ['01', '02', '03', '04'])
+            for path in (f'{prefix}/projects/', f'{prefix}/projects/project-1/'):
+                self.assertEqual(self.client.get(path).status_code, 404, path)
+            self.assertNotIn('/projects/', self.client.get(f'{prefix}/no-such-page/').content.decode())
+            self.assertNotIn('/projects/', self.client.get(f'{prefix}/about/').content.decode())
+
+    def test_contact_shows_no_unconfirmed_details(self):
+        for path, invitation in (('/', 'Share a little about your space and what you imagine for it.</p>'),
+                                 ('/ar/', 'حدّثنا قليلًا عن مساحتك وما تتخيّله لها.</p>')):
+            html = self.client.get(path).content.decode()
+            self.assertIn('id="contact"', html)
+            self.assertIn(invitation, html)
+            self.assertNotIn('contact__details', html)
+            self.assertNotIn('site-footer__contact', html)
+
+    def test_unfinished_features_stay_honest(self):
+        services = self.client.get('/services/').content.decode()
+        self.assertIn('Online enquiries are not available yet, so this form cannot be sent.', services)
+        self.assertRegex(services, r'class="btn btn--primary enquiry-form__send" type="submit" disabled')
+        self.assertNotIn('data-whatsapp', services)
+        self.assertIn('إرسال الاستفسارات عبر الموقع غير متاح بعد', self.client.get('/ar/services/').content.decode())
+        tool = self.client.get('/free-tools/tiles/').content.decode()
+        self.assertIn('Coming soon', tool)
+        self.assertNotIn('data-tool-script', tool)
+
+    def test_generated_images_keep_their_disclosure(self):
+        html = self.client.get('/').content.decode()
+        self.assertIn('Illustrative image — not a studio project', html)  # hero
+        about = html[html.index('id="about"'):html.index('id="contact"')]
+        self.assertIn('<figcaption class="media__tag" aria-hidden="true">Illustrative image</figcaption>', about)
+        self.assertIn('alt="Illustrative image:', about)
+        self.assertIn('صورة توضيحية', self.client.get('/ar/').content.decode())
+
+
+class DeploymentTests(SimpleTestCase):
+    """Preview/production plumbing: noindex, robots, errors."""
 
     def test_free_tools_stay_coming_soon_without_scripts(self):
         for slug in ('wire', 'tiles', 'bricks', 'cement'):
@@ -619,13 +707,23 @@ class StaticExportTests(SimpleTestCase):
                         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'}}
             with self.settings(STATIC_ROOT=tmp / 'collected', STORAGES=storages):
                 call_command('export_static', output=str(tmp / 'dist'), base_url='https://preview.example', verbosity=0)
+                # Once real projects are published, their pages are exported too.
+                with mock.patch.object(project_data, 'PUBLISHED', True):
+                    call_command('export_static', output=str(tmp / 'published' / 'dist'),
+                                 base_url='https://preview.example', verbosity=0)
+            published = tmp / 'published' / 'dist'
+            for page in ('projects/index.html', 'projects/project-1/index.html', 'ar/projects/project-4/index.html'):
+                self.assertTrue((published / page).is_file(), page)
+            self.assertEqual(len(list(published.rglob('index.html'))), 26)
             dist = tmp / 'dist'
-            for page in ('index.html', 'ar/index.html', 'projects/index.html', 'projects/project-1/index.html',
-                         'ar/projects/project-4/index.html', 'about/index.html', 'services/index.html',
+            for page in ('index.html', 'ar/index.html', 'about/index.html', 'services/index.html',
                          'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/cement/index.html',
                          '404.html', 'ar/404.html', 'robots.txt'):
                 self.assertTrue((dist / page).is_file(), page)
-            self.assertEqual(len(list(dist.rglob('index.html'))), 26)
+            # Projects not published (the default): no project pages at all.
+            self.assertFalse((dist / 'projects').exists())
+            self.assertFalse((dist / 'ar' / 'projects').exists())
+            self.assertEqual(len(list(dist.rglob('index.html'))), 16)
             home = (dist / 'index.html').read_text(encoding='utf-8')
             self.assertIn('href="https://preview.example/ar/"', home)
             self.assertRegex(home, r'/static/css/base\.[0-9a-f]{12}\.css')

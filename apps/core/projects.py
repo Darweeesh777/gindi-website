@@ -31,6 +31,11 @@ missing 'ar' falls back to English.
 The entries below are TEMPORARY: their photos are illustrative, AI-generated
 interiors (labelled as such on the page), not studio projects, and the
 detail photos are placeholders.
+
+PUBLISHED is False while that is so: the homepage Projects section, the
+"Projects" menu links and /projects/ pages are not shown (the pages return
+404 and are not exported). Replace the entries with real, confirmed projects,
+then set PUBLISHED = True.
 """
 import re
 
@@ -39,6 +44,9 @@ from django.templatetags.static import static
 from django.urls import reverse
 
 from .images import IMAGES, resolve
+
+# Public only once the entries are real, verified projects (see above).
+PUBLISHED = False
 
 PLACEHOLDER_SCOPE = {'en': 'Scope of work to be added.', 'ar': 'سيُضاف نطاق العمل لاحقًا.'}
 PLACEHOLDER_DESCRIPTION = {

@@ -25,7 +25,7 @@ Branded 404 (apps.core.views.page_not_found, handler404): in Arabic for
         </header>
         <div class="error-page__actions">
           <a class="btn btn--primary" href="{% url url_name %}">{{ c.not_found.home }}</a>
-          <a class="link-arrow" href="{{ projects_url }}">{{ c.not_found.projects }}{% include "partials/arrow.html" %}</a>
+          {% if show_projects %}<a class="link-arrow" href="{{ projects_url }}">{{ c.not_found.projects }}{% include "partials/arrow.html" %}</a>{% endif %}
         </div>
       </div>
     </section>

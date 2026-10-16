@@ -22,13 +22,15 @@
         </ul>
       </nav>
 
-      {# PLACEHOLDER: contact and social details. #}
-      <div class="site-footer__contact">
-        {% for item in c.contact.details %}
-          <p><span class="label">{{ item.label }}</span><span class="is-placeholder">{{ item.value }}</span></p>
-        {% endfor %}
-        <p><span class="label">{{ c.contact.social_label }}</span><span class="is-placeholder">{{ c.contact.social }}</span></p>
-      </div>
+      {# Confirmed contact details only (content.py → contact); none yet, so nothing is shown. #}
+      {% if c.contact.details or c.contact.social %}
+        <div class="site-footer__contact">
+          {% for item in c.contact.details %}
+            <p><span class="label">{{ item.label }}</span><span>{{ item.value }}</span></p>
+          {% endfor %}
+          {% if c.contact.social %}<p><span class="label">{{ c.contact.social_label }}</span><span>{{ c.contact.social }}</span></p>{% endif %}
+        </div>
+      {% endif %}
     </div>
 
     <div class="site-footer__bottom">

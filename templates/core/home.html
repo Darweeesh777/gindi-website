@@ -8,8 +8,10 @@
 
 {% block head_extra %}
   {% load static %}
+  {# Homepage-only spacing and sizing (scoped under main.home). #}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
   {# Featured projects carousel (Projects section). #}
-  <script src="{% static 'js/projects-carousel.js' %}" defer></script>
+  {% if show_projects %}<script src="{% static 'js/projects-carousel.js' %}" defer></script>{% endif %}
   {# Design/reality comparison ("From Vision to Reality"). #}
   <script src="{% static 'js/compare-slider.js' %}" defer></script>
   {# The Geometric G reveal in the Gindi Innovations section. #}
@@ -23,9 +25,10 @@
 {% block body %}
   {% include "partials/header.html" %}
 
-  <main id="main" tabindex="-1">
+  <main id="main" class="home" tabindex="-1">
     {% include "core/sections/hero.html" %}
-    {% include "core/sections/projects.html" %}
+    {# Only once there are real projects (apps/core/projects.py PUBLISHED). #}
+    {% if show_projects %}{% include "core/sections/projects.html" %}{% endif %}
     {% include "core/sections/vision.html" %}
     {% include "core/sections/services.html" %}
     {% include "core/sections/process.html" %}

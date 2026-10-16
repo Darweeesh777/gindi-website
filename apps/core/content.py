@@ -7,8 +7,6 @@ details confirmed by the studio. See docs/content-placeholders.md.
 
 Rules:
 - Numbers are always Western digits (01, 02, 2026), in both languages.
-- With DEBUG on, the template marks placeholder blocks with a small
-  "Placeholder" badge; remove each badge as its content is confirmed.
 - `image` is a key from images.py (with `alt` text alongside it); `None`
   renders a labelled image placeholder instead.
 """
@@ -43,7 +41,6 @@ CONTENT = {
             'image_placeholder': 'Image placeholder',
             'illustrative': 'Illustrative image',
             'illustrative_note': 'Illustrative image — not a studio project',
-            'placeholder_badge': 'Placeholder',
             'rights': 'All rights reserved.',
             'back_to_top': 'Back to top',
         },
@@ -122,9 +119,7 @@ CONTENT = {
             'send': 'Send enquiry',
             'close': 'Close',
             'required': 'Required',
-            'not_connected': 'Online enquiries are not connected yet, so this form cannot be sent. '
-                             'The studio’s contact details will be published on the homepage.',
-            'contact_link': 'Go to Contact',
+            'not_connected': 'Online enquiries are not available yet, so this form cannot be sent.',
             'whatsapp': 'Chat with Us on WhatsApp',
             'whatsapp_service': 'Hello, I’d like to enquire about {service}.',
             'whatsapp_general': 'Hello, I’d like to enquire about your services.',
@@ -179,26 +174,40 @@ CONTENT = {
             'slider': 'Compare the design with the finished space',
             'design_short': 'design',
             'reality_short': 'reality',
-            'design_missing': 'Placeholder: design visual to be added',
-            'reality_missing': 'Placeholder: photograph to be added',
+            'design_missing': 'Design image unavailable',
+            'reality_missing': 'Photograph unavailable',
         },
         'services': {
             'eyebrow': 'Services',
             'title': 'What the studio offers.',
-            'intro': 'Service descriptions are temporary and will be confirmed by the studio.',
             'all': 'All services',  # the services themselves: apps/core/services.py
         },
         'process': {
             'eyebrow': 'Process',
-            'title': 'From first conversation to final detail.',
-            'intro': 'The stages below are illustrative and will be updated with the studio’s own workflow.',
-            # PLACEHOLDER: temporary stages.
+            # The studio's confirmed workflow (six steps, numbered 01–06 by the template).
+            'title': 'From Our First Call to After Handover',
+            'intro': 'We work through every stage with you—from understanding your needs and refining the '
+                     'design to approving materials and completing the work.',
             'steps': [
-                {'title': 'Discovery', 'text': 'Understanding the space, the brief and the way you live or work.'},
-                {'title': 'Concept', 'text': 'A design direction expressed through mood, material and layout.'},
-                {'title': 'Design Development', 'text': 'Refining every surface, joint and detail.'},
-                {'title': 'Documentation', 'text': 'Drawings and specifications prepared for execution.'},
-                {'title': 'Realisation', 'text': 'Overseeing the work until the space is complete.'},
+                {'title': 'A Call & a Free Site Visit',
+                 'text': 'We start with a call to learn about your property—whether it’s a house, villa, '
+                         'apartment, or shop—and what you need. Then we arrange a free site visit to see the '
+                         'space in person.'},
+                {'title': 'Agreement & Initial Design',
+                 'text': 'After the visit, we agree on the scope of work and begin designing around your needs, '
+                         'preferences, and how you’ll use the space.'},
+                {'title': 'Design Meetings & Revisions',
+                 'text': 'We present the design, discuss your feedback, and work through revisions together '
+                         'until you approve the final design.'},
+                {'title': 'Materials & Price Approval',
+                 'text': 'We source material options that suit the approved design and share their prices with '
+                         'you. Every selection and its cost are reviewed with you before we purchase.'},
+                {'title': 'Purchasing & Execution',
+                 'text': 'Once you approve, we purchase the materials and carry out the agreed work, keeping you '
+                         'involved as the project progresses.'},
+                {'title': 'Handover & Follow-Up',
+                 'text': 'Our involvement continues after handover. If you have any concerns about the completed '
+                         'work, we review them with you and follow through on the adjustments.'},
             ],
         },
         'about': {
@@ -222,18 +231,13 @@ CONTENT = {
         'contact': {
             'eyebrow': 'Contact',
             'title': 'Let’s begin with a conversation.',
-            'intro': (
-                'Share a little about your space and what you imagine for it. '
-                'Contact details will be published here shortly.'
-            ),
-            # PLACEHOLDER: no contact details have been supplied yet.
-            'details': [
-                {'label': 'Email', 'value': 'Email address to be confirmed'},
-                {'label': 'Phone', 'value': 'Phone number to be confirmed'},
-                {'label': 'Studio', 'value': 'Office address to be confirmed'},
-            ],
+            'intro': 'Share a little about your space and what you imagine for it.',
+            # Real contact details only, e.g. {'label': 'Email', 'value': '…'}. While
+            # the list is empty (none confirmed yet) neither the Contact section nor
+            # the footer shows a details block. 'social': a confirmed link text.
+            'details': [],
             'social_label': 'Follow',
-            'social': 'Social media links to be confirmed',
+            'social': '',
         },
         'footer': {
             'tagline': 'Interior design studio · Egypt — International',
@@ -262,7 +266,6 @@ CONTENT = {
             'image_placeholder': 'مكان مخصّص لصورة',
             'illustrative': 'صورة توضيحية',
             'illustrative_note': 'صورة توضيحية — ليست من مشاريع الاستوديو',
-            'placeholder_badge': 'محتوى مؤقت',
             'rights': 'جميع الحقوق محفوظة.',
             'back_to_top': 'العودة إلى الأعلى',
         },
@@ -338,9 +341,7 @@ CONTENT = {
             'send': 'إرسال الاستفسار',
             'close': 'إغلاق',
             'required': 'مطلوب',
-            'not_connected': 'لم يُربط إرسال الاستفسارات عبر الموقع بعد، لذا لا يمكن إرسال هذا النموذج. '
-                             'ستُنشر بيانات التواصل مع الاستوديو في الصفحة الرئيسية.',
-            'contact_link': 'انتقل إلى التواصل',
+            'not_connected': 'إرسال الاستفسارات عبر الموقع غير متاح بعد، لذا لا يمكن إرسال هذا النموذج.',
             'whatsapp': 'تواصل معنا عبر واتساب',
             'whatsapp_service': 'مرحبًا، أودّ الاستفسار عن {service}.',
             'whatsapp_general': 'مرحبًا، أودّ الاستفسار عن خدماتكم.',
@@ -395,26 +396,37 @@ CONTENT = {
             'slider': 'قارن التصميم بالمساحة بعد التنفيذ',
             'design_short': 'التصميم',
             'reality_short': 'الواقع',
-            'design_missing': 'محتوى مؤقت: سيُضاف التصميم',
-            'reality_missing': 'محتوى مؤقت: ستُضاف صورة التنفيذ',
+            'design_missing': 'صورة التصميم غير متاحة',
+            'reality_missing': 'صورة التنفيذ غير متاحة',
         },
         'services': {
             'eyebrow': 'الخدمات',
             'title': 'ما يقدّمه الاستوديو.',
-            'intro': 'أوصاف الخدمات مؤقتة، وسيعتمدها الاستوديو لاحقًا.',
             'all': 'كل الخدمات',  # the services themselves: apps/core/services.py
         },
         'process': {
             'eyebrow': 'منهجية العمل',
-            'title': 'من الحديث الأول حتى التفصيلة الأخيرة.',
-            'intro': 'المراحل التالية توضيحية، وستُحدَّث وفق منهجية العمل المعتمدة لدى الاستوديو.',
-            # PLACEHOLDER: temporary stages.
+            # The studio's confirmed workflow (six steps, numbered 01–06 by the template).
+            'title': 'من أول اتصال حتى ما بعد التسليم',
+            'intro': 'نرافقك في كل مرحلة، من فهم احتياجاتك وتطوير التصميم إلى اعتماد الخامات وإنجاز الأعمال.',
             'steps': [
-                {'title': 'الاستكشاف', 'text': 'فهم المساحة والمتطلبات وطريقة عيشك أو عملك.'},
-                {'title': 'الفكرة', 'text': 'توجّه تصميمي يُعبَّر عنه بالأجواء والخامات والتوزيع.'},
-                {'title': 'تطوير التصميم', 'text': 'صقل كل سطح وكل وصلة وكل تفصيلة.'},
-                {'title': 'التوثيق', 'text': 'إعداد الرسومات والمواصفات اللازمة للتنفيذ.'},
-                {'title': 'التنفيذ', 'text': 'متابعة الأعمال حتى اكتمال المساحة.'},
+                {'title': 'اتصال وزيارة مجانية للموقع',
+                 'text': 'نبدأ باتصال نتعرّف فيه على عقارك، سواء كان منزلًا أو فيلا أو شقة أو محلًا، وعلى ما '
+                         'تحتاج إليه. ثم نرتّب زيارة مجانية للموقع لنعاين المساحة على أرض الواقع.'},
+                {'title': 'الاتفاق والتصميم المبدئي',
+                 'text': 'بعد الزيارة نتفق على نطاق العمل، ونبدأ التصميم وفق احتياجاتك وتفضيلاتك وطريقة '
+                         'استخدامك للمساحة.'},
+                {'title': 'اجتماعات التصميم والتعديلات',
+                 'text': 'نعرض عليك التصميم ونناقش ملاحظاتك، ونُجري التعديلات معًا حتى تعتمد التصميم النهائي.'},
+                {'title': 'اعتماد الخامات والأسعار',
+                 'text': 'نوفّر خيارات من الخامات تناسب التصميم المعتمد ونطلعك على أسعارها، ونراجع معك كل '
+                         'اختيار وتكلفته قبل الشراء.'},
+                {'title': 'الشراء والتنفيذ',
+                 'text': 'بعد موافقتك نشتري الخامات وننفّذ الأعمال المتفق عليها، ونُشركك في سير العمل مع تقدّم '
+                         'المشروع.'},
+                {'title': 'التسليم والمتابعة',
+                 'text': 'لا ينتهي دورنا عند التسليم؛ فإن كانت لديك أي ملاحظات على الأعمال المنفّذة، نراجعها '
+                         'معك ونتابع تنفيذ التعديلات اللازمة.'},
             ],
         },
         'about': {
@@ -437,15 +449,11 @@ CONTENT = {
         'contact': {
             'eyebrow': 'تواصل',
             'title': 'لنبدأ بحديث.',
-            'intro': 'حدّثنا قليلًا عن مساحتك وما تتخيّله لها. ستُنشر بيانات التواصل هنا قريبًا.',
-            # PLACEHOLDER: no contact details have been supplied yet.
-            'details': [
-                {'label': 'البريد الإلكتروني', 'value': 'البريد الإلكتروني قيد التأكيد'},
-                {'label': 'الهاتف', 'value': 'رقم الهاتف قيد التأكيد'},
-                {'label': 'الاستوديو', 'value': 'عنوان المكتب قيد التأكيد'},
-            ],
+            'intro': 'حدّثنا قليلًا عن مساحتك وما تتخيّله لها.',
+            # Real contact details only (see the English block); empty: not shown.
+            'details': [],
             'social_label': 'تابعنا',
-            'social': 'روابط وسائل التواصل الاجتماعي قيد التأكيد',
+            'social': '',
         },
         'footer': {
             'tagline': 'استوديو تصميم داخلي · مصر — دوليًا',

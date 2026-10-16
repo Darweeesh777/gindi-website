@@ -119,12 +119,9 @@ the `*.onrender.com` host is allowed automatically; elsewhere, set
 `DJANGO_ALLOWED_HOSTS`. See `.env.example` for the full list and
 [docs/deployment-render.md](docs/deployment-render.md) for the Render preview.
 
-Two flags are independent of `DEBUG` and default to on:
-
-- `SHOW_PLACEHOLDER_BADGES` marks unfinished copy as "Placeholder".
-- `SITE_NOINDEX` sends a noindex header and meta tag to keep search engines out.
-
-Set either to `false` only at launch.
+`SITE_NOINDEX` (independent of `DEBUG`, on by default) sends a noindex
+header and meta tag to keep search engines out; set it to `false` only at
+launch.
 
 ## Directory structure
 
