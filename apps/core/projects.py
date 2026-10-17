@@ -32,10 +32,10 @@ The entries below are TEMPORARY: their photos are illustrative, AI-generated
 interiors (labelled as such on the page), not studio projects, and the
 detail photos are placeholders.
 
-PUBLISHED is False while that is so: the homepage Projects section, the
-"Projects" menu links and /projects/ pages are not shown (the pages return
-404 and are not exported). Replace the entries with real, confirmed projects,
-then set PUBLISHED = True.
+PUBLISHED switches the homepage Projects section, the "Projects" menu links
+and the /projects/ pages on or off (off: the pages return 404 and are not
+exported). It is on at the studio's request, with these placeholder entries,
+until real projects replace them.
 """
 import re
 
@@ -45,8 +45,8 @@ from django.urls import reverse
 
 from .images import IMAGES, resolve
 
-# Public only once the entries are real, verified projects (see above).
-PUBLISHED = False
+# Shown on the site (see above). False hides every Projects entry point.
+PUBLISHED = True
 
 PLACEHOLDER_SCOPE = {'en': 'Scope of work to be added.', 'ar': 'سيُضاف نطاق العمل لاحقًا.'}
 PLACEHOLDER_DESCRIPTION = {

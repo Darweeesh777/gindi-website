@@ -561,6 +561,9 @@ class PublicContentTests(SimpleTestCase):
         html = re.sub(r'(?s)<(script|style)\b.*?</\1>|<!--.*?-->', ' ', html)
         return re.sub(r'<[^>]+>', ' ', html)
 
+    # Projects is shown with placeholder entries at the studio's request, so
+    # this scan covers the rest of the site (Projects switched off).
+    @mock.patch.object(project_data, 'PUBLISHED', False)
     def test_no_editorial_notes_on_any_public_page(self):
         for path in self.PAGES + ['/no-such-page/', '/ar/no-such-page/']:
             html = self.client.get(path).content.decode()
@@ -569,8 +572,18 @@ class PublicContentTests(SimpleTestCase):
                 ' '.join(re.findall(r'(?:alt|title|aria-label|placeholder)="([^"]*)"', html)))
             self.assertEqual(found, [], path)
 
-    def test_projects_are_hidden_until_published(self):
-        self.assertFalse(project_data.PUBLISHED)
+    def test_projects_shown_by_default(self):
+        self.assertTrue(project_data.PUBLISHED)
+        for home, prefix in (('/', ''), ('/ar/', '/ar')):
+            html = self.client.get(home).content.decode()
+            self.assertIn('id="projects"', html)
+            self.assertIn(f'href="{prefix}/projects/"', html)
+            self.assertEqual(re.findall(r'<span class="num">(\d+)</span>\s*<span class="keystone"', html),
+                             ['02', '03', '04', '05'])
+            self.assertEqual(self.client.get(f'{prefix}/projects/project-1/').status_code, 200)
+
+    @mock.patch.object(project_data, 'PUBLISHED', False)
+    def test_projects_can_be_switched_off(self):
         for home, prefix in (('/', ''), ('/ar/', '/ar')):
             html = self.client.get(home).content.decode()
             self.assertNotIn('id="projects"', html)
@@ -706,8 +719,10 @@ class StaticExportTests(SimpleTestCase):
             storages = {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
                         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'}}
             with self.settings(STATIC_ROOT=tmp / 'collected', STORAGES=storages):
-                call_command('export_static', output=str(tmp / 'dist'), base_url='https://preview.example', verbosity=0)
-                # Once real projects are published, their pages are exported too.
+                with mock.patch.object(project_data, 'PUBLISHED', False):
+                    call_command('export_static', output=str(tmp / 'dist'), base_url='https://preview.example',
+                                 verbosity=0)
+                # With Projects on, their pages are exported too.
                 with mock.patch.object(project_data, 'PUBLISHED', True):
                     call_command('export_static', output=str(tmp / 'published' / 'dist'),
                                  base_url='https://preview.example', verbosity=0)
@@ -720,7 +735,7 @@ class StaticExportTests(SimpleTestCase):
                          'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/cement/index.html',
                          '404.html', 'ar/404.html', 'robots.txt'):
                 self.assertTrue((dist / page).is_file(), page)
-            # Projects not published (the default): no project pages at all.
+            # Projects switched off: no project pages at all.
             self.assertFalse((dist / 'projects').exists())
             self.assertFalse((dist / 'ar' / 'projects').exists())
             self.assertEqual(len(list(dist.rglob('index.html'))), 16)

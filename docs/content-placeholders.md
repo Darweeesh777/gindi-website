@@ -17,7 +17,7 @@ All copy lives in `apps/core/content.py` (English and Arabic side by side);
 |---|---|---|
 | Hero | Headline and supporting line: draft brand copy, shown | Confirm or edit `hero.title` / `hero.lead` |
 | Hero | Background photograph: **illustrative AI image**, labelled | Replace with real photography — see "Images" below |
-| Projects | **Hidden**: no verified projects (only "Project 01"–"04" with AI images). The homepage section, the "Projects" menu links and `/projects/…` pages are off | Add real projects to `PROJECTS` in `apps/core/projects.py`, then set `PUBLISHED = True` there |
+| Projects | **Shown at the studio's request with placeholder entries** ("Project 01"–"04", "Scope of work to be added.", illustrative AI images, "Photo to be added" on detail pages) | Replace the entries in `PROJECTS` in `apps/core/projects.py` with real projects. `PUBLISHED = False` there hides the section, the menu links and the `/projects/…` pages |
 | Services | Four confirmed services; summaries and deliverables are **drafts to confirm**, shown without labels | Edit `SERVICES` in `apps/core/services.py` |
 | About (Gindi Innovations) | Studio image: **illustrative AI image**, labelled | A real studio or founder photo is preferred — see "Gindi Innovations reveal" below |
 | Contact / footer | **No details shown**: none confirmed yet; the Contact section keeps only its heading and invitation | Add real entries to `contact.details` (e.g. `{'label': 'Email', 'value': '…'}`) and `contact.social`; the details block appears in the section and the footer automatically |
@@ -95,8 +95,9 @@ To add a photo: export two WebP widths into `static/images/site/` named
 
 The four current projects are placeholders ("Project 01"–"04", "Scope of
 work to be added.") with one illustrative photo each and labelled
-placeholders for their detail photos, so **`PUBLISHED = False`** and none of
-this is public. Replace them with real projects, then set `PUBLISHED = True`.
+placeholders for their detail photos. They are shown (`PUBLISHED = True`) at
+the studio's request until real projects replace them; `PUBLISHED = False`
+hides every Projects entry point.
 `python manage.py test` checks the list (unique slugs, known images, alt
 text, film files present).
 

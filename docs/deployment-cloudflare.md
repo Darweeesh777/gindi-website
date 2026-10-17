@@ -102,7 +102,7 @@ exported pages are public.
   turn on Cloudflare's "Always Use HTTPS".
 - "Illustrative image" labels on generated images, the not-available
   enquiry form and "Coming soon" tools, all unchanged. The Projects pages are
-  not exported while `apps/core/projects.py` has `PUBLISHED = False`.
+  exported while `apps/core/projects.py` has `PUBLISHED = True` (the default).
 
 ## What a static host does not include
 
