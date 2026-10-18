@@ -133,14 +133,27 @@
 
   if ('IntersectionObserver' in window && sections.length) {
     var visible = {};
+    // The last section (Contact, at the page end) may never reach the middle
+    // band; at the bottom of the page it is the current one while on screen.
+    var last = sections[sections.length - 1];
+    var lastOnScreen = false;
+    var update = function () {
+      var atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      var current = atEnd && lastOnScreen ? last : sections.filter(function (s) { return visible[s.id]; }).pop();
+      setActive(current ? current.id : '');
+    };
     var sectionObserver = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         visible[entry.target.id] = entry.isIntersecting;
       });
-      var current = sections.filter(function (s) { return visible[s.id]; }).pop();
-      setActive(current ? current.id : '');
+      update();
     }, { rootMargin: '-45% 0px -50% 0px' });
     sections.forEach(function (s) { sectionObserver.observe(s); });
+    new IntersectionObserver(function (entries) {
+      lastOnScreen = entries[entries.length - 1].isIntersecting;
+      update();
+    }).observe(last);
+    window.addEventListener('scroll', update, { passive: true });
   }
 
   /* ---------- Scroll reveals ---------- */

@@ -1,0 +1,542 @@
+/*
+ * Gindi Innovations — interactive project page (KK Barbershop)
+ * Markup: templates/partials/project_gallery.html; script: js/project-gallery.js.
+ *
+ * Ivory page, navy text and controls, gold for selected states, markers and
+ * fine rules. The page container is nearly full width (about 40px side
+ * margins on desktop, 16px on phones). The large photo keeps the
+ * photographs' own 3:2 shape (set on the frame from the image size), so
+ * nothing is cropped and the markers, placed in % of the photo, stay on
+ * their objects at every size. Its width follows the screen height so the
+ * whole photo, caption and counter included, fits in the first screen below
+ * the navbar and heading (.pg-fit); the thumbnails follow below the fold.
+ */
+
+.pg {
+  --pg-fade: 280ms; /* keep in sync with FADE_MS in project-gallery.js */
+  --pg-gold-line: color-mix(in srgb, var(--gindi-gold) 55%, transparent);
+  padding-block: calc(var(--header-h) + clamp(0.625rem, 0.4rem + 0.7vw, 1.125rem)) clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+}
+
+/* Wider than the site's usual container: heading, tabs, photo and
+   thumbnails share these edges (16px on phones, ~40-48px on desktop). */
+.pg > .container {
+  max-width: 120rem;
+  padding-inline: clamp(1rem, 0.4rem + 2.4vw, 3rem);
+}
+
+/* ---------- Head: back link and name | tabs ---------- */
+.pg-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2.5rem;
+  margin-block-end: clamp(0.625rem, 0.4rem + 0.6vw, 1rem);
+}
+
+.pg-back {
+  padding-block: 0.25rem;
+  color: var(--muted);
+}
+
+.pg-back svg {
+  transform: scaleX(-1); /* points back */
+}
+
+[dir="rtl"] .pg-back svg {
+  transform: none;
+}
+
+.pg-title {
+  margin-block-start: 0.375rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.75rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.pg-tabs {
+  display: flex;
+  border-block-end: 1px solid var(--pg-gold-line);
+}
+
+.pg-tab {
+  position: relative;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.125rem;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.pg-tab::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.5rem;
+  inset-block-end: -1px;
+  height: 2px;
+  background: var(--gindi-gold);
+  transform: scaleX(0);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.pg-tab:hover,
+.pg-tab[aria-selected="true"] {
+  color: var(--gindi-navy);
+}
+
+.pg-tab[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+
+.pg-tab:focus-visible {
+  outline: 2px solid var(--gindi-navy);
+  outline-offset: 2px;
+}
+
+/* Only the selected tab's panel shows (the script also sets [hidden]). */
+.js .pg-panel:not(.is-active) {
+  display: none;
+}
+
+/* ---------- The large photo ---------- */
+/* As wide as fits: the height left in the first screen below the photo's
+   top (--pg-above, measured by project-gallery.js; an estimate without it),
+   less a 20px margin, times the image's own ratio (--pg-ratio) — but never
+   wider than the container, nor narrower than 30rem (phones and short
+   screens then simply scroll). Centred; the page container stays wide. */
+.pg-fit {
+  width: clamp(min(100%, 30rem), calc((100vh - var(--pg-above, 13rem) - 1.25rem) * var(--pg-ratio, 1.5)), 100%);
+  width: clamp(min(100%, 30rem), calc((100svh - var(--pg-above, 13rem) - 1.25rem) * var(--pg-ratio, 1.5)), 100%);
+  margin-inline: auto;
+}
+
+.pg-frame {
+  position: relative;
+  overflow: hidden;
+  background: var(--navy-08);
+}
+
+.pg-frame__img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* the frame has the photo's own shape: nothing is cropped */
+  transition: opacity var(--pg-fade) ease;
+}
+
+.pg-frame__img.is-entering {
+  opacity: 0;
+  transition: none;
+}
+
+/* Caption and counter on a soft shade at the bottom. */
+.pg-frame__bar {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0;
+  padding: 2.5rem clamp(0.875rem, 0.5rem + 1.2vw, 1.5rem) clamp(0.75rem, 0.5rem + 0.8vw, 1.125rem);
+  background: linear-gradient(to top, rgb(28 44 74 / 0.72), rgb(28 44 74 / 0));
+  color: var(--gindi-ivory);
+  pointer-events: none;
+}
+
+.pg-frame__caption {
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.pg-frame__count {
+  flex: none;
+  font-size: var(--fs-small);
+  letter-spacing: 0.14em;
+  unicode-bidi: isolate;
+}
+
+/* Corner controls: Previous View and Overview (reading start), full screen (end). */
+.pg-toolbar {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: clamp(0.625rem, 0.4rem + 0.8vw, 1rem);
+  inset-inline-start: clamp(0.625rem, 0.4rem + 0.8vw, 1rem);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pg-tool,
+.pg-expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 1px solid rgb(200 137 43 / 0.75);
+  background: rgb(28 44 74 / 0.72);
+  color: var(--gindi-ivory);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.pg-tool {
+  padding-inline: 0.875rem;
+  font-family: var(--font-sans);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+}
+
+.pg-expand {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: clamp(0.625rem, 0.4rem + 0.8vw, 1rem);
+  inset-inline-end: clamp(0.625rem, 0.4rem + 0.8vw, 1rem);
+}
+
+.pg-tool svg {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.pg-tool .pg-tool__back {
+  height: auto;
+}
+
+[dir="rtl"] .pg-tool__back {
+  transform: scaleX(-1);
+}
+
+.pg-expand svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.pg-tool:hover:not(:disabled),
+.pg-expand:hover {
+  border-color: var(--gindi-gold);
+  background: var(--gindi-navy);
+}
+
+/* Previous View with nowhere to go back to: clearly unavailable. */
+.pg-tool:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+/* Overview while showing the overview: marked as the current view. */
+.pg-tool[aria-current="true"] {
+  border-color: var(--gindi-gold);
+  background: rgb(28 44 74 / 0.9);
+  color: var(--gindi-gold);
+  opacity: 1;
+}
+
+.pg-tool:focus-visible,
+.pg-expand:focus-visible,
+.pg-hotspot:focus-visible {
+  outline: 2px solid var(--gindi-yellow);
+  outline-offset: 2px;
+}
+
+/* ---------- Markers: links to connected views ---------- */
+.pg-hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pg-hotspots[hidden] {
+  display: none;
+}
+
+/* A 44px target centred on the point, around a small gold keystone (the
+   logo's own shape). Positioned in physical %, like the photo itself, which
+   is never mirrored. The label sits beside the marker. */
+.pg-hotspot {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  translate: -50% -50%;
+}
+
+/* A soft ring so the marker reads on light and dark parts of the photo. */
+.pg-hotspot::before {
+  content: "";
+  position: absolute;
+  width: 2.125rem;
+  height: 2.125rem;
+  border: 1px solid rgb(244 241 236 / 0.9);
+  border-radius: 50%;
+  background: rgb(28 44 74 / 0.45);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.pg-hotspot__mark {
+  position: relative;
+  width: 1.125rem;
+  height: 0.9rem;
+  background: var(--gindi-gold);
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%); /* the logo's keystone */
+}
+
+.pg-hotspot:hover::before,
+.pg-hotspot:focus-visible::before {
+  transform: scale(1.12);
+}
+
+/* The destination's name: navy and ivory, beside the marker (towards the
+   middle of the photo near an edge). Shown on hover and focus; always on
+   touch screens, which have no hover. */
+.pg-hotspot__label {
+  position: absolute;
+  top: 50%;
+  left: calc(100% - 0.125rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid rgb(200 137 43 / 0.8);
+  background: rgb(28 44 74 / 0.92);
+  color: var(--gindi-ivory);
+  font-size: 0.875rem;
+  font-weight: var(--fw-medium);
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  translate: -0.25rem -50%;
+  transition: opacity var(--dur-fast) var(--ease-out), translate var(--dur-fast) var(--ease-out);
+}
+
+.pg-hotspot__label svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--gindi-gold);
+}
+
+.pg-hotspot--right .pg-hotspot__label {
+  left: auto;
+  right: calc(100% - 0.125rem);
+  translate: 0.25rem -50%;
+}
+
+.pg-hotspot:is(:hover, :focus) .pg-hotspot__label {
+  opacity: 1;
+  translate: 0 -50%;
+}
+
+@media (hover: none) {
+  .pg-hotspot__label {
+    opacity: 1;
+    translate: 0 -50%;
+  }
+}
+
+/* ---------- Thumbnails ---------- */
+/* All six across the gallery width on desktop; captions wrap to at most
+   two lines, in a caption area of the same height for every thumbnail. */
+.pg-thumbs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(0.5rem, 0.3rem + 0.6vw, 1rem);
+  margin: clamp(0.625rem, 0.4rem + 0.6vw, 1rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pg-thumb {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.3125rem 0.3125rem 0.5rem;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--muted);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.pg-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  opacity: 0.85;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.pg-thumb__caption {
+  min-height: calc(2 * 1.35em);
+  font-size: clamp(0.875rem, 0.8rem + 0.2vw, 1rem);
+  font-weight: var(--fw-medium);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.pg-thumb__num {
+  margin-inline-end: 0.25rem;
+  color: var(--gindi-gold);
+}
+
+.pg-thumb:hover {
+  color: var(--gindi-navy);
+}
+
+.pg-thumb:hover img,
+.pg-thumb[aria-current="true"] img {
+  opacity: 1;
+}
+
+/* The selected thumbnail: a thin gold border. */
+.pg-thumb[aria-current="true"] {
+  border-color: var(--gindi-gold);
+  color: var(--gindi-navy);
+}
+
+.pg-thumb:focus-visible {
+  outline: 2px solid var(--gindi-navy);
+  outline-offset: 2px;
+}
+
+/* ---------- Concept Visualization ---------- */
+/* The note under the concept gallery. */
+.pg-concept__caption {
+  display: grid;
+  gap: 0.25rem;
+  margin-block: clamp(1rem, 0.7rem + 0.8vw, 1.5rem) 0;
+  padding-block-start: 0.875rem;
+  border-block-start: 1px solid var(--pg-gold-line);
+  color: var(--muted);
+}
+
+.pg-concept__label {
+  color: var(--gindi-navy);
+}
+
+/* ---------- Without JS: every photo listed ---------- */
+.pg-static {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pg-static img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pg-static figcaption {
+  margin-block-start: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+}
+
+.js .pg-static,
+.no-js .pg-gallery,
+.no-js .pg-tabs {
+  display: none;
+}
+
+.no-js .pg-panel + .pg-panel {
+  margin-block-start: 2.5rem;
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width: 64rem) {
+  .pg-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  /* A scrollable strip; the selected thumbnail is kept in view by the script. */
+  .pg-thumbs {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    padding-block-end: 0.25rem;
+  }
+
+  .pg-thumbs li {
+    flex: 0 0 11rem;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 40rem) {
+  .pg-tabs {
+    width: 100%;
+  }
+
+  .pg-tab {
+    flex: 1 1 0;
+    padding-inline: 0.5rem;
+  }
+
+  /* Icons alone on narrow photos; the names stay for assistive tech. */
+  .pg-tool {
+    padding-inline: 0.5rem;
+  }
+
+  .pg-tool__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .pg-frame__bar {
+    padding-block-start: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-frame__img,
+  .pg-tab,
+  .pg-tab::after,
+  .pg-thumb,
+  .pg-thumb img,
+  .pg-hotspot::before,
+  .pg-hotspot__label,
+  .pg-tool {
+    transition: none;
+  }
+}

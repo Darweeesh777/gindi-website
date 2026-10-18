@@ -40,6 +40,9 @@ db.sqlite3-journal
 # stay tracked); the originals at the root of static/images/ are excluded.
 /static/images/*
 !/static/images/*/
+# The KK Barbershop originals (photos and concept renders) likewise: the site
+# uses their WebP copies in static/images/site/ (kk-img-*, kk-render-2, kk-concept-*).
+/static/images/KK/
 
 # Tooling / test output
 .coverage

@@ -45,7 +45,7 @@ so /projects/#<slug> lands on it (the fixed header is allowed for in CSS).
                 </div>
                 <div class="project-entry__foot" data-reveal>
                   <div class="project-entry__text">
-                    <h2 class="project-entry__name" id="{{ project.slug }}-name">{{ project.name }}</h2>
+                    <h2 class="project-entry__name" id="{{ project.slug }}-name">{{ project.title }}</h2>
                     {% if project.work %}<p class="project-entry__scope">{{ project.work }}</p>{% endif %}
                   </div>
                   <a class="link-arrow project-entry__view" href="{{ project.detail_url }}">
@@ -60,7 +60,7 @@ so /projects/#<slug> lands on it (the fixed header is allowed for in CSS).
       </div>
     </section>
 
-    {% include "partials/projects_cta.html" %}
+    
   </main>
 
   {% include "partials/footer.html" %}

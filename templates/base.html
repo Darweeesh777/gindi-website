@@ -24,7 +24,10 @@
   <link rel="stylesheet" href="{% static 'css/layout.css' %}">
   <link rel="stylesheet" href="{% static 'css/sections.css' %}">
   <link rel="stylesheet" href="{% static 'css/motion.css' %}">
+  {# The quotation form is part of every page's end (partials/footer.html). #}
+  <link rel="stylesheet" href="{% static 'css/drawer.css' %}">
   <script src="{% static 'js/main.js' %}" defer></script>
+  <script src="{% static 'js/quote-form.js' %}" defer></script>
   {% block head_extra %}{% endblock %}
 </head>
 <body>

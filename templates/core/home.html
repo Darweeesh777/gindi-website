@@ -14,6 +14,7 @@
   {% if show_projects %}<script src="{% static 'js/projects-carousel.js' %}" defer></script>{% endif %}
   {# Design/reality comparison ("From Vision to Reality"). #}
   <script src="{% static 'js/compare-slider.js' %}" defer></script>
+  <script src="{% static 'js/vision-nav.js' %}" defer></script>
   {# The Geometric G reveal in the Gindi Innovations section. #}
   <link rel="stylesheet" href="{% static 'css/emblem-reveal.css' %}">
   {# GSAP 3.13.0 (vendored; GreenSock standard no-charge licence). Deferred scripts run in order. #}
@@ -29,11 +30,10 @@
     {% include "core/sections/hero.html" %}
     {# Only once there are real projects (apps/core/projects.py PUBLISHED). #}
     {% if show_projects %}{% include "core/sections/projects.html" %}{% endif %}
-    {% include "core/sections/vision.html" %}
+    {% if visions %}{% include "core/sections/vision.html" %}{% endif %}
     {% include "core/sections/services.html" %}
     {% include "core/sections/process.html" %}
     {% include "core/sections/about.html" %}
-    {% include "core/sections/contact.html" %}
   </main>
 
   {% include "partials/footer.html" %}

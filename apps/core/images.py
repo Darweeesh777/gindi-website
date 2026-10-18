@@ -27,6 +27,23 @@ IMAGES = {
     # Both exported at identical sizes, so they line up in the comparison.
     'kk-design': {'name': 'kk-barbershop-design', 'size': (1536, 1024), 'widths': (960, 1536), 'illustrative': False},
     'kk-reality': {'name': 'kk-barbershop-reality', 'size': (1536, 1024), 'widths': (960, 1536), 'illustrative': False},
+    # Project 01, KK Barbershop - Sheikh Zayed: the real photographs and the
+    # concept visualization, from static/images/KK/ (originals kept as they
+    # are). Each kk-img-NNNN is IMG_NNNN.JPG (2048 x 1365); kk-render-2 is
+    # "Render 2.png" (1536 x 1024). The 480 px files are the thumbnails.
+    **{f'kk-img-{n}': {'name': f'kk-img-{n}', 'size': (2048, 1365), 'widths': (480, 960, 1536, 2048), 'illustrative': False}
+       for n in range(8891, 8897)},
+    'kk-render-2': {'name': 'kk-render-2', 'size': (1536, 1024), 'widths': (480, 960, 1536), 'illustrative': False},
+    # The other concept visualizations (AI-generated, 1536 x 1024), from
+    # static/images/KK/render/ "ChatGPT Image Oct 18, 2026, <time> AM.png":
+    # 03_04_03 = stations, 03_04_40 = styling, 03_05_15 = coffee,
+    # 03_09_25 = waiting, 03_06_47 = front.
+    **{f'kk-concept-{view}': {'name': f'kk-concept-{view}', 'size': (1536, 1024), 'widths': (480, 960, 1536), 'illustrative': False}
+       for view in ('stations', 'styling', 'coffee', 'waiting', 'front')},
+    # TEMPORARY second comparison (sample, not a project): the hero room empty
+    # (master: room-background.png), paired with 'hero-desktop' (the same room
+    # furnished, same viewpoint and size). Remove with its VISIONS entry.
+    'sample-hall-empty': {'name': 'sample-arched-hall-empty', 'size': (1672, 941), 'widths': (1100, 1672), 'illustrative': True},
     # Revealed through the Geometric G in the About (Gindi Innovations) section.
     'about': {'name': 'about-studio-materials', 'size': (1086, 1448), 'widths': (640, 1086), 'illustrative': True},
 }

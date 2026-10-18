@@ -28,23 +28,9 @@
     </h1>
     <p class="hero__lead lead hero-intro" style="--i: 2">{{ c.hero.lead }}</p>
     <div class="hero__actions hero-intro" style="--i: 3">
-      <a class="btn hero__quote" href="#contact">{{ c.hero.cta_primary }}</a>
+      <a class="btn hero__quote" href="#contact" data-quote>{{ c.hero.cta_primary }}</a>
       <a class="link-arrow hero__services" href="{{ tools_url }}">{{ c.hero.cta_secondary }}{% include "partials/arrow.html" %}</a>
     </div>
   </div>
 
-  <div class="hero__meta container hero-intro" style="--i: 4">
-    <p class="label">{{ c.hero.location }}</p>
-    {% if not c.hero.image %}
-      <p class="hero__image-note">
-        <span class="placeholder__kind">{{ c.ui.image_placeholder }}</span>
-        <span>{{ c.hero.image_label }} · <span class="num">{{ c.hero.image_spec }}</span></span>
-      </p>
-    {% elif c.hero.image.illustrative %}
-      <p class="hero__image-note"><span class="placeholder__kind">{{ c.ui.illustrative_note }}</span></p>
-    {% endif %}
-    <a class="hero__scroll label" href="#{% if show_projects %}projects{% else %}vision{% endif %}" aria-hidden="true" tabindex="-1">
-      <span>{{ c.ui.scroll }}</span><span class="hero__scroll-line"></span>
-    </a>
-  </div>
 </section>

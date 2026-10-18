@@ -111,6 +111,12 @@
       set(next);
     });
 
+    // Another project shown (static/js/vision-nav.js): start from the middle.
+    root.addEventListener('compare:reset', function () {
+      endDrag();
+      set(50);
+    });
+
     set(pos);
   });
 })();

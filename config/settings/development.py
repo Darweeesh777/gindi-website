@@ -20,3 +20,10 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Static URLs change when a file changes (?v=<modified time>), so the browser
+# never pairs new pages with a stale cached stylesheet or script.
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'apps.core.storage.DevCacheBustingStorage'},
+}

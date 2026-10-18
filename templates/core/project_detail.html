@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% comment %}
-A project's own page (/projects/<slug>/): name, scope and description, then
-every photo and film from apps/core/projects.py. Photos open in a full-screen
+A project's own page (/projects/<slug>/). Projects whose photos all have
+captions (KK Barbershop) get the interactive gallery (partials/
+project_gallery.html); the others: name, scope and description, then every
+photo and film from apps/core/projects.py. Photos open in a full-screen
 gallery (static/js/projects-page.js); films play with their own controls and
 never start by themselves.
 {% endcomment %}
@@ -19,12 +21,19 @@ never start by themselves.
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/projects-page.css' %}">
   <script src="{% static 'js/projects-page.js' %}" defer></script>
+  {% if project.interactive %}
+    <link rel="stylesheet" href="{% static 'css/project-gallery.css' %}">
+    <script src="{% static 'js/project-gallery.js' %}" defer></script>
+  {% endif %}
 {% endblock %}
 
 {% block body %}
   {% include "partials/header.html" %}
 
   <main id="main" tabindex="-1">
+    {% if project.interactive %}
+      {% include "partials/project_gallery.html" %}
+    {% else %}
     <section class="section project-page theme-light" id="top" aria-labelledby="project-title">
       <div class="container">
         <a class="link-arrow project-page__back" href="{{ project.index_url }}">
@@ -49,7 +58,7 @@ never start by themselves.
           {% for item in project.media %}
             <li class="project-media__item{% if forloop.first %} project-media__item--lead{% endif %}" data-reveal>
               {% if item.kind == 'photo' %}
-                <button class="project-media__photo" type="button" data-lightbox-open="{{ item.index }}"
+                <button class="project-media__photo" type="button" data-lightbox-open="{{ item.index }}" data-lightbox-item="{{ item.index }}"
                         data-src="{{ item.image.src }}" data-srcset="{{ item.image.srcset }}" data-alt="{{ item.image.alt }}"
                         data-width="{{ item.image.width }}" data-height="{{ item.image.height }}"
                         aria-label="{{ c.projects_page.open_photo }} {{ item.index|add:1 }} {{ c.projects_page.of }} {{ project.photos|length }}: {{ item.image.alt }}">
@@ -78,11 +87,10 @@ never start by themselves.
         </ul>
       </div>
     </section>
-
-    {% include "partials/projects_cta.html" %}
+    {% endif %}
   </main>
 
-  {% if project.photos %}
+  {% if project.photos or project.concept %}
     {# Full-screen photo gallery. #}
     <dialog class="lightbox" aria-label="{{ c.projects_page.lightbox }}: {{ project.name }}" data-lightbox>
       <figure class="lightbox__figure">
@@ -94,6 +102,7 @@ never start by themselves.
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5 5 19" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </button>
       {% if project.photos|length > 1 %}
+        {# Hidden by the script for a single image (e.g. the concept visualization). #}
         <button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="{{ c.projects_page.previous }}" data-lightbox-prev>
           <svg viewBox="0 0 12 20" aria-hidden="true" focusable="false"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
         </button>

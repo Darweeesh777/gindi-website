@@ -1,18 +1,69 @@
+{% comment %}
+Homepage Services: a header, then two panels side by side (stacked on smaller
+screens), each a 2 × 2 grid. Studio Services: apps/core/services.py (each
+opens its item on the Services page). Free Services: apps/core/tools.py
+(each opens its own page, which states its availability). Copy: content.py →
+services. Styles: home.css (homepage only).
+{% endcomment %}
 <section class="section services theme-light" id="services" aria-labelledby="services-title">
   <div class="container">
-    {% include "partials/section_head.html" with num=nums.services eyebrow=c.services.eyebrow title=c.services.title intro=c.services.intro title_id="services-title" %}
+    <header class="services-head" data-reveal>
+      <div class="services-head__main">
+        {# The same keystone marker as the other section labels (base.css .eyebrow / .keystone), no number. #}
+        <p class="services-head__eyebrow eyebrow label"><span class="keystone" aria-hidden="true"></span><span>{{ c.services.eyebrow }}</span></p>
+        <h2 class="services-head__title" id="services-title">{{ c.services.title }}</h2>
+      </div>
+      <p class="services-head__lead">{{ c.services.lead }}</p>
+    </header>
 
-    {# Services come from apps/core/services.py; each opens its item on the Services page. #}
-    <ol class="services__list" role="list">
-      {% for service in services %}
-        <li class="service" data-reveal style="--d: {{ forloop.counter0 }}">
-          <span class="num service__index">{{ service.number }}</span>
-          <h3 class="service__title"><a class="service__link" href="{{ service.url }}">{{ service.name }}</a></h3>
-          <p class="service__text">{{ service.summary }}</p>
-          <span class="service__mark keystone" aria-hidden="true"></span>
-        </li>
-      {% endfor %}
-    </ol>
-    <a class="link-arrow services__all" href="{{ services_url }}">{{ c.services.all }}{% include "partials/arrow.html" %}</a>
+    <div class="services-panels">
+      <div class="svc-panel svc-panel--studio" role="group" aria-labelledby="studio-services-title" data-reveal>
+        <div class="svc-panel__head">
+          <h3 class="svc-panel__title" id="studio-services-title">{{ c.services.studio_title }}</h3>
+          <a class="svc-panel__more" href="{{ services_url }}">{{ c.services.explore }}
+            <svg class="svc-arrow svc-arrow--up" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          </a>
+        </div>
+        <ol class="svc-cells" role="list">
+          {% for service in services %}
+            <li class="svc-cell">
+              <span class="num svc-cell__num">{{ service.number }}</span>
+              <h4 class="svc-cell__title"><a class="svc-cell__link" href="{{ service.url }}">{{ service.name }}</a></h4>
+              <p class="svc-cell__text">{{ service.teaser }}</p>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+
+      <div class="svc-panel svc-panel--free theme-dark" role="group" aria-labelledby="free-services-title" data-reveal style="--d: 1">
+        <div class="svc-panel__head svc-panel__head--stack">
+          <p class="svc-panel__eyebrow label">{{ c.services.free_eyebrow }}</p>
+          <h3 class="svc-panel__title" id="free-services-title">{{ c.services.free_title }}</h3>
+          <p class="svc-panel__text">{{ c.services.free_text }}</p>
+        </div>
+        <ul class="svc-cells" role="list">
+          {% for tool in tools %}
+            <li class="svc-cell svc-cell--tool">
+              <div class="svc-cell__top">
+                {% include "partials/tool_icon.html" with slug=tool.slug %}
+                {# Not connected yet: said here as well as on the tool's page. #}
+                {% if not tool.script %}<span class="svc-cell__status">{{ c.tools_page.status }}</span>{% endif %}
+              </div>
+              <h4 class="svc-cell__title"><a class="svc-cell__link" href="{{ tool.url }}">{{ tool.short_name }}</a></h4>
+              <p class="svc-cell__text">
+                <span>{{ tool.teaser }}</span>
+                <svg class="svc-arrow svc-cell__arrow" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+        <p class="svc-panel__foot">
+          <a class="svc-panel__more" href="{{ tools_url }}">{{ c.services.explore_tools }}
+            <svg class="svc-arrow" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+          </a>
+          <span class="svc-panel__rule" aria-hidden="true"></span>
+        </p>
+      </div>
+    </div>
   </div>
 </section>

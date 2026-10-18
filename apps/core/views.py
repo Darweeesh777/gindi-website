@@ -30,6 +30,7 @@ def _context(lang, page, view, kwargs=None):
         'projects': (reverse('core:projects' + suffix), {'projects': 'page', 'project': 'true'}),
         'services': (reverse('core:services' + suffix), {'services': 'page', 'free_tools': 'true', 'free_tool': 'true'}),
         'about': (reverse('core:about' + suffix), {'about': 'page'}),
+        'contact': (reverse('core:contact' + suffix), {'contact': 'page'}),
     }
     # "Home" first: the top of the homepage from anywhere.
     nav = [{'id': 'home', 'label': CONTENT[lang]['nav']['home'], 'href': '#top' if page == 'home' else home_url,
@@ -57,16 +58,20 @@ def _context(lang, page, view, kwargs=None):
         'projects_url': own_pages['projects'][0],
         'services_url': own_pages['services'][0],
         'about_url': own_pages['about'][0],
+        'contact_url': own_pages['contact'][0],
         'tools_url': reverse('core:free_tools' + suffix),
         'nav': nav,
         'show_projects': projects.PUBLISHED,
+        # Quotation form destinations (partials/quote_drawer.html); empty = not configured.
+        'quote_email': settings.QUOTATION_EMAIL,
+        'quote_whatsapp': settings.WHATSAPP_NUMBER,
         'site_noindex': settings.SITE_NOINDEX,
     }
 
 
 # Homepage sections with a number in their heading, in page order. Projects,
 # when published, comes first (as 01) and is numbered by its own layout.
-NUMBERED_SECTIONS = ('services', 'process', 'about', 'contact')
+NUMBERED_SECTIONS = ('services', 'process', 'about')
 
 
 def _section_numbers():
@@ -85,7 +90,8 @@ def home(request, lang='en'):
         'emblem': emblem.context(),
         'projects': projects.for_language(lang) if projects.PUBLISHED else [],
         'services': services.for_language(lang),
-        'vision': vision.for_language(lang),
+        'tools': tools.for_language(lang),  # "Free Services" in the Services section
+        'visions': vision.for_language(lang),  # complete entries only
         'nums': _section_numbers(),
     })
     return render(request, 'core/home.html', context)
@@ -138,11 +144,27 @@ def services_page(request, lang='en'):
         'c': CONTENT[lang],
         'services': services.for_language(lang),
         'tools': tools.for_language(lang),
-        'hero_image': resolve('hero-desktop', CONTENT[lang]['services_page']['hero_alt']),
+        'emblem': emblem.context(),  # the monogram watermark in the planning-tools band
         'enquiry_action': settings.ENQUIRY_FORM_ACTION,
         'whatsapp_number': settings.WHATSAPP_NUMBER,
     })
     return render(request, 'core/services.html', context)
+
+
+def contact_page(request, lang='en'):
+    """Contact Us (/contact/): the brand panel and the project enquiry form.
+    The form works like the quotation form (same lists, rules and script):
+    the visitor sends the enquiry from their own email app or WhatsApp, to
+    settings.QUOTATION_EMAIL / settings.WHATSAPP_NUMBER. Copy: content.py
+    (contact_page, quote)."""
+    content = CONTENT[lang]
+    page = content['contact_page']
+    texts = dict(content['quote']['js'], subject=page['js']['subject'])
+    texts['errors'] = {**content['quote']['js']['errors'], **page['js']['errors']}
+    texts['message'] = {**content['quote']['js']['message'], **page['js']['message']}
+    context = _context(lang, 'contact', 'core:contact')
+    context.update({'c': content, 'contact_texts': texts})
+    return render(request, 'core/contact.html', context)
 
 
 def free_tools(request, lang='en'):

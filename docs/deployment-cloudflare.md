@@ -71,7 +71,8 @@ None are required for the preview. Optional:
 | `SITE_URL` | `https://gindi-website.ah-darwesh.workers.dev` | Public address used in links between the English and Arabic pages. Set it if Cloudflare gives the project a different `*.pages.dev` name, or for a custom domain |
 | `SITE_NOINDEX` | `true` | `false` only at the official launch |
 | `ENQUIRY_FORM_ACTION` | *(empty)* | Enquiry form endpoint (a form service URL). Empty: the form says it is not connected |
-| `WHATSAPP_NUMBER` | *(empty)* | Shows the WhatsApp button (digits, international format) |
+| `WHATSAPP_NUMBER` | *(empty)* | Shows the WhatsApp button and enables "Submit via WhatsApp" in the quotation form (digits, international format) |
+| `QUOTATION_EMAIL` | *(empty)* | Enables "Submit via Email" in the quotation form (opens the visitor's email app addressed to it) |
 | `FREE_TOOL_WIRE_SCRIPT_URL`, `…_TILES_…`, `…_BRICKS_…`, `…_CEMENT_…` | *(empty)* | Loads that tool's agent. Empty: "Coming soon" |
 
 The values are built into the pages, so **after changing a variable, open

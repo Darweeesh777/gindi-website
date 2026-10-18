@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% comment %}
+Contact Us (/contact/, /ar/contact/): a navy brand panel beside the project
+enquiry form. Copy: content.py → contact_page (the page's own words) and
+quote (the shared lists, field words and messages). Styles: css/contact.css.
+
+The form is run by static/js/quote-form.js, like the quotation form: the
+property list follows the project type, "Other" asks for details, and choosing
+Email as the contact method makes the email address required. The site has no
+server-side email (it is a static build), so the visitor sends the enquiry
+themselves: "Submit via Email" opens their email app addressed to
+settings.QUOTATION_EMAIL, "Submit via WhatsApp" opens WhatsApp to
+settings.WHATSAPP_NUMBER, both with every filled-in detail. A button whose
+destination is not configured is disabled and says so. Nothing on the page
+claims the enquiry was delivered, and nothing is stored in the browser.
+{% endcomment %}
+
+{% block title %}{{ c.contact_page.meta_title }}{% endblock %}
+{% block description %}{{ c.contact_page.meta_description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+{% endblock %}
+
+{% block body %}
+  {% load static %}
+  {% include "partials/header.html" %}
+
+  <main id="main" class="cp" tabindex="-1">
+    <section class="cp-section theme-light" id="top" aria-labelledby="cp-title">
+      <div class="container">
+        <div class="cp-grid">
+          {# ---------- Brand panel ---------- #}
+          <div class="cp-panel theme-dark">
+            <span class="cp-panel__rule" aria-hidden="true"></span>
+            <p class="cp-panel__eyebrow label">{{ c.contact_page.eyebrow }}</p>
+            <h1 class="cp-panel__title" id="cp-title">{{ c.contact_page.title }}</h1>
+            <p class="cp-panel__lead">{{ c.contact_page.lead }}</p>
+            <ul class="cp-panel__services" role="list" aria-label="{{ c.contact_page.services_label }}">
+              {% for item in c.contact_page.services %}
+                <li>
+                  <svg class="cp-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    {% if item.icon == 'design' %}
+                      {# A frame with a drafting pencil. #}
+                      <path d="M3.5 3.5h11v11h-11z"/><path d="M8.5 20.5 20 9l-2-2L6.5 18.5 6 21z"/>
+                    {% elif item.icon == 'finishing' %}
+                      {# A paint roller. #}
+                      <path d="M4 3.5h12.5v5H4z"/><path d="M16.5 6h3v5.5H10.25V15"/><path d="M8.75 15h3v5.5h-3z"/>
+                    {% else %}
+                      {# Built-in joinery: a cabinet. #}
+                      <path d="M4 4.5h16v12.5H4zM12 4.5V17M4 10.75h16M8 7.75h1.5M14.5 7.75H16M6 17v2.5M18 17v2.5"/>
+                    {% endif %}
+                  </svg>
+                  <span>{{ item.label }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+            {# The official monogram (transparent version), very faint and cropped at the bottom. #}
+            <img class="cp-panel__mark" src="{% static 'images/brand/gindi-monogram-transparent.png' %}"
+                 width="1109" height="1419" alt="" aria-hidden="true" decoding="async">
+          </div>
+
+          {# ---------- Enquiry form ---------- #}
+          <div class="cp-form-area" data-quote-root data-quote-texts="contact-data"
+               data-quote-email="{{ quote_email }}" data-quote-whatsapp="{{ quote_whatsapp }}">
+            <span class="keystone cp-form-area__keystone" aria-hidden="true"></span>
+            <h2 class="cp-form-area__title" id="cp-form-title">{{ c.contact_page.form_title }}</h2>
+            <p class="cp-form-area__intro" id="cp-form-intro">{{ c.contact_page.form_intro }}</p>
+
+            <form class="enquiry-form quote-form cp-form" novalidate data-quote-form
+                  aria-labelledby="cp-form-title" aria-describedby="cp-form-intro">
+              <div class="cp-form__row">
+                <div class="enquiry-form__field" data-field="name">
+                  <label for="c-name">{{ c.contact_page.name }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+                  <input id="c-name" name="name" type="text" autocomplete="name" required aria-describedby="c-name-error">
+                  <p class="quote-form__error" id="c-name-error" data-error hidden></p>
+                </div>
+                <div class="enquiry-form__field" data-field="phone">
+                  <label for="c-phone">{{ c.contact_page.phone }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+                  <input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" dir="ltr" required
+                         aria-describedby="c-phone-hint c-phone-error">
+                  <p class="quote-form__hint" id="c-phone-hint">{{ c.quote.phone_hint }}</p>
+                  <p class="quote-form__error" id="c-phone-error" data-error hidden></p>
+                </div>
+              </div>
+
+              <div class="cp-form__row">
+                {# Optional, unless the visitor asks to be contacted by email (quote-form.js updates the label). #}
+                <div class="enquiry-form__field" data-field="email" data-quote-email data-quote-email-always>
+                  <label for="c-email">{{ c.contact_page.email }} <span class="enquiry-form__req" data-quote-req
+                         data-required="({{ c.quote.required }})" data-optional="({{ c.quote.optional }})">({{ c.quote.optional }})</span></label>
+                  <input id="c-email" name="email" type="email" autocomplete="email" dir="ltr" aria-describedby="c-email-hint c-email-error">
+                  <p class="quote-form__hint" id="c-email-hint">{{ c.contact_page.email_hint }}</p>
+                  <p class="quote-form__error" id="c-email-error" data-error hidden></p>
+                </div>
+                <div class="enquiry-form__field" data-field="occupation">
+                  <label for="c-occupation">{{ c.contact_page.occupation }} <span class="enquiry-form__req">({{ c.quote.optional }})</span></label>
+                  <input id="c-occupation" name="occupation" type="text" autocomplete="organization-title">
+                </div>
+              </div>
+
+              <div class="cp-form__row">
+                <div class="enquiry-form__field" data-field="project_type">
+                  <label for="c-project">{{ c.contact_page.project_type }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+                  <select id="c-project" name="project_type" required aria-describedby="c-project-error" data-quote-project>
+                    <option value="">{{ c.quote.choose }}</option>
+                    {% for project in c.quote.js.projects %}<option value="{{ project.value }}">{{ project.label }}</option>{% endfor %}
+                  </select>
+                  <p class="quote-form__error" id="c-project-error" data-error hidden></p>
+                </div>
+                {# Options follow the project type; with project type "Other", only the text field below. #}
+                <div class="enquiry-form__field" data-field="property_type" data-quote-property-field>
+                  <label for="c-property">{{ c.contact_page.property_type }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+                  <select id="c-property" name="property_type" required disabled aria-describedby="c-property-error" data-quote-property>
+                    <option value="">{{ c.quote.property_first }}</option>
+                  </select>
+                  <p class="quote-form__error" id="c-property-error" data-error hidden></p>
+                </div>
+                <div class="enquiry-form__field cp-form__full" data-field="property_other" data-quote-other hidden>
+                  <label for="c-property-other">{{ c.contact_page.property_other }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+                  <input id="c-property-other" name="property_other" type="text" aria-describedby="c-property-other-error">
+                  <p class="quote-form__error" id="c-property-other-error" data-error hidden></p>
+                </div>
+              </div>
+
+              <div class="cp-form__row">
+                <div class="enquiry-form__field" data-field="area">
+                  <label for="c-area">{{ c.contact_page.area }} <span class="enquiry-form__req">({{ c.quote.optional }})</span></label>
+                  {# Text, not type=number: that would silently empty Arabic-Indic digits (the script normalises them). #}
+                  <input id="c-area" name="area" type="text" inputmode="decimal" dir="ltr" aria-describedby="c-area-error">
+                  <p class="quote-form__error" id="c-area-error" data-error hidden></p>
+                </div>
+                <div class="enquiry-form__field" data-field="location">
+                  <label for="c-location">{{ c.contact_page.location }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+                  <input id="c-location" name="location" type="text" autocomplete="street-address" required
+                         aria-describedby="c-location-hint c-location-error">
+                  <p class="quote-form__hint" id="c-location-hint">{{ c.contact_page.location_hint }}</p>
+                  <p class="quote-form__error" id="c-location-error" data-error hidden></p>
+                </div>
+              </div>
+
+              <div class="enquiry-form__field" data-field="message">
+                <label for="c-message">{{ c.contact_page.message }} <span class="enquiry-form__req">({{ c.quote.optional }})</span></label>
+                <textarea id="c-message" name="message" rows="4"></textarea>
+              </div>
+
+              <fieldset class="quote-form__group" data-field="contact" aria-describedby="c-contact-error">
+                <legend>{{ c.contact_page.contact }} <span class="enquiry-form__req">({{ c.quote.required }})</span></legend>
+                <div class="quote-form__choices">
+                  {% for method in c.quote.contact_methods %}
+                    <label class="quote-form__choice">
+                      <input type="radio" name="contact" value="{{ method.value }}" required{% if method.value == 'whatsapp' %} checked{% endif %}>
+                      <span>{{ method.label }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+                <p class="quote-form__error" id="c-contact-error" data-error hidden></p>
+              </fieldset>
+
+              {# How the visitor sends the enquiry — separate from how the studio replies (above). #}
+              <div class="cp-form__actions">
+                <div class="quote-form__send">
+                  <button class="btn btn--primary cp-form__btn" type="button" data-quote-send="email" aria-describedby="c-send-email-hint"
+                          {% if not quote_email %}disabled{% endif %}>{{ c.contact_page.send_email }}
+                    <svg class="cp-form__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+                  <p class="quote-form__hint" id="c-send-email-hint">{% if quote_email %}{{ c.quote.send_email_hint }}{% else %}{{ c.quote.email_unavailable }}{% endif %}</p>
+                </div>
+                <div class="quote-form__send">
+                  <button class="btn quote-form__whatsapp cp-form__btn" type="button" data-quote-send="whatsapp" aria-describedby="c-send-whatsapp-hint"
+                          {% if not quote_whatsapp %}disabled{% endif %}>
+                    <svg class="cp-form__wa" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9.2 8.3c.2-.4.5-.4.7-.4h.5c.2 0 .4 0 .5.4l.7 1.6c.1.2 0 .4-.1.6l-.5.6c-.1.1-.2.3 0 .5.5.9 1.3 1.7 2.2 2.2.2.1.4.1.5 0l.6-.7c.2-.2.4-.2.6-.1l1.6.7c.3.1.4.3.3.6-.1.9-.9 1.6-1.8 1.6-2.9-.2-5.6-2.9-5.8-5.8 0-.5.3-1.2.8-1.6Z" fill="currentColor"/></svg>
+                    {{ c.contact_page.send_whatsapp }}
+                    <svg class="cp-form__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+                  <p class="quote-form__hint" id="c-send-whatsapp-hint">{% if quote_whatsapp %}{{ c.quote.send_whatsapp_hint }}{% else %}{{ c.quote.whatsapp_unavailable }}{% endif %}</p>
+                </div>
+              </div>
+              <p class="cp-form__privacy">{{ c.contact_page.privacy }}</p>
+              <p class="quote-form__status" role="status" aria-live="polite" data-quote-status></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {{ contact_texts|json_script:"contact-data" }}
+  {% include "partials/footer.html" %}
+{% endblock %}

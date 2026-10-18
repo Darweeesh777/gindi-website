@@ -1,10 +1,10 @@
 /*
  * Gindi Innovations — Services page (vanilla JS).
  *
- * Accordion: one service open at a time (the first by default). The URL
- * hash picks the open one, so /services/#space-planning opens Space
- * Planning — on load and when the hash changes. Headers are real buttons
- * (aria-expanded); Up/Down/Home/End move between them.
+ * Service cards: each card's id is its service slug and its details are a
+ * native <details> (they open and close without JS). A link to
+ * /services/#<slug> scrolls to that card, below the sticky header, and
+ * opens its details — on load and when the hash changes.
  *
  * Enquiry drawer: [data-enquire] links (which go to the homepage contact
  * section without JS) open a <dialog> with the service prefilled. While no
@@ -14,49 +14,21 @@
 (function () {
   'use strict';
 
-  /* ---------- Accordion ---------- */
-  var accordion = document.querySelector('[data-accordion]');
-  var items = accordion ? Array.prototype.slice.call(accordion.querySelectorAll('[data-accordion-item]')) : [];
-  var triggers = items.map(function (item) { return item.querySelector('[data-accordion-trigger]'); });
+  /* ---------- Service cards ---------- */
+  var cards = Array.prototype.slice.call(document.querySelectorAll('[data-service-card]'));
 
-  function setOpen(item, open) {
-    item.classList.toggle('is-open', open);
-    item.querySelector('[data-accordion-trigger]').setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-
-  function openOnly(target) {
-    items.forEach(function (item) { setOpen(item, item === target); });
-  }
-
-  function openFromHash(scroll) {
+  function openFromHash(smooth) {
     var id = decodeURIComponent(location.hash.slice(1));
-    var target = id && items.filter(function (item) { return item.id === id; })[0];
-    if (!target) return false;
-    // Lay out the final state at once, then bring the item into view.
-    accordion.classList.add('is-settling');
-    openOnly(target);
-    if (scroll) target.scrollIntoView({ block: 'start', behavior: 'instant' });
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { accordion.classList.remove('is-settling'); });
-    });
-    return true;
+    var card = id && cards.filter(function (c) { return c.id === id; })[0];
+    if (!card) return;
+    var details = card.querySelector('[data-service-details]');
+    if (details) details.open = true;
+    // scroll-margin (services-cards.css) keeps it below the header.
+    card.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'instant' });
   }
 
-  if (items.length) {
-    triggers.forEach(function (trigger, i) {
-      trigger.addEventListener('click', function () {
-        var item = items[i];
-        if (item.classList.contains('is-open')) setOpen(item, false);
-        else openOnly(item);
-      });
-      trigger.addEventListener('keydown', function (event) {
-        var next = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: triggers.length - 1 }[event.key];
-        if (next === undefined) return;
-        event.preventDefault();
-        triggers[(next + triggers.length) % triggers.length].focus();
-      });
-    });
-    openFromHash(true);
+  if (cards.length) {
+    openFromHash(false);
     window.addEventListener('hashchange', function () { openFromHash(true); });
   }
 

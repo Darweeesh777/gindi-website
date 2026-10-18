@@ -1,0 +1,143 @@
+{% comment %}
+Quotation request form (opened by [data-quote] links, e.g. "Get Quotation";
+static/js/quote-form.js). The site has no server-side email, so the visitor
+sends the request themselves:
+- "Submit via Email" opens their email app, addressed to settings.QUOTATION_EMAIL;
+- "Submit via WhatsApp" opens WhatsApp to settings.WHATSAPP_NUMBER.
+Both carry the whole request as a formatted message. A button whose
+destination is not configured is disabled and says so. Nothing here claims a
+request was sent: the visitor completes it in their own app.
+Copy: content.py → quote (both languages). The Contact page's form runs on
+the same script and lists.
+{% endcomment %}
+{# data-quote-draft: keeps the values in sessionStorage (this tab), across a trip to the email app or WhatsApp. #}
+<dialog class="drawer drawer--quote theme-light" aria-labelledby="quote-title" aria-describedby="quote-intro" data-quote-drawer
+        data-quote-root data-quote-texts="quote-data" data-quote-draft
+        data-quote-email="{{ quote_email }}" data-quote-whatsapp="{{ quote_whatsapp }}">
+  <div class="drawer__panel">
+    <div class="drawer__head quote__head">
+      <h2 class="drawer__title" id="quote-title">{{ c.quote.title }}</h2>
+      <button class="drawer__close" type="button" aria-label="{{ c.quote.close }}" data-quote-close>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5 5 19" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+    <p class="quote__intro" id="quote-intro">{{ c.quote.intro }}</p>
+
+    <form class="enquiry-form quote-form" novalidate data-quote-form>
+      <div class="enquiry-form__field" data-field="name">
+        <label for="q-name">{{ c.quote.name }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <input id="q-name" name="name" type="text" autocomplete="name" required aria-describedby="q-name-error">
+        <p class="quote-form__error" id="q-name-error" data-error hidden></p>
+      </div>
+
+      <div class="enquiry-form__field" data-field="phone">
+        <label for="q-phone">{{ c.quote.phone }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <input id="q-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" dir="ltr" required
+               aria-describedby="q-phone-hint q-phone-error">
+        <p class="quote-form__hint" id="q-phone-hint">{{ c.quote.phone_hint }}</p>
+        <p class="quote-form__error" id="q-phone-error" data-error hidden></p>
+      </div>
+
+      <div class="enquiry-form__field" data-field="occupation">
+        <label for="q-occupation">{{ c.quote.occupation }} <span class="enquiry-form__req">({{ c.quote.optional }})</span></label>
+        <input id="q-occupation" name="occupation" type="text" autocomplete="organization-title">
+      </div>
+
+      <div class="enquiry-form__field" data-field="project_type">
+        <label for="q-project">{{ c.quote.project_type }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <select id="q-project" name="project_type" required aria-describedby="q-project-error" data-quote-project>
+          <option value="">{{ c.quote.choose }}</option>
+          {% for project in c.quote.js.projects %}<option value="{{ project.value }}">{{ project.label }}</option>{% endfor %}
+        </select>
+        <p class="quote-form__error" id="q-project-error" data-error hidden></p>
+      </div>
+
+      {# Options follow the project type (quote-form.js); "Other" project type: a text field instead. #}
+      <div class="enquiry-form__field" data-field="property_type" data-quote-property-field>
+        <label for="q-property">{{ c.quote.property_type }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <select id="q-property" name="property_type" required disabled aria-describedby="q-property-error" data-quote-property>
+          <option value="">{{ c.quote.property_first }}</option>
+        </select>
+        <p class="quote-form__error" id="q-property-error" data-error hidden></p>
+      </div>
+
+      <div class="enquiry-form__field" data-field="property_other" data-quote-other hidden>
+        <label for="q-property-other">{{ c.quote.property_other }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <input id="q-property-other" name="property_other" type="text" aria-describedby="q-property-other-error">
+        <p class="quote-form__error" id="q-property-other-error" data-error hidden></p>
+      </div>
+
+      <div class="enquiry-form__field" data-field="area">
+        <label for="q-area">{{ c.quote.area }} <span class="enquiry-form__req">({{ c.quote.required }})</span><span class="visually-hidden">, {{ c.quote.area_unit_label }}</span></label>
+        <div class="quote-form__unit">
+          {# Text, not type=number: that would silently empty Arabic-Indic digits (the script normalises them). #}
+          <input id="q-area" name="area" type="text" inputmode="decimal" dir="ltr" required
+                 aria-describedby="q-area-error">
+          <span class="quote-form__unit-label" aria-hidden="true">{{ c.quote.area_unit }}</span>
+        </div>
+        <p class="quote-form__error" id="q-area-error" data-error hidden></p>
+      </div>
+
+      <fieldset class="quote-form__group">
+        <legend>{{ c.quote.location }} <span class="enquiry-form__req">({{ c.quote.required }})</span></legend>
+        <div class="enquiry-form__field" data-field="city">
+          <label for="q-city">{{ c.quote.city }}</label>
+          <input id="q-city" name="city" type="text" autocomplete="address-level2" required aria-describedby="q-city-error">
+          <p class="quote-form__error" id="q-city-error" data-error hidden></p>
+        </div>
+        <div class="enquiry-form__field" data-field="district">
+          <label for="q-district">{{ c.quote.district }}</label>
+          <input id="q-district" name="district" type="text" autocomplete="address-level3" required aria-describedby="q-district-error">
+          <p class="quote-form__error" id="q-district-error" data-error hidden></p>
+        </div>
+        <div class="enquiry-form__field" data-field="address">
+          <label for="q-address">{{ c.quote.address }}</label>
+          <textarea id="q-address" name="address" rows="2" autocomplete="street-address" required aria-describedby="q-address-error"></textarea>
+          <p class="quote-form__error" id="q-address-error" data-error hidden></p>
+        </div>
+        <div class="enquiry-form__field" data-field="map">
+          <label for="q-map">{{ c.quote.map }} <span class="enquiry-form__req">({{ c.quote.optional }})</span></label>
+          <input id="q-map" name="map" type="url" inputmode="url" dir="ltr" aria-describedby="q-map-hint q-map-error">
+          <p class="quote-form__hint" id="q-map-hint">{{ c.quote.map_hint }}</p>
+          <p class="quote-form__error" id="q-map-error" data-error hidden></p>
+        </div>
+      </fieldset>
+
+      <fieldset class="quote-form__group" data-field="contact" aria-describedby="q-contact-hint q-contact-error">
+        <legend>{{ c.quote.contact }} <span class="enquiry-form__req">({{ c.quote.required }})</span></legend>
+        <p class="quote-form__hint" id="q-contact-hint">{{ c.quote.contact_hint }}</p>
+        <div class="quote-form__choices">
+          {% for method in c.quote.contact_methods %}
+            <label class="quote-form__choice">
+              <input type="radio" name="contact" value="{{ method.value }}" required data-quote-contact>
+              <span>{{ method.label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <p class="quote-form__error" id="q-contact-error" data-error hidden></p>
+      </fieldset>
+
+      <div class="enquiry-form__field" data-field="email" data-quote-email hidden>
+        <label for="q-email">{{ c.quote.email }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <input id="q-email" name="email" type="email" autocomplete="email" dir="ltr" aria-describedby="q-email-error">
+        <p class="quote-form__error" id="q-email-error" data-error hidden></p>
+      </div>
+
+      {# How the visitor sends the request (separate from how the studio replies, above). #}
+      <div class="quote-form__actions">
+        <div class="quote-form__send">
+          <button class="btn btn--primary" type="button" data-quote-send="email" aria-describedby="q-send-email-hint"
+                  {% if not quote_email %}disabled{% endif %}>{{ c.quote.send_email }}</button>
+          <p class="quote-form__hint" id="q-send-email-hint">{% if quote_email %}{{ c.quote.send_email_hint }}{% else %}{{ c.quote.email_unavailable }}{% endif %}</p>
+        </div>
+        <div class="quote-form__send">
+          <button class="btn quote-form__whatsapp" type="button" data-quote-send="whatsapp" aria-describedby="q-send-whatsapp-hint"
+                  {% if not quote_whatsapp %}disabled{% endif %}>{{ c.quote.send_whatsapp }}</button>
+          <p class="quote-form__hint" id="q-send-whatsapp-hint">{% if quote_whatsapp %}{{ c.quote.send_whatsapp_hint }}{% else %}{{ c.quote.whatsapp_unavailable }}{% endif %}</p>
+        </div>
+      </div>
+      <p class="quote-form__status" role="status" aria-live="polite" data-quote-status></p>
+    </form>
+  </div>
+</dialog>
+{{ c.quote.js|json_script:"quote-data" }}

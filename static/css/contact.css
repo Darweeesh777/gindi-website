@@ -1,0 +1,254 @@
+/*
+ * Gindi Innovations — Contact page (/contact/, /ar/contact/)
+ *
+ * A navy brand panel (about 35%) beside the ivory enquiry form (about 65%),
+ * as one bordered block with straight corners. Fields, errors, choices and
+ * hints reuse the quotation form's styles (drawer.css: .enquiry-form,
+ * .quote-form__*); this file lays them out in two columns and styles the
+ * panel. Below 64rem the panel becomes a compact introduction above the form;
+ * below 40rem the fields and buttons stack. The page grows with its content.
+ */
+
+.cp {
+  --quote-error: #a1301f; /* brick red, as in the quotation form: 6.5:1 on ivory */
+  --cp-gold-line: color-mix(in srgb, var(--gindi-gold) 55%, transparent);
+}
+
+.cp-section {
+  padding-block: calc(var(--header-h) + clamp(1.25rem, 0.75rem + 2vw, 2.75rem)) clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+}
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 35fr) minmax(0, 65fr);
+  border: 1px solid var(--navy-15);
+}
+
+/* ---------- Brand panel ---------- */
+.cp-panel {
+  position: relative;
+  overflow: hidden; /* the monogram is cropped at the bottom */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(2rem, 1.25rem + 2.4vw, 3.5rem) clamp(1.5rem, 0.9rem + 2vw, 3rem);
+  background: var(--gindi-navy);
+  color: var(--gindi-ivory);
+}
+
+.cp-panel > :not(.cp-panel__mark) {
+  position: relative;
+  z-index: 1;
+}
+
+.cp-panel__rule {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  margin-block-end: 1.5rem;
+  background: var(--gindi-gold);
+}
+
+.cp-panel__eyebrow {
+  color: var(--gindi-gold);
+}
+
+.cp-panel__title {
+  margin-block-start: 0.875rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 1.55rem + 2vw, 3.5rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.cp-panel__lead {
+  max-width: 24rem;
+  margin-block-start: 1.25rem;
+  color: var(--ivory-72);
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+}
+
+.cp-panel__services {
+  display: grid;
+  gap: 1rem;
+  margin: 2.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cp-panel__services li {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.cp-icon {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: var(--gindi-gold);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The monogram, very faint and oversized, cropped at the bottom. Its artwork
+   is never mirrored (in Arabic it simply sits at the other corner). */
+.cp-panel__mark {
+  position: absolute;
+  inset-block-end: -24%;
+  inset-inline-end: -16%;
+  width: 82%;
+  height: auto;
+  opacity: 0.07;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- Form area ---------- */
+.cp-form-area {
+  padding: clamp(1.75rem, 1rem + 2.4vw, 3.25rem) clamp(1.25rem, 0.5rem + 3vw, 3.5rem);
+  background: var(--gindi-ivory);
+}
+
+.cp-form-area__keystone {
+  display: block;
+  width: 1.125rem;
+  height: 0.9rem;
+  background: var(--gindi-gold);
+}
+
+.cp-form-area__title {
+  margin-block-start: 0.875rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.875rem, 1.4rem + 1.4vw, 2.625rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.12;
+}
+
+.cp-form-area__intro {
+  margin-block-start: 0.375rem;
+  color: var(--muted);
+}
+
+.cp-form {
+  gap: 1.125rem;
+  margin-block-start: 1.75rem;
+}
+
+/* Two fields side by side; an "Other" field spans the row. */
+.cp-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1.125rem 1.25rem;
+}
+
+.cp-form__full {
+  grid-column: 1 / -1;
+}
+
+/* Two equal buttons, each with its explanation underneath. */
+.cp-form__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+  padding-block-start: 1.25rem;
+  border-block-start: 1px solid var(--line);
+}
+
+/* The columns share a height (the longer hint); the buttons keep theirs. */
+.cp-form__actions .quote-form__send {
+  align-content: start;
+}
+
+.cp-form__btn {
+  width: 100%;
+  gap: 0.625rem;
+}
+
+/* Submit via Email: gold, navy text (the light theme's primary is navy). */
+.cp-form .btn--primary {
+  background: var(--gindi-gold);
+  color: var(--gindi-navy);
+}
+
+.cp-form .btn--primary:hover:not(:disabled) {
+  background: var(--gindi-yellow);
+}
+
+/* Submit via WhatsApp: ivory with a thin navy border. */
+.cp-form .quote-form__whatsapp {
+  background: var(--gindi-ivory);
+}
+
+.cp-form__arrow {
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* The arrow points up and away along the reading direction. */
+[dir="rtl"] .cp-form__arrow {
+  transform: scaleX(-1);
+}
+
+.cp-form__wa {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* The contact choices at the field size (16px+), not the drawer's smaller one. */
+.cp-form .quote-form__choice {
+  font-size: 1rem;
+}
+
+.cp-form__privacy {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+/* ---------- Tablet and phone: introduction above the form ---------- */
+@media (max-width: 64rem) {
+  .cp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cp-panel__title {
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  }
+
+  .cp-panel__services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+    margin-block-start: 1.5rem;
+  }
+
+  .cp-panel__mark {
+    inset-block-end: -45%;
+    inset-inline-end: -4%;
+    width: 34%;
+    opacity: 0.06;
+  }
+}
+
+@media (max-width: 40rem) {
+  .cp-form__row,
+  .cp-form__actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cp-panel__services {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .cp-panel__mark {
+    display: none;
+  }
+}

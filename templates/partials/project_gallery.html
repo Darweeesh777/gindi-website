@@ -1,0 +1,187 @@
+{% comment %}
+Interactive project page (projects whose photos all have captions, e.g.
+KK Barbershop): name, Back to Projects, and two tabs —
+- Completed: one large photo with its caption, counter "01 / 06", a full
+  screen button, markers on every photo linking to its connected views,
+  "Previous View" (the last photo visited) and "Overview"; thumbnails of
+  every photo below.
+- Concept Visualization: a gallery of the concept visualizations, with
+  Previous / Next, its own counter, thumbnails and full screen (no markers
+  or history), and a note that they are illustrations.
+Data: apps/core/projects.py (captions, hotspots, concept); copy: content.py
+(projects_page). Script: static/js/project-gallery.js; full screen: the
+shared lightbox (static/js/projects-page.js). Styles: css/project-gallery.css.
+Without JS: no tabs or markers; every photo is listed with its caption,
+then the concept image.
+{% endcomment %}
+{% with p=c.projects_page photos=project.photos overview=project.photos.0 %}
+<section class="section pg theme-light" id="top" aria-labelledby="project-title" data-pg>
+  <div class="container">
+    <header class="pg-head">
+      <div class="pg-head__text">
+        <a class="link-arrow pg-back" href="{{ project.index_url }}">
+          {% include "partials/arrow.html" %}<span>{{ p.back }}</span>
+        </a>
+        <h1 class="pg-title" id="project-title">{{ project.title }}</h1>
+      </div>
+      {% if project.concept %}
+        <div class="pg-tabs" role="tablist" aria-label="{{ p.views }}">
+          <button class="pg-tab" type="button" role="tab" id="pg-tab-completed" aria-controls="pg-completed"
+                  aria-selected="true" data-pg-tab>{{ p.completed }}</button>
+          <button class="pg-tab" type="button" role="tab" id="pg-tab-concept" aria-controls="pg-concept"
+                  aria-selected="false" tabindex="-1" data-pg-tab>{{ p.concept }}</button>
+        </div>
+      {% endif %}
+    </header>
+
+    {# ---------- Completed ---------- #}
+    <div class="pg-panel is-active" id="pg-completed"{% if project.concept %} role="tabpanel" aria-labelledby="pg-tab-completed"{% endif %}>
+      <h2 class="visually-hidden">{{ p.completed }}</h2>
+      <div class="pg-gallery" data-pg-gallery data-failed="{{ p.photo_failed }}">
+        {# pg-fit: as wide as the screen height allows (the whole photo in the first screen), centred. #}
+        <div class="pg-frame pg-fit" style="aspect-ratio: {{ overview.image.width }} / {{ overview.image.height }}; --pg-ratio: {{ overview.image.width }} / {{ overview.image.height }};" data-pg-frame>
+          <img class="pg-frame__img" src="{{ overview.image.src }}" srcset="{{ overview.image.srcset }}"
+               sizes="(min-width: 120rem) 1824px, calc(100vw - 2rem)" width="{{ overview.image.width }}"
+               height="{{ overview.image.height }}" alt="{{ overview.image.alt }}" fetchpriority="high" decoding="async" data-pg-image>
+
+          {# Each photo's markers to its connected views, in % of the photo (which fills the frame exactly,
+             so there is no letterboxing to allow for). Only the shown photo's set is visible. #}
+          {% for photo in photos %}
+            {% if photo.hotspots %}
+              <div class="pg-hotspots" data-pg-hotspots="{{ photo.index }}"{% if not forloop.first %} hidden{% endif %}>
+                {% for spot in photo.hotspots %}
+                  <button class="pg-hotspot{% if spot.edge %} pg-hotspot--{{ spot.edge }}{% endif %}" type="button"
+                          style="--x: {{ spot.x }}%; --y: {{ spot.y }}%;" data-pg-goto="{{ spot.target }}"
+                          aria-label="{{ spot.label }} — {{ p.open_view }}">
+                    <span class="pg-hotspot__mark" aria-hidden="true"></span>
+                    <span class="pg-hotspot__label" aria-hidden="true">{{ spot.label }}
+                      <svg viewBox="0 0 16 16" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
+                  </button>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endfor %}
+
+          {# Previous View: the last photo actually visited (this page's own history, not the browser's). #}
+          <div class="pg-toolbar" role="group" aria-label="{{ p.view_tools }}">
+            <button class="pg-tool" type="button" data-pg-previous disabled>
+              <svg class="pg-tool__back" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M20 6H2M7 1 2 6l5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+              <span class="pg-tool__text">{{ p.previous_view }}</span>
+            </button>
+            <button class="pg-tool" type="button" data-pg-home disabled aria-current="true">
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 9.5 10 3l7 6.5M5 8v9h4v-5h2v5h4V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              <span class="pg-tool__text">{{ p.overview }}</span>
+            </button>
+          </div>
+          <button class="pg-expand" type="button" aria-label="{{ p.expand }}" data-lightbox-open="0" data-lightbox-group="completed" data-pg-expand>
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          </button>
+          <p class="pg-frame__bar">
+            <span class="pg-frame__caption" data-pg-caption>{{ overview.caption }}</span>
+            <span class="pg-frame__count num" dir="ltr"><span data-pg-count>{{ overview.number }}</span> / {{ photos|length|stringformat:"02d" }}</span>
+          </p>
+        </div>
+        <p class="visually-hidden" role="status" aria-live="polite" data-pg-status></p>
+
+        <ul class="pg-thumbs" role="list" aria-label="{{ p.all_views }}" data-pg-thumbs>
+          {% for photo in photos %}
+            <li>
+              <button class="pg-thumb" type="button" data-pg-thumb="{{ photo.index }}"{% if forloop.first %} aria-current="true"{% endif %}
+                      data-lightbox-item="{{ photo.index }}" data-lightbox-group="completed"
+                      data-src="{{ photo.image.src }}" data-srcset="{{ photo.image.srcset }}" data-alt="{{ photo.image.alt }}"
+                      data-caption="{{ photo.caption }}" data-width="{{ photo.image.width }}" data-height="{{ photo.image.height }}">
+                <img src="{{ photo.image.src }}" srcset="{{ photo.image.srcset }}" sizes="(min-width: 64rem) 16vw, 11rem"
+                     width="{{ photo.image.width }}" height="{{ photo.image.height }}" alt="" loading="lazy" decoding="async">
+                <span class="pg-thumb__caption"><span class="num pg-thumb__num">{{ photo.number }}</span> {{ photo.caption }}</span>
+              </button>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      {# Without JS: every photo, in order, with its caption. #}
+      <ol class="pg-static" role="list">
+        {% for photo in photos %}
+          <li>
+            <figure>
+              <img src="{{ photo.image.src }}" srcset="{{ photo.image.srcset }}" sizes="100vw"
+                   width="{{ photo.image.width }}" height="{{ photo.image.height }}" alt="{{ photo.image.alt }}" loading="lazy" decoding="async">
+              <figcaption><span class="num">{{ photo.number }}</span> {{ photo.caption }}</figcaption>
+            </figure>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+
+    {# ---------- Concept Visualization ---------- #}
+    {# A gallery of its own: no markers or history; Previous / Next, its own counter and thumbnails. #}
+    {% if project.concept %}
+      {% with concepts=project.concept.images first=project.concept.images.0 %}
+      <div class="pg-panel" id="pg-concept" role="tabpanel" aria-labelledby="pg-tab-concept">
+        <h2 class="visually-hidden">{{ p.concept }}</h2>
+        <div class="pg-gallery pg-gallery--concept" data-pg-gallery data-failed="{{ p.photo_failed }}">
+          <div class="pg-frame pg-fit" style="aspect-ratio: {{ first.image.width }} / {{ first.image.height }}; --pg-ratio: {{ first.image.width }} / {{ first.image.height }};" data-pg-frame>
+            <img class="pg-frame__img" src="{{ first.image.src }}" srcset="{{ first.image.srcset }}"
+                 sizes="(min-width: 120rem) 1824px, calc(100vw - 2rem)" width="{{ first.image.width }}"
+                 height="{{ first.image.height }}" alt="{{ first.image.alt }}" loading="lazy" decoding="async" data-pg-image>
+            {% if concepts|length > 1 %}
+              <div class="pg-toolbar" role="group" aria-label="{{ p.view_tools }}">
+                <button class="pg-tool" type="button" data-pg-step="-1">
+                  <svg class="pg-tool__back" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M20 6H2M7 1 2 6l5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                  <span class="pg-tool__text">{{ p.prev_image }}</span>
+                </button>
+                <button class="pg-tool" type="button" data-pg-step="1">
+                  <span class="pg-tool__text">{{ p.next_image }}</span>
+                  <svg class="pg-tool__back pg-tool__next" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                </button>
+              </div>
+            {% endif %}
+            <button class="pg-expand" type="button" aria-label="{{ p.expand }}: {{ p.concept }}" data-lightbox-open="0" data-lightbox-group="concept" data-pg-expand>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            </button>
+            <p class="pg-frame__bar">
+              <span class="pg-frame__caption" data-pg-caption>{{ first.caption }}</span>
+              <span class="pg-frame__count num" dir="ltr"><span data-pg-count>{{ first.number }}</span> / {{ concepts|length|stringformat:"02d" }}</span>
+            </p>
+          </div>
+          <p class="visually-hidden" role="status" aria-live="polite" data-pg-status></p>
+
+          <ul class="pg-thumbs" role="list" aria-label="{{ p.all_concepts }}" data-pg-thumbs>
+            {% for item in concepts %}
+              <li>
+                <button class="pg-thumb" type="button" data-pg-thumb="{{ item.index }}"{% if forloop.first %} aria-current="true"{% endif %}
+                        data-lightbox-item="{{ item.index }}" data-lightbox-group="concept"
+                        data-src="{{ item.image.src }}" data-srcset="{{ item.image.srcset }}" data-alt="{{ item.image.alt }}"
+                        data-caption="{{ item.caption }}" data-width="{{ item.image.width }}" data-height="{{ item.image.height }}">
+                  <img src="{{ item.image.src }}" srcset="{{ item.image.srcset }}" sizes="(min-width: 64rem) 16vw, 11rem"
+                       width="{{ item.image.width }}" height="{{ item.image.height }}" alt="" loading="lazy" decoding="async">
+                  <span class="pg-thumb__caption"><span class="num pg-thumb__num">{{ item.number }}</span> {{ item.caption }}</span>
+                </button>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        {# Without JS: every visualization, in order. #}
+        <ol class="pg-static" role="list">
+          {% for item in concepts %}
+            <li>
+              <figure>
+                <img src="{{ item.image.src }}" srcset="{{ item.image.srcset }}" sizes="100vw"
+                     width="{{ item.image.width }}" height="{{ item.image.height }}" alt="{{ item.image.alt }}" loading="lazy" decoding="async">
+                <figcaption><span class="num">{{ item.number }}</span> {{ item.caption }}</figcaption>
+              </figure>
+            </li>
+          {% endfor %}
+        </ol>
+
+        <p class="pg-concept__caption">
+          <span class="label pg-concept__label">{{ p.concept }}</span>
+          <span>{{ project.concept.note }}</span>
+        </p>
+      </div>
+      {% endwith %}
+    {% endif %}
+  </div>
+</section>
+{% endwith %}

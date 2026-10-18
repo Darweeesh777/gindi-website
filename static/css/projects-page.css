@@ -138,21 +138,18 @@
 }
 
 /* "View Project": navy text, gold underline growing on hover, arrow nudges. */
-.project-entry__view,
-.projects-cta__link {
+.project-entry__view {
   min-height: 2.75rem;
   color: var(--fg);
   background-image: linear-gradient(var(--gindi-gold), var(--gindi-gold));
   background-size: 100% 1px;
 }
 
-.project-entry__view .link-arrow__icon,
-.projects-cta__link .link-arrow__icon {
+.project-entry__view .link-arrow__icon {
   color: var(--gindi-gold);
 }
 
-.project-entry__view:hover,
-.projects-cta__link:hover {
+.project-entry__view:hover {
   background-size: 100% 2px;
 }
 
@@ -254,38 +251,6 @@
 .tile__video.is-playing .tile__play,
 .tile__video.is-playing .tile__film {
   display: none;
-}
-
-/* ---------- "Have a project in mind?" ---------- */
-.projects-cta {
-  padding-block: var(--space-lg);
-  border-block-start: 1px solid var(--line);
-}
-
-.projects-cta__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem 2.5rem;
-}
-
-.projects-cta__title {
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 1.5rem + 1.8vw, 3rem);
-  font-weight: var(--fw-regular);
-  line-height: 1.1;
-}
-
-.projects-cta__text {
-  max-width: 16rem;
-  padding-inline-end: 2rem;
-  margin-inline-start: auto;
-  border-inline-end: 1px solid var(--gindi-gold);
-  font-family: var(--font-heading);
-  font-size: 1.125rem;
-  line-height: 1.4;
-  color: var(--muted);
 }
 
 /* ---------- Project page ---------- */
@@ -509,6 +474,11 @@
   translate: 0 -50%;
 }
 
+/* A single image (e.g. a concept visualization): no arrows. */
+.lightbox__nav[hidden] {
+  display: none;
+}
+
 .lightbox__nav svg {
   width: 0.625rem;
   height: 1.0625rem;
@@ -580,12 +550,6 @@
     grid-row: 2;
     grid-column: auto;
     aspect-ratio: 4 / 3;
-  }
-
-  .projects-cta__text {
-    margin-inline-start: 0;
-    padding-inline-end: 0;
-    border-inline-end: 0;
   }
 
   .project-media {

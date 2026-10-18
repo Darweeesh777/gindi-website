@@ -7,6 +7,7 @@ from a local, git-ignored .env file).
 """
 
 import os
+import re
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -149,6 +150,12 @@ ENQUIRY_FORM_ACTION = os.environ.get('ENQUIRY_FORM_ACTION', '')
 # The studio's WhatsApp number, international format, digits only (e.g. a
 # number like 20XXXXXXXXXX for Egypt). Empty: no WhatsApp button is shown.
 WHATSAPP_NUMBER = ''.join(ch for ch in os.environ.get('WHATSAPP_NUMBER', '') if ch.isdigit())
+# The studio's email address for quotation requests ("Submit via Email" opens
+# the visitor's email app addressed to it; there is no server-side email).
+# Empty or not an email address: that button is disabled and says why.
+QUOTATION_EMAIL = os.environ.get('QUOTATION_EMAIL', '').strip()
+if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', QUOTATION_EMAIL):
+    QUOTATION_EMAIL = ''
 # Each free tool's agent script, loaded on its own page (/free-tools/<slug>/).
 # Empty: that page shows an honest "Coming soon" state.
 FREE_TOOL_SCRIPTS = {

@@ -17,7 +17,7 @@ All copy lives in `apps/core/content.py` (English and Arabic side by side);
 |---|---|---|
 | Hero | Headline and supporting line: draft brand copy, shown | Confirm or edit `hero.title` / `hero.lead` |
 | Hero | Background photograph: **illustrative AI image**, labelled | Replace with real photography — see "Images" below |
-| Projects | **Shown at the studio's request with placeholder entries** ("Project 01"–"04", "Scope of work to be added.", illustrative AI images, "Photo to be added" on detail pages) | Replace the entries in `PROJECTS` in `apps/core/projects.py` with real projects. `PUBLISHED = False` there hides the section, the menu links and the `/projects/…` pages |
+| Projects | **Project 01 is real: KK Barbershop - Sheikh Zayed** (six photos and a concept visualization). Projects 02–04 are still placeholders, shown at the studio's request ("Scope of work to be added.", illustrative AI images, "Photo to be added" on detail pages) | Replace the entries in `PROJECTS` in `apps/core/projects.py` with real projects. `PUBLISHED = False` there hides the section, the menu links and the `/projects/…` pages |
 | Services | Four confirmed services; summaries and deliverables are **drafts to confirm**, shown without labels | Edit `SERVICES` in `apps/core/services.py` |
 | About (Gindi Innovations) | Studio image: **illustrative AI image**, labelled | A real studio or founder photo is preferred — see "Gindi Innovations reveal" below |
 | Contact / footer | **No details shown**: none confirmed yet; the Contact section keeps only its heading and invitation | Add real entries to `contact.details` (e.g. `{'label': 'Email', 'value': '…'}`) and `contact.social`; the details block appears in the section and the footer automatically |
@@ -74,6 +74,8 @@ duplicated. Page labels are in `content.py` (`projects` for the carousel,
 | `work` | The scope of work, one line |
 | `description` | Longer text for the project's own page |
 | `media` | Photos and films in display order (see below) |
+| `tiles` | Optional: which `media` items (by index) form the Projects page group, in order. Default: the first three |
+| `concept` | Optional `{'image', 'alt', 'caption'}`: a concept visualization, on its own tab of the interactive page |
 | `thumbnail` | Optional images.py key for the homepage thumbnail |
 | `focus` | Optional crop focal point for the homepage image, e.g. `'50% 60%'` |
 
@@ -84,6 +86,15 @@ duplicated. Page labels are in `content.py` (`projects` for the carousel,
   (put the MP4 in `static/videos/`; it plays only when pressed, with controls)
 - Placeholder: `{'image': None}` shows "Photo to be added"
 
+When **every** item is a photo with a `caption` (a short title, e.g.
+`{'en': 'Overview', 'ar': 'نظرة عامة'}`), the project's page becomes the
+interactive gallery: one large photo with its caption and counter, a full
+screen button, thumbnails of every photo, and tabs for Completed / Concept
+Visualization (when `concept` is set). The first photo can carry
+`'hotspots'`: numbered markers, each `{'target': <index of the photo it
+opens>, 'x': <% of the photo's width>, 'y': <% of its height>}`; their labels
+are the target photos' captions.
+
 The first three items form the project's group on the Projects page (the
 first is the large image); any further items appear as "+N Photos" there
 and in full on the project's page, where photos open in a full-screen
@@ -93,13 +104,25 @@ To add a photo: export two WebP widths into `static/images/site/` named
 `<name>-<width>.webp`, register them in `IMAGES` in `apps/core/images.py`
 (name, size, widths, `illustrative`), then use the key in `media`.
 
-The four current projects are placeholders ("Project 01"–"04", "Scope of
-work to be added.") with one illustrative photo each and labelled
-placeholders for their detail photos. They are shown (`PUBLISHED = True`) at
-the studio's request until real projects replace them; `PUBLISHED = False`
-hides every Projects entry point.
+**Project 01 is KK Barbershop - Sheikh Zayed** (slug `project-1`, kept so
+existing links work). Its photos are `static/images/KK/IMG_8891.JPG` …
+`IMG_8896.JPG` (2048 × 1365), exported as `kk-img-8891-{480,960,1536,2048}.webp`
+… `kk-img-8896-…`, and the concept visualization `static/images/KK/Render 2.png`
+(1536 × 1024) as `kk-render-2-{480,960,1536}.webp`; the originals are kept as
+they are. The Projects page shows 8891 (large), 8894 and 8896. The overview's
+three markers open the coffee counter (8894), the styling area (8893) and the
+waiting & display area (8895). The concept image is an illustration of the
+space, not the original design; its caption says its details differ from
+the completed interior.
+
+Projects 02–04 are still placeholders ("Project 02"–"04", "Scope of work to
+be added.") with one illustrative photo each and labelled placeholders for
+their detail photos. They are shown (`PUBLISHED = True`) at the studio's
+request until real projects replace them; `PUBLISHED = False` hides every
+Projects entry point.
 `python manage.py test` checks the list (unique slugs, known images, alt
-text, film files present).
+text, film files present, `tiles` indexes, hotspot targets and positions,
+the concept image).
 
 ## Services page, enquiry drawer and free tools
 
@@ -130,6 +153,15 @@ sent yet and says so. To connect it, set `ENQUIRY_FORM_ACTION` (environment /
 `20` followed by the number, no `+` or spaces needed). It opens WhatsApp with
 "Hello, I’d like to enquire about <service>." (texts in `content.py` →
 `enquiry`). **No number is configured yet**, so the button is hidden.
+
+**Quotation form** ("Get Quotation" on the homepage hero, the Services page and
+the Projects pages): `templates/partials/quote_drawer.html`,
+`static/js/quote-form.js`, copy in `content.py` → `quote` (both languages). The
+site has no server-side email, so the visitor sends the request from their own
+app: "Submit via Email" opens their email app addressed to `QUOTATION_EMAIL`,
+"Submit via WhatsApp" opens WhatsApp to `WHATSAPP_NUMBER`, each with the whole
+request filled in. **Neither is configured yet**, so both buttons are disabled
+and say so.
 
 **Free tools** are listed in **`apps/core/tools.py`** (`TOOLS`): wire,
 tiles, bricks, cement. Pages: `/free-tools/` (overview) and
@@ -175,32 +207,43 @@ accordion items. "Discuss Your Project" opens the shared enquiry drawer;
 
 ## From Vision to Reality
 
-The design/reality comparison below Projects is edited in one place:
-**`apps/core/vision.py`**, the `VISION` dictionary.
+The design/reality comparisons below Projects are edited in one place:
+**`apps/core/vision.py`**, the `VISIONS` list (one entry per project, in
+display order). One project is shown at a time; the keystone handle compares
+its design with the finished space, and the arrows and dots below change the
+project.
 
 | Field | What to put |
 |---|---|
+| `id` | A stable, unique id: lowercase letters, digits and hyphens (`kk-barbershop`) |
 | `project_name` | The project's name, shown at the top right (one string, or `{'en': ..., 'ar': ...}`) |
 | `design.image` | The design visual's key in `apps/core/images.py` |
-| `design.alt` | A description of the design visual |
+| `design.alt` | A description of the design visual (say if it is the original render) |
 | `reality.image` | The photograph's key in `apps/core/images.py` |
 | `reality.alt` | A description of the photograph |
 | `focus` | Optional crop focal point for both, e.g. `'50% 50%'` |
 
-Currently: **KK Barbershop — Sheikh Zayed**, with `Render.png` (the design)
-and `real.JPG` (the photograph) from `static/images/`, exported to
-`static/images/site/kk-barbershop-{design,reality}-{960,1536}.webp` at
+Currently one entry: **KK Barbershop — Sheikh Zayed**, with `Render.png`
+(the design) and `real.JPG` (the photograph) from `static/images/`, exported
+to `static/images/site/kk-barbershop-{design,reality}-{960,1536}.webp` at
 identical sizes and registered in `images.py` as `kk-design` / `kk-reality`.
-If an image is set to `None`, its side shows a plain drawing labelled
-"Design image unavailable" / "Photograph unavailable" instead.
 
-To add the images: export the design and the photograph **from the same
-viewpoint and at the same size** (16:9 landscape works best, at least 1672 px
-wide), as two WebP widths each in `static/images/site/`; register both in
-`images.py` (see "Images" above); then set their keys in `vision.py`.
-`python manage.py test` warns if the two images have different proportions,
-which would stop them lining up. The labels ("The Design", "Drag to
-reveal" …) are in `content.py` under `vision`.
+Only complete entries (both images registered) are shown. The counter
+("01 / 02"), the dots, the arrows and "Choose project" follow the number of
+complete entries and appear only from two; with one, the section shows just
+that comparison. If an image fails to load in the browser, neither image of
+that pair is shown (a short notice instead), so a design is never paired
+with the wrong photograph.
+
+To add a project: export its design render and the photograph of the
+finished space **from the same viewpoint and at the same size** (3:2 or 16:9
+landscape, at least 1536 px wide), as two WebP widths each in
+`static/images/site/`; register both in `images.py` (see "Images" above); then
+add an entry to `VISIONS`. `python manage.py test` reports a duplicate id, a
+missing image or alt text, the same image used twice, or two images with
+different proportions (which would stop them lining up). Never pair unrelated
+images or reuse one project's images for another. The labels ("The Design",
+"Drag to compare", "Choose project" …) are in `content.py` under `vision`.
 
 ## Gindi Innovations reveal
 

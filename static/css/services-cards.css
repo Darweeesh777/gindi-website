@@ -1,0 +1,450 @@
+/*
+ * Gindi Innovations — Services page (/services/): introduction, four service
+ * cards with arched photographs, free planning tools (the quotation call to
+ * action is the shared one above the footer). Loaded by services.html only.
+ */
+
+.sp {
+  --sp-gold-line: color-mix(in srgb, var(--gindi-gold) 45%, transparent);
+  --sp-card-bg: color-mix(in srgb, var(--gindi-ivory) 45%, #fff);
+}
+
+.sp-eyebrow {
+  color: var(--gindi-gold);
+}
+
+.sp-arrow {
+  flex: none;
+  width: 1.125rem;
+  height: auto;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.sp-arrow--up {
+  width: 0.875rem;
+}
+
+/* Arrows point the reading way. */
+[dir="rtl"] .sp-arrow {
+  transform: scaleX(-1);
+}
+
+/* ---------- Introduction ---------- */
+.sp-intro {
+  padding-block: calc(var(--header-h) + clamp(1.5rem, 1rem + 1.8vw, 2.75rem)) clamp(1.5rem, 1.1rem + 1.2vw, 2.25rem);
+}
+
+.sp-intro__inner {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.sp-intro__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 1.1rem + 2.6vw, 3.5rem);
+  font-weight: var(--fw-medium);
+  line-height: 1.08;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+:lang(ar) .sp-intro__title {
+  line-height: 1.3;
+}
+
+.sp-intro__lead {
+  max-width: 40rem;
+  color: var(--muted);
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+/* ---------- Service cards ---------- */
+.sp-services {
+  padding-block: 0.5rem clamp(2.5rem, 1.75rem + 2.5vw, 4rem);
+}
+
+.sp-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  max-width: 77.5rem; /* 1240px: two cards ~600px wide, centred */
+  margin-inline: auto;
+  /* Row gap leaves room for the next row's keystone above its arch. */
+  gap: clamp(2.25rem, 1.75rem + 1.5vw, 3rem) clamp(1.5rem, 1.1rem + 1vw, 2rem);
+}
+
+/* Anchor scrolling: the page already keeps clear of the sticky header
+   (scroll-padding in base.css); this adds room for the keystone. */
+.sp-card {
+  scroll-margin-block-start: 1.75rem;
+}
+
+/* The arch: one element whose border is the gold outline and whose rounded
+   top corners (elliptical radii) clip the photograph. Curved top, vertical
+   sides, flat bottom; outside it the page background shows. */
+.sp-card__arch {
+  position: relative;
+}
+
+.sp-card__photo {
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border: 3px solid var(--gindi-gold);
+  border-block-end: 0;
+  border-radius: 50% 50% 0 0 / 44% 44% 0 0;
+  background: var(--placeholder-bg);
+}
+
+.sp-card__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* cropped, never stretched */
+}
+
+/* Keystone at the apex, over the outline; same proportions as the
+   monogram's. A separate layer, so the photo's clip never cuts it. */
+.sp-card__keystone {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  width: clamp(1.25rem, 0.85rem + 0.9vw, 1.875rem);
+  height: auto;
+  translate: -50% -42%;
+  fill: var(--gindi-ivory);
+  stroke: var(--gindi-gold);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+[dir="rtl"] .sp-card__keystone {
+  translate: 50% -42%;
+}
+
+.sp-card__body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: clamp(0.75rem, 0.5rem + 0.6vw, 1.125rem);
+  padding: 1.25rem clamp(1.125rem, 0.9rem + 0.6vw, 1.5rem);
+  border: 1px solid var(--sp-gold-line);
+  border-block-start: 0;
+  background: var(--sp-card-bg);
+}
+
+/* Number beside the title; the text, toggle and details line up under the title. */
+.sp-card__heading {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+}
+
+.sp-card__num {
+  color: var(--gindi-gold);
+  font-size: 0.9375rem;
+  font-weight: var(--fw-medium);
+}
+
+.sp-card__title {
+  color: var(--gindi-navy);
+  font-family: var(--font-heading);
+  font-size: clamp(1.625rem, 1.1rem + 1vw, 2.25rem);
+  font-weight: var(--fw-medium);
+  line-height: 1.1;
+}
+
+:lang(ar) .sp-card__title {
+  line-height: 1.35;
+}
+
+.sp-card__text,
+.sp-card__more {
+  grid-column: 2;
+}
+
+.sp-card__text {
+  margin-block-start: 0.25rem;
+  color: var(--muted);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+/* "Explore service": a text button that opens the card's details. */
+.sp-card__more {
+  margin-block-start: 0.375rem;
+}
+
+.sp-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.25rem;
+  color: var(--gindi-gold);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+  list-style: none;
+  cursor: pointer;
+}
+
+.sp-card__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.sp-card__toggle:focus-visible {
+  outline: 2px solid var(--gindi-navy);
+  outline-offset: 3px;
+}
+
+.sp-card__toggle:hover .sp-arrow--up {
+  transform: translate(0.125rem, -0.125rem);
+}
+
+[dir="rtl"] .sp-card__toggle:hover .sp-arrow--up {
+  transform: scaleX(-1) translate(0.125rem, -0.125rem);
+}
+
+/* Open: the arrow turns down towards the details. */
+.sp-card__more[open] .sp-arrow--up {
+  rotate: 90deg;
+}
+
+[dir="rtl"] .sp-card__more[open] .sp-arrow--up {
+  rotate: -90deg;
+}
+
+.sp-card__details {
+  display: grid;
+  gap: 0.875rem;
+  margin-block-start: 1rem;
+  padding-block-start: 1rem;
+  border-block-start: 1px solid var(--sp-gold-line);
+}
+
+.sp-card__summary {
+  color: var(--fg);
+}
+
+.sp-card__label {
+  color: var(--muted);
+}
+
+.sp-card__list {
+  display: grid;
+  gap: 0.375rem;
+  margin-block-start: -0.375rem;
+}
+
+.sp-card__list li {
+  position: relative;
+  padding-inline-start: 1rem;
+  color: var(--muted);
+}
+
+.sp-card__list li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0.7em;
+  width: 0.375rem;
+  height: 1px;
+  background: var(--gindi-gold);
+}
+
+.sp-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-block-start: 0.25rem;
+}
+
+/* ---------- Free planning tools ---------- */
+.sp-tools {
+  position: relative;
+  overflow: clip; /* the oversized monogram never widens the page */
+  padding-block: clamp(2.75rem, 1.75rem + 3vw, 4.5rem);
+}
+
+/* Oversized, low-contrast monogram at the inline end, partly cropped. */
+.sp-tools__mark {
+  position: absolute;
+  inset-block-start: -8%;
+  inset-inline-end: -4%;
+  height: 125%;
+  width: auto;
+  fill: color-mix(in srgb, var(--gindi-ivory) 5%, transparent);
+  pointer-events: none;
+}
+
+.sp-tools__inner {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sp-tools__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 1.2rem + 2.4vw, 3.25rem);
+  font-weight: var(--fw-medium);
+  line-height: 1.1;
+}
+
+:lang(ar) .sp-tools__title {
+  line-height: 1.35;
+}
+
+.sp-tools__text {
+  max-width: 34rem;
+  color: var(--muted);
+}
+
+.sp-tools__list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-block-start: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+
+.sp-tool {
+  display: grid;
+  align-content: start;
+  gap: 0.375rem;
+  padding-inline: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+}
+
+.sp-tool:first-child {
+  padding-inline-start: 0;
+}
+
+.sp-tool + .sp-tool {
+  border-inline-start: 1px solid var(--ivory-18);
+}
+
+.sp-tool__icon {
+  width: 2.75rem;
+  height: auto;
+  margin-block-end: 0.5rem;
+  color: var(--gindi-gold);
+}
+
+.sp-tool__name {
+  font-family: var(--font-heading);
+  font-size: clamp(1.375rem, 1.1rem + 0.6vw, 1.625rem);
+  font-weight: var(--fw-medium);
+  line-height: 1.2;
+}
+
+:lang(ar) .sp-tool__name {
+  line-height: 1.4;
+}
+
+.sp-tool__text {
+  color: var(--muted);
+  font-size: var(--fs-small);
+  line-height: 1.55;
+}
+
+.sp-tool__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.875rem;
+  margin-block-start: 0.5rem;
+}
+
+.sp-tool__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.25rem;
+  color: var(--gindi-gold);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+}
+
+.sp-tool__link:hover .sp-arrow {
+  transform: translateX(0.25rem);
+}
+
+[dir="rtl"] .sp-tool__link:hover .sp-arrow {
+  transform: scaleX(-1) translateX(0.25rem);
+}
+
+/* Not connected yet (its page says so too). */
+.sp-tool__status {
+  padding: 0.0625rem 0.375rem;
+  border: 1px solid var(--sp-gold-line);
+  color: var(--gindi-gold);
+  font-size: 0.625rem;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.14em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:lang(ar) .sp-tool__status {
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ---------- Smaller screens ---------- */
+/* Tablets: two cards per row stays; the tools become 2 x 2. */
+@media (max-width: 64rem) {
+  .sp-tools__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 2rem;
+  }
+
+  .sp-tool:nth-child(odd) {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+
+  .sp-tool:nth-child(even) {
+    padding-inline-end: 0;
+  }
+}
+
+/* Phones: one card per row; the tools one per row (with a line between). */
+@media (max-width: 40rem) {
+  .sp-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 30rem) {
+  .sp-tools__list {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+  }
+
+  .sp-tool,
+  .sp-tool:nth-child(odd),
+  .sp-tool:nth-child(even) {
+    padding-block: 1.25rem;
+    padding-inline: 0;
+    border-inline-start: 0;
+  }
+
+  .sp-tool + .sp-tool {
+    border-block-start: 1px solid var(--ivory-18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-arrow {
+    transition: none;
+  }
+}

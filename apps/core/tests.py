@@ -53,7 +53,7 @@ class HomepageTests(SimpleTestCase):
         for name, label in (('core:home', 'Illustrative image'), ('core:home_ar', 'صورة توضيحية')):
             html = self.get(name)
             self.assertIn('<source media="(orientation: portrait)"', html)
-            self.assertEqual(html.count('class="media__tag"'), 5)  # 4 projects + about
+            self.assertEqual(html.count('class="media__tag"'), 4)  # projects 02-04 (01 is real) + about
             self.assertIn(label, html)
             self.assertNotIn('{#', html)  # no template comments leaking into the page
 
@@ -64,7 +64,7 @@ class HomepageTests(SimpleTestCase):
         self.assertIn('Spaces composed<br>with quiet intention.', hero)
         self.assertIn('class="hero__actions hero-intro" style="--i: 3"', hero)
         # Concept 05 CTAs, linked to existing sections only.
-        self.assertIn('<a class="btn hero__quote" href="#contact">Get Quotation</a>', hero)
+        self.assertIn('<a class="btn hero__quote" href="#contact" data-quote>Get Quotation</a>', hero)
         self.assertIn('<a class="link-arrow hero__services" href="/free-tools/">Free Services', hero)
         self.assertIn('images/site/hero-desktop-1672.webp', hero)
         self.assertIn('data-parallax', hero)
@@ -117,13 +117,18 @@ class HomepageTests(SimpleTestCase):
         cx, cy, r, bottom = window_end()
         self.assertTrue(cx - r < 0 and cx + r > 300 and cy - r < 0 and bottom > 400)
 
+    def vision_section(self, name):
+        html = self.get(name)
+        return html, html[html.index('id="vision"'):html.index('id="services"')]
+
     def test_vision_section(self):
-        from .vision import VISION, validate
+        from .images import IMAGES
+        from .vision import VISIONS, validate
 
         self.assertEqual(validate(), [])
-        for name, title in (('core:home', 'From Vision to Reality'), ('core:home_ar', 'من الرؤية إلى الواقع')):
-            html = self.get(name)
-            section = html[html.index('id="vision"'):html.index('id="services"')]
+        for name, title, hint in (('core:home', 'From Vision to Reality', 'Drag to compare'),
+                                  ('core:home_ar', 'من الرؤية إلى الواقع', 'اسحب للمقارنة')):
+            html, section = self.vision_section(name)
             self.assertIn(f'id="vision-title" data-reveal>{title}</h2>', section)
             # One accessible slider, starting at 50%.
             self.assertEqual(section.count('role="slider"'), 1)
@@ -132,34 +137,58 @@ class HomepageTests(SimpleTestCase):
             # Design under reality in the markup, so the clipped design layer sits on top.
             self.assertLess(section.index('compare__layer--reality'), section.index('compare__layer--design'))
             self.assertIn('js/compare-slider.js', html)
-            # Real images: both shown with the same crop, no placeholder notices.
+            self.assertIn('js/vision-nav.js', html)
+            # Labels row: design | hint | reality, with the gold rules between.
+            labels = section[section.index('class="compare__labels"'):]
+            self.assertLess(labels.index('compare__label'), labels.index(hint))
+            self.assertEqual(labels[:labels.index('</div>')].count('compare__rule'), 2)
+            # Real images, the same crop on both layers; no explanatory sentence.
+            entry = VISIONS[0]
             for side in ('design', 'reality'):
-                key = VISION[side]['image']
-                if key:
-                    from .images import IMAGES
-                    self.assertIn(f"/static/images/site/{IMAGES[key]['name']}-", section)
-                else:
-                    self.assertIn(f'compare__missing--{side}', section)
-            if VISION['design']['image'] and VISION['reality']['image']:
-                self.assertNotIn('compare__missing', section)
-                self.assertNotIn('compare__art', section)
-                self.assertEqual(section.count(f"style=\"object-position: {VISION['focus']};\""), 2)
-                self.assertNotIn('C:\\', section)
+                self.assertIn(f"/static/images/site/{IMAGES[entry[side]['image']]['name']}-", section)
+            self.assertEqual(section.count(f"style=\"object-position: {entry['focus']};\""), 2)
+            self.assertNotIn('C:\\', section)
+            self.assertNotIn('One project at a time', section)
+            # One verified pair: one slide, and no counter, dots or arrows.
+            self.assertEqual(section.count('data-vision-slide'), len(VISIONS))
+            if len(VISIONS) == 1:
+                self.assertNotIn('data-vision-nav', section)
+                self.assertNotIn('01 / ', section)
 
-    def test_vision_images_render_when_set(self):
-        from unittest import mock
-
+    def test_vision_navigation_follows_entries(self):
         from . import vision
 
-        data = dict(vision.VISION, design={'image': 'project-3', 'alt': 'Design of the kitchen.'},
-                    reality={'image': 'project-3', 'alt': 'The finished kitchen.'})
-        with mock.patch.object(vision, 'VISION', data):
-            self.assertEqual(vision.validate(), [])
-            html = self.get('core:home')
-        section = html[html.index('id="vision"'):html.index('id="services"')]
-        self.assertIn('alt="Design of the kitchen."', section)
-        self.assertIn('alt="The finished kitchen."', section)
-        self.assertNotIn('compare__missing', section)
+        second = {
+            'id': 'test-kitchen', 'project_name': {'en': 'Test Kitchen', 'ar': 'مطبخ تجريبي'},
+            'design': {'image': 'project-3', 'alt': 'Design of the kitchen.'},
+            'reality': {'image': 'project-4', 'alt': 'The finished kitchen.'},
+        }
+        incomplete = dict(second, id='test-incomplete', design={'image': 'no-such-image', 'alt': 'x'},
+                          reality={'image': 'project-2', 'alt': 'y'})
+        with mock.patch.object(vision, 'VISIONS', vision.VISIONS[:1] + [second, incomplete]):
+            self.assertIn("test-incomplete: design image 'no-such-image' is not in images.py", vision.validate())
+            for name, label in (('core:home', 'Choose project'), ('core:home_ar', 'اختر المشروع')):
+                _, section = self.vision_section(name)
+                # Only complete entries count: two slides, "01 / 02", two dots.
+                self.assertEqual(section.count('data-vision-slide'), 2)
+                self.assertIn('<span data-vision-current>01</span> / 02', section)
+                self.assertEqual(section.count('data-vision-dot='), 2)
+                self.assertEqual(section.count('aria-current="true"'), 1)
+                self.assertIn(label, section)
+                self.assertNotIn('test-incomplete', section)
+                # The second slide is hidden until chosen; the first is shown.
+                first = section[section.index('id="vision-kk-barbershop"'):]
+                self.assertNotIn(' hidden>', first[:first.index('>') + 1])
+                tail = section[section.index('id="vision-test-kitchen"'):]
+                self.assertIn(' hidden>', tail[:tail.index('>') + 1])
+            self.assertIn('alt="Design of the kitchen."', section)
+        # The same image for design and reality, or one image in two entries, is rejected.
+        same = dict(second, reality={'image': 'project-3', 'alt': 'z'})
+        with mock.patch.object(vision, 'VISIONS', [same]):
+            self.assertIn('test-kitchen: design and reality are the same image', vision.validate())
+        reused = dict(second, design=vision.VISIONS[0]['design'])
+        with mock.patch.object(vision, 'VISIONS', vision.VISIONS + [reused]):
+            self.assertIn('an image is used by more than one entry', vision.validate())
 
     def test_project_data_is_valid(self):
         from .projects import validate
@@ -184,7 +213,7 @@ class HomepageTests(SimpleTestCase):
             self.assertIn('data-prev', section)
             self.assertIn('data-next', section)
             # The real monogram as decoration, by its static URL.
-            self.assertIn('src="/static/images/brand/gindi-monogram-transparent.png"', section)
+            self.assertIn('src="/static/images/brand/gindi-monogram-transparent.png', section)
             self.assertNotIn('C:/', section)
             # "Explore Project" on every project, to that project on the Projects page.
             prefix = '/ar' if name.endswith('_ar') else ''
@@ -242,9 +271,11 @@ class HomepageTests(SimpleTestCase):
             response = self.client.get(f"/projects/{project['slug']}/")
             self.assertEqual(response.status_code, 200)
             html = response.content.decode()
-            self.assertIn(f'id="project-title" data-reveal>{project["name"]}</h1>', html)
             self.assertIn(f'href="/projects/#{project["slug"]}"', html)  # Back to Projects
             self.assertIn('Back to Projects', html)
+            if project['interactive']:
+                continue  # KK Barbershop: test_interactive_project_page
+            self.assertIn(f'id="project-title" data-reveal>{project["name"]}</h1>', html)
             self.assertEqual(html.count('data-lightbox-open='), len(project['photos']))
             self.assertEqual(html.count('Photo to be added'), sum(1 for m in project['media'] if m['kind'] == 'placeholder'))
             if project['photos']:
@@ -255,12 +286,63 @@ class HomepageTests(SimpleTestCase):
         self.assertEqual(self.client.get('/projects/no-such-project/').status_code, 404)
         self.assertEqual(len(PROJECTS), len({p['slug'] for p in PROJECTS}))
 
+    def test_interactive_project_page(self):
+        from .images import IMAGES
+        from .projects import PROJECTS
+
+        kk = PROJECTS[0]
+        self.assertEqual(kk['slug'], 'project-1')  # existing links keep working
+        files = [IMAGES[item['image']]['name'] for item in kk['media']]
+        self.assertEqual(files, [f'kk-img-{n}' for n in range(8891, 8897)])
+        for lang, prefix, name, tabs in (
+                ('en', '', 'KK Barbershop - Sheikh Zayed', ('Completed', 'Concept Visualization')),
+                ('ar', '/ar', 'صالون KK - الشيخ زايد', ('بعد التنفيذ', 'تصور للمكان'))):
+            html = self.client.get(f'{prefix}/projects/project-1/').content.decode()
+            title = name.replace(' - ', ' - ')  # the hyphen never starts a line
+            self.assertIn(f'id="project-title">{title}</h1>', html)
+            for label in tabs:
+                self.assertIn(f'data-pg-tab>{label}</button>', html)
+            self.assertIn('aria-selected="true" data-pg-tab', html)
+            # The overview first, six thumbnails, three markers opening photos 4, 3 and 5.
+            self.assertIn('images/site/kk-img-8891-2048.webp', html.split('data-pg-image')[0].rsplit('<img', 1)[1])
+            completed, concept = html.split('id="pg-concept"')
+            self.assertEqual(completed.count('data-pg-thumb='), 6)
+            # Markers on every photo, linking the connected views (Overview: the toolbar button).
+            sets = re.findall(r'data-pg-hotspots="(\d)"(.*?)</div>', html, re.S)
+            links = {int(i): [int(t) for t in re.findall(r'data-pg-goto="(\d)"', body)] for i, body in sets}
+            self.assertEqual(links, {0: [3, 2, 4], 1: [2, 5], 2: [1, 5], 3: [4], 4: [3, 5], 5: [2, 4]})
+            self.assertIn('data-pg-previous disabled', html)
+            self.assertIn('data-pg-home disabled aria-current="true"', html)
+            self.assertIn('<span data-pg-count>01</span> / 06', html)
+            # The concept visualizations: their own gallery (six, in the photos' order), no markers
+            # or history, never mixed with the photographs; no tags or placeholders.
+            renders = ['kk-render-2'] + [f'kk-concept-{v}' for v in ('stations', 'styling', 'coffee', 'waiting', 'front')]
+            self.assertEqual(re.findall(r'data-pg-thumb="\d"[^>]*?data-src="/static/images/site/([a-z0-9-]+?)-\d+\.webp', concept, re.S), renders)
+            self.assertNotIn('data-pg-goto', concept)
+            self.assertNotIn('data-pg-previous', concept)
+            self.assertIn('data-pg-step="-1"', concept)
+            self.assertIn('<span data-pg-count>01</span> / 06', concept)
+            self.assertFalse(any(r in completed for r in renders))
+            self.assertNotIn('kk-img-', concept)
+            self.assertNotIn('media__tag', html)
+            self.assertNotIn('tile--placeholder', html)
+            # The Projects page entry: the real name, three real photos, the neutral line.
+            index = self.client.get(f'{prefix}/projects/').content.decode()
+            entry = index[index.index('id="project-1"'):index.index('id="project-2"')]
+            self.assertIn(name, entry)
+            self.assertEqual(list(dict.fromkeys(re.findall(r'kk-img-(\d{4})-2048', entry))), ['8891', '8894', '8896'])
+            self.assertIn('Explore the completed space and its different views.' if lang == 'en'
+                          else 'استكشف المساحة بعد التنفيذ من زوايا مختلفة.', entry)
+            self.assertIn(f'href="{prefix}/projects/project-1/"', entry)
+            self.assertNotIn('media__tag', entry)
+            self.assertNotIn('tile__missing', entry)
+
     def test_project_films_and_galleries(self):
         from unittest import mock
 
         from . import projects
 
-        rich = dict(projects.PROJECTS[0], media=[
+        rich = dict(projects.PROJECTS[0], tiles=None, concept=None, media=[
             {'video': 'videos/example.mp4', 'poster': 'project-1', 'title': 'Project Film'},
             {'image': 'project-1', 'alt': 'First photo.'},
             {'image': 'project-3', 'alt': 'Second photo.'},
@@ -307,23 +389,39 @@ class HomepageTests(SimpleTestCase):
         for name, prefix in (('core:services', ''), ('core:services_ar', '/ar')):
             html = self.get(name)
             if not prefix:
-                self.assertIn('>Expertise for every stage.</h1>', html)
-                self.assertIn('Discuss Your Project', html)
-                for service_name in names:
-                    self.assertIn(f'<span class="accordion__name">{service_name}</span>', html)
-            # One accordion item per service, anchored by slug; the first open.
-            for i, service in enumerate(SERVICES):
+                self.assertIn('>Your space. Every detail considered.</h1>', html)
+                self.assertIn('Explore 2D design, 3D visualization, interior finishing, and fit-out services', html)
+                self.assertEqual(re.findall(r'<span class="sp-card__title">([^<]+)</span>', html), names)
+                for text in ('Layouts shaped around your needs.', 'Explore your space before execution.',
+                             'Bring the approved finishes to life.', 'Prepare your space for everyday use.',
+                             'A practical place to start.', 'Let’s discuss your project.', 'Estimate initial electrical wire quantities.'):
+                    self.assertIn(text, html)
+            # One card per service, anchored by its slug, with its arched photo and one keystone;
+            # details (summary, deliverables, enquiry) in a closed <details>.
+            self.assertEqual(html.count('data-service-card'), 4)
+            self.assertEqual(html.count('class="sp-card__keystone"'), 4)
+            self.assertEqual(html.count('<details class="sp-card__more" data-service-details>'), 4)  # closed by default
+            parts = html[:html.index('</ol>')].split('data-service-card')
+            cards = {re.search(r'id="([^"]+)" $', before).group(1): part for before, part in zip(parts, parts[1:])}
+            for service in SERVICES:
                 slug = service['slug']
-                self.assertIn(f'id="{slug}" data-accordion-item', html)
-                expanded = 'true' if i == 0 else 'false'
-                self.assertIn(f'id="{slug}-trigger"\n                        aria-expanded="{expanded}"', html)
-                self.assertIn(f'aria-haspopup="dialog" data-enquire="{slug}"', html)
-            self.assertEqual(html.count('accordion__item is-open'), 1)
-            # Free Tools: four cards, all "Coming soon" with no button that looks usable
-            # (no agent connected); no inputs outside the enquiry drawer.
-            self.assertEqual(html.count('class="tool-card__status label"'), 4)
-            self.assertNotIn('tool-card__cta', html)
-            self.assertIn(f'href="{prefix}/free-tools/"', html)
+                card = cards[slug]
+                self.assertIn('<div class="sp-card__photo">', card)
+                self.assertRegex(card, r'<img src="/static/images/site/[^"]+\.webp')
+                self.assertIn(f'aria-haspopup="dialog" data-enquire="{slug}"', card)
+                self.assertIn('class="sp-card__list"', card)  # verified deliverables kept
+                self.assertNotIn('keystone"></span>', card)  # no badge beside the number
+            # Free planning tools: each to its own localized page, "Coming soon" while not connected.
+            tools = html[html.index('class="sp-tools'):html.index('class="footer-cta')]
+            for slug in ('wire', 'tiles', 'bricks', 'cement'):
+                self.assertIn(f'<a class="sp-tool__link" href="{prefix}/free-tools/{slug}/">', tools)
+            self.assertEqual(tools.count('class="sp-tool__status"'), 4)
+            self.assertEqual(tools.count('class="sp-tool__icon"'), 4)
+            self.assertIn('class="sp-tools__mark"', tools)  # the monogram watermark, decorative
+            # Get Quotation opens the existing quotation form.
+            self.assertRegex(html, r'class="btn footer-cta__btn" href="[^"]*#contact" aria-haspopup="dialog" data-quote>')
+            self.assertEqual(html.count('data-quote-drawer'), 1)  # one quotation form, in the shared page end
+            self.assertIn('data-quote-drawer', html)
             body = html[:html.index('<dialog class="drawer')]
             self.assertNotIn('<input', body)
             self.assertNotIn('<select', body)
@@ -385,7 +483,7 @@ class HomepageTests(SimpleTestCase):
             self.assertEqual(html.count('class="tool-card__status label"'), 4)  # all coming soon
             self.assertNotIn('tool-card__cta', html)  # ...so no "Start Free Estimate" button
             self.assertIn(f'href="{prefix}/services/" aria-current="true"', html)
-            self.assertNotIn('<input', html)
+            self.assertNotIn('<input', html[html.index('<main'):html.index('</main>')])
         for slug in slugs:
             for prefix in ('', '/ar'):
                 response = self.client.get(f'{prefix}/free-tools/{slug}/')
@@ -396,8 +494,9 @@ class HomepageTests(SimpleTestCase):
                 self.assertIn('data-tool-placeholder', html)
                 self.assertIn(f'href="{prefix}/free-tools/"', html)  # back to Free Tools
                 self.assertNotIn('data-tool-script', html)
-                self.assertNotIn('<input', html)
-                self.assertNotIn('<form', html)
+                main = html[html.index('<main'):html.index('</main>')]  # the quotation form is in the shared page end
+                self.assertNotIn('<input', main)
+                self.assertNotIn('<form', main)
         self.assertIn('Coming soon', self.client.get('/free-tools/tiles/').content.decode())
         self.assertEqual(self.client.get('/free-tools/no-such-tool/').status_code, 404)
         # Each agent is independent: connecting one loads only that one.
@@ -425,14 +524,41 @@ class HomepageTests(SimpleTestCase):
             html = self.get(name)
             section = html[html.index('id="services"'):html.index('id="process"')]
             for service in SERVICES:
-                self.assertIn(f'<a class="service__link" href="{prefix}/services/#{service["slug"]}">', section)
-            self.assertIn(f'href="{prefix}/services/"', section)  # All services
+                self.assertIn(f'<a class="svc-cell__link" href="{prefix}/services/#{service["slug"]}">', section)
+            self.assertIn(f'<a class="svc-panel__more" href="{prefix}/services/">', section)  # Explore services
+            # Free Services: each tool opens its own page, "Coming soon" while not connected.
+            for slug in ('wire', 'tiles', 'bricks', 'cement'):
+                self.assertIn(f'<a class="svc-cell__link" href="{prefix}/free-tools/{slug}/">', section)
+            self.assertEqual(section.count('class="svc-cell__status"'), 4)
+            self.assertEqual(section.count('class="svc-cell__icon"'), 4)
+            self.assertIn(f'<a class="svc-panel__more" href="{prefix}/free-tools/">', section)  # Explore free tools
             header = html[html.index('<header class="site-header'):html.index('</header>')]
             footer = html[html.index('<footer'):html.index('</footer>')]
             self.assertIn(f'href="{prefix}/services/"', header)
             self.assertIn(f'href="{prefix}/services/"', footer)
             self.assertNotIn('href="#services"', header + footer)
             self.assertIn('href="#projects"', header)  # in-page sections still work on the homepage
+
+    def test_homepage_services_copy(self):
+        en = self.get('core:home')
+        en = en[en.index('id="services"'):en.index('id="process"')]
+        for text in ('>Our Services<', 'Considered design. Complete execution.', 'From the first plan to the finishing details.',
+                     'Studio Services', 'Explore services', 'Layouts shaped around your needs.',
+                     'See your space before execution.', 'Materials and finishes brought to life.',
+                     'Prepare your space for everyday use.', 'Plan your project', '>Free Services<',
+                     'Start with an initial material estimate.', 'Estimate electrical wire quantities.',
+                     'Plan tiles for floors and walls.', 'Calculate initial brick quantities.',
+                     'Plan cement quantities for your work.', 'Explore free tools'):
+            self.assertIn(text, en)
+        # Order: 2D, 3D, Interior Finishing, Fit-Out; then Wire, Tile, Brick, Cement.
+        self.assertEqual(re.findall(r'<a class="svc-cell__link" href="/services/#[^"]+">([^<]+)<', en),
+                         ['2D Design', '3D Design', 'Interior Finishing', 'Fit-Out'])
+        self.assertEqual(re.findall(r'<a class="svc-cell__link" href="/free-tools/[^"]+">([^<]+)<', en),
+                         ['Wire Estimator', 'Tile Estimator', 'Brick Estimator', 'Cement Estimator'])
+        ar = self.get('core:home_ar')
+        for text in ('خدماتنا', 'تصميم مدروس. تنفيذ متكامل.', 'خدمات الاستوديو', 'الخدمات المجانية',
+                     'حاسبة الأسلاك', 'احسب كميات الطوب المبدئية.', 'استكشف الأدوات المجانية'):
+            self.assertIn(text, ar)
 
     def test_about_page(self):
         from .about import ABOUT
@@ -452,7 +578,7 @@ class HomepageTests(SimpleTestCase):
             for key in ('about-hero', 'about-who', 'about-what', 'about-how', 'about-detail-1', 'about-detail-2'):
                 self.assertIn(f'/static/images/site/{key}-', html)
             self.assertNotIn('C:\\', html)
-            self.assertIn('src="/static/images/brand/gindi-monogram-transparent.png"', html)
+            self.assertIn('src="/static/images/brand/gindi-monogram-transparent.png', html)
             # Chapter 02 services link to their accordion items; Explore to /services/.
             for slug in ('2d-design', '3d-design', 'interior-finishing', 'fit-out'):
                 self.assertIn(f'<a class="ab-service" href="{prefix}/services/#{slug}">', html)
@@ -578,8 +704,9 @@ class PublicContentTests(SimpleTestCase):
             html = self.client.get(home).content.decode()
             self.assertIn('id="projects"', html)
             self.assertIn(f'href="{prefix}/projects/"', html)
+            # Services (02) shows no number in its own header (design); Process, About, Contact do.
             self.assertEqual(re.findall(r'<span class="num">(\d+)</span>\s*<span class="keystone"', html),
-                             ['02', '03', '04', '05'])
+                             ['03', '04'])
             self.assertEqual(self.client.get(f'{prefix}/projects/project-1/').status_code, 200)
 
     @mock.patch.object(project_data, 'PUBLISHED', False)
@@ -589,23 +716,23 @@ class PublicContentTests(SimpleTestCase):
             self.assertNotIn('id="projects"', html)
             self.assertNotIn('/projects/', html)
             self.assertNotIn('projects-carousel.js', html)
-            self.assertIn('href="#vision" aria-hidden="true"', html)  # hero scroll cue: next section
+            self.assertNotIn('hero__scroll', html)  # the hero has no scroll cue
             # Numbered sections start at 01 without Projects.
             self.assertEqual(re.findall(r'<span class="num">(\d+)</span>\s*<span class="keystone"', html),
-                             ['01', '02', '03', '04'])
+                             ['02', '03'])  # Services (01) shows no number in its own header
             for path in (f'{prefix}/projects/', f'{prefix}/projects/project-1/'):
                 self.assertEqual(self.client.get(path).status_code, 404, path)
             self.assertNotIn('/projects/', self.client.get(f'{prefix}/no-such-page/').content.decode())
             self.assertNotIn('/projects/', self.client.get(f'{prefix}/about/').content.decode())
 
     def test_contact_shows_no_unconfirmed_details(self):
-        for path, invitation in (('/', 'Share a little about your space and what you imagine for it.</p>'),
-                                 ('/ar/', 'حدّثنا قليلًا عن مساحتك وما تتخيّله لها.</p>')):
+        for path, title in (('/', 'Let’s discuss your project.'), ('/ar/', 'خلّينا نتكلم عن مشروعك.'),
+                            ('/services/', 'Let’s discuss your project.'), ('/ar/about/', 'خلّينا نتكلم عن مشروعك.')):
             html = self.client.get(path).content.decode()
-            self.assertIn('id="contact"', html)
-            self.assertIn(invitation, html)
-            self.assertNotIn('contact__details', html)
-            self.assertNotIn('site-footer__contact', html)
+            self.assertEqual(html.count('id="contact"'), 1, path)  # the shared call to action, on every page
+            self.assertIn(f'id="footer-cta-title">{title}</h2>', html)
+            self.assertNotIn('footer-cta__details', html)  # no confirmed contact details yet
+            self.assertLess(html.index('id="contact"'), html.index('<footer'))
 
     def test_unfinished_features_stay_honest(self):
         services = self.client.get('/services/').content.decode()
@@ -619,7 +746,7 @@ class PublicContentTests(SimpleTestCase):
 
     def test_generated_images_keep_their_disclosure(self):
         html = self.client.get('/').content.decode()
-        self.assertIn('Illustrative image — not a studio project', html)  # hero
+        self.assertNotIn('not a studio project', html)  # the hero's note was removed at the studio's request
         about = html[html.index('id="about"'):html.index('id="contact"')]
         self.assertIn('<figcaption class="media__tag" aria-hidden="true">Illustrative image</figcaption>', about)
         self.assertIn('alt="Illustrative image:', about)
@@ -655,7 +782,7 @@ class DeploymentTests(SimpleTestCase):
     def test_favicon_redirects_to_the_brand_icon(self):
         response = self.client.get('/favicon.ico')
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response['Location'].endswith('images/brand/favicon-32.png'))
+        self.assertIn('images/brand/favicon-32.png', response['Location'])
 
     def test_branded_404_in_both_languages(self):
         for path, lang, heading in (('/no-such-page/', 'en', 'This page could not be found.'),
@@ -729,16 +856,16 @@ class StaticExportTests(SimpleTestCase):
             published = tmp / 'published' / 'dist'
             for page in ('projects/index.html', 'projects/project-1/index.html', 'ar/projects/project-4/index.html'):
                 self.assertTrue((published / page).is_file(), page)
-            self.assertEqual(len(list(published.rglob('index.html'))), 26)
+            self.assertEqual(len(list(published.rglob('index.html'))), 28)
             dist = tmp / 'dist'
             for page in ('index.html', 'ar/index.html', 'about/index.html', 'services/index.html',
-                         'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/cement/index.html',
+                         'contact/index.html', 'ar/contact/index.html', 'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/cement/index.html',
                          '404.html', 'ar/404.html', 'robots.txt'):
                 self.assertTrue((dist / page).is_file(), page)
             # Projects switched off: no project pages at all.
             self.assertFalse((dist / 'projects').exists())
             self.assertFalse((dist / 'ar' / 'projects').exists())
-            self.assertEqual(len(list(dist.rglob('index.html'))), 16)
+            self.assertEqual(len(list(dist.rglob('index.html'))), 18)
             home = (dist / 'index.html').read_text(encoding='utf-8')
             self.assertIn('href="https://preview.example/ar/"', home)
             self.assertRegex(home, r'/static/css/base\.[0-9a-f]{12}\.css')

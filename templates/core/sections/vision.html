@@ -1,42 +1,53 @@
 {% comment %}
-"From Vision to Reality": the design and the finished space in one frame.
-Data: apps/core/vision.py (project name, images, alt text); labels:
-content.py (c.vision). Both layers fill the same frame with the same crop;
-dragging only changes how much of the design layer is clipped
-(static/js/compare-slider.js). Without JS it rests at 50%.
+"From Vision to Reality": the design and the finished space in one frame,
+one project at a time. Data: apps/core/vision.py (VISIONS: project names,
+images, alt text; only complete entries arrive here); labels: content.py
+(c.vision).
+
+Two separate controls:
+- the keystone handle reveals design vs reality within the shown project
+  (static/js/compare-slider.js; without JS it rests at 50%);
+- the arrows and dots switch the whole project: images, name, counter and
+  active dot (static/js/vision-nav.js). They exist only with two or more
+  entries, and need JS (hidden without it, when only the first is shown).
+
+Each project is a slide in the shared frame; inactive slides are hidden, so
+they are neither seen nor focused nor read. Both layers of a slide fill the
+frame with the same crop; dragging only changes the clip of the design layer.
 {% endcomment %}
+{% with count=visions|length %}
 <section class="section vision theme-light" id="vision" aria-labelledby="vision-title">
   <div class="container">
     <header class="vision__head">
       <h2 class="heading vision__title" id="vision-title" data-reveal>{{ c.vision.title }}</h2>
-      <p class="vision__project" data-reveal>{{ vision.project_name }}</p>
+      {# All names share one cell, so the heading keeps the height of the longest and the frame never moves. #}
+      <p class="vision__project" data-reveal>
+        {% for v in visions %}<span class="vision__name{% if forloop.first %} is-active{% endif %}" data-vision-name{% if not forloop.first %} aria-hidden="true"{% endif %}>{{ v.project_name }}</span>{% endfor %}
+      </p>
     </header>
 
     <div class="compare" data-compare data-label-design="{{ c.vision.design_short }}"
          data-label-reality="{{ c.vision.reality_short }}">
-      <div class="compare__frame" data-compare-frame>
-        <figure class="compare__layer compare__layer--reality">
-          {% if vision.reality.image %}
-            <img src="{{ vision.reality.image.src }}" srcset="{{ vision.reality.image.srcset }}"
-                 sizes="(min-width: 90rem) 1312px, calc(100vw - 2.5rem)" width="{{ vision.reality.image.width }}"
-                 height="{{ vision.reality.image.height }}" alt="{{ vision.reality.alt }}"
-                 style="object-position: {{ vision.focus }};" loading="lazy" decoding="async">
-          {% else %}
-            {% include "partials/vision_placeholder.html" with kind="reality" %}
-            <figcaption class="compare__missing compare__missing--reality">{{ c.vision.reality_missing }}</figcaption>
-          {% endif %}
-        </figure>
-        <figure class="compare__layer compare__layer--design">
-          {% if vision.design.image %}
-            <img src="{{ vision.design.image.src }}" srcset="{{ vision.design.image.srcset }}"
-                 sizes="(min-width: 90rem) 1312px, calc(100vw - 2.5rem)" width="{{ vision.design.image.width }}"
-                 height="{{ vision.design.image.height }}" alt="{{ vision.design.alt }}"
-                 style="object-position: {{ vision.focus }};" loading="lazy" decoding="async">
-          {% else %}
-            {% include "partials/vision_placeholder.html" with kind="design" %}
-            <figcaption class="compare__missing compare__missing--design">{{ c.vision.design_missing }}</figcaption>
-          {% endif %}
-        </figure>
+      <div class="compare__frame" id="vision-frame" data-compare-frame>
+        {% for v in visions %}
+          <div class="compare__slide{% if forloop.first %} is-active{% endif %}" id="vision-{{ v.id }}"
+               data-vision-slide{% if not forloop.first %} hidden{% endif %}>
+            <figure class="compare__layer compare__layer--reality">
+              <img src="{{ v.reality.image.src }}" srcset="{{ v.reality.image.srcset }}"
+                   sizes="(min-width: 90rem) 1312px, calc(100vw - 2.5rem)" width="{{ v.reality.image.width }}"
+                   height="{{ v.reality.image.height }}" alt="{{ v.reality.alt }}"
+                   style="object-position: {{ v.focus }};" loading="lazy" decoding="async">
+            </figure>
+            <figure class="compare__layer compare__layer--design">
+              <img src="{{ v.design.image.src }}" srcset="{{ v.design.image.srcset }}"
+                   sizes="(min-width: 90rem) 1312px, calc(100vw - 2.5rem)" width="{{ v.design.image.width }}"
+                   height="{{ v.design.image.height }}" alt="{{ v.design.alt }}"
+                   style="object-position: {{ v.focus }};" loading="lazy" decoding="async">
+            </figure>
+            {# Shown instead of both images if either fails to load: never half a pair. #}
+            <p class="compare__unavailable" data-vision-error hidden>{{ c.vision.unavailable }}</p>
+          </div>
+        {% endfor %}
 
         <div class="compare__divider">
           {# The handle is the slider: drag it, or focus it and use the arrow keys. #}
@@ -52,11 +63,45 @@ dragging only changes how much of the design layer is clipped
         </div>
       </div>
 
+      {# The design is at the reading start (left in English, right in Arabic), like its layer. #}
       <div class="compare__labels">
-        <span class="label">{{ c.vision.design }}</span>
-        <span class="label">{{ c.vision.reality }}</span>
+        <span class="compare__side">
+          <span class="label compare__label">{{ c.vision.design }}</span>
+          <span class="compare__rule" aria-hidden="true"></span>
+        </span>
+        <span class="label compare__hint">{{ c.vision.hint }}</span>
+        <span class="compare__side">
+          <span class="compare__rule" aria-hidden="true"></span>
+          <span class="label compare__label">{{ c.vision.reality }}</span>
+        </span>
       </div>
-      <p class="compare__hint label">{{ c.vision.hint }}</p>
     </div>
+
+    {% if count > 1 %}
+      <div class="vision-nav" role="group" aria-labelledby="vision-nav-label" data-vision-nav>
+        {# Announces the project shown after a switch. #}
+        <p class="visually-hidden" aria-live="polite" data-vision-status></p>
+        <p class="vision-nav__label label" id="vision-nav-label">{{ c.vision.change }}</p>
+        <div class="vision-nav__row">
+          <button class="vision-nav__arrow" type="button" aria-controls="vision-frame" data-vision-prev>
+            <span class="visually-hidden">{{ c.vision.prev }}</span>
+            <svg viewBox="0 0 24 12" aria-hidden="true" focusable="false"><path d="M23 6H2M7 1 2 6l5 5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+          <p class="vision-nav__count num" dir="ltr"><span data-vision-current>01</span> / {{ count|stringformat:"02d" }}</p>
+          <button class="vision-nav__arrow vision-nav__arrow--next" type="button" aria-controls="vision-frame" data-vision-next>
+            <span class="visually-hidden">{{ c.vision.next }}</span>
+            <svg viewBox="0 0 24 12" aria-hidden="true" focusable="false"><path d="M1 6h21M17 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+        <div class="vision-nav__dots">
+          {% for v in visions %}
+            <button class="vision-nav__dot" type="button" aria-controls="vision-frame" data-vision-dot="{{ forloop.counter0 }}"{% if forloop.first %} aria-current="true"{% endif %}>
+              <span class="visually-hidden">{{ forloop.counter|stringformat:"02d" }}: {{ v.project_name }}</span>
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
   </div>
 </section>
+{% endwith %}

@@ -5,7 +5,9 @@
  *   controls and starts it (a visitor's choice, never autoplay).
  * - Photo gallery (project pages): each photo opens a full-screen <dialog>
  *   with previous/next buttons, arrow keys, swipes, and Escape to close;
- *   focus returns to the photo it was opened from.
+ *   focus returns to the button it was opened from. On the interactive
+ *   project page (project-gallery.js) the six photos and the concept image
+ *   are separate groups.
  */
 (function () {
   'use strict';
@@ -29,6 +31,11 @@
   });
 
   /* ---------- Photo gallery ---------- */
+  // Photos: [data-lightbox-item] elements (their value is the position in
+  // their group, data-lightbox-group; one group if none is given), each with
+  // data-src, -srcset, -alt, -width, -height and optionally -caption.
+  // Openers: [data-lightbox-open] (the position to start at, read at click
+  // time) in the same group. A group of one shows no arrows or counter.
   var dialog = document.querySelector('[data-lightbox]');
   var openers = Array.prototype.slice.call(document.querySelectorAll('[data-lightbox-open]'));
   if (!dialog || !openers.length || typeof dialog.showModal !== 'function') return;
@@ -40,14 +47,14 @@
   var next = dialog.querySelector('[data-lightbox-next]');
   var closeButton = dialog.querySelector('[data-lightbox-close]');
   var rtl = document.documentElement.dir === 'rtl';
+  var items = Array.prototype.slice.call(document.querySelectorAll('[data-lightbox-item]'));
+  var photos = [];
+  var total = 0;
   var current = 0;
   var opener = null;
 
-  // Photos in gallery order (data-lightbox-open holds each one's index).
-  var photos = openers.slice().sort(function (a, b) {
-    return a.getAttribute('data-lightbox-open') - b.getAttribute('data-lightbox-open');
-  });
-  var total = photos.length;
+  function groupOf(el) { return el.getAttribute('data-lightbox-group') || ''; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
 
   function show(index) {
     current = (index + total) % total;
@@ -59,15 +66,24 @@
     image.alt = source.getAttribute('data-alt') || '';
     image.width = +source.getAttribute('data-width') || 0;
     image.height = +source.getAttribute('data-height') || 0;
-    caption.textContent = source.getAttribute('data-alt') || '';
-    count.textContent = (current + 1) + ' / ' + total;
+    caption.textContent = source.getAttribute('data-caption') || source.getAttribute('data-alt') || '';
+    count.textContent = total > 1 ? pad(current + 1) + ' / ' + pad(total) : '';
   }
 
   function open(index, from) {
     opener = from || null;
+    var group = from ? groupOf(from) : '';
+    // Photos of this group, in gallery order.
+    photos = items.filter(function (el) { return groupOf(el) === group; }).sort(function (a, b) {
+      return a.getAttribute('data-lightbox-item') - b.getAttribute('data-lightbox-item');
+    });
+    total = photos.length;
+    if (!total) return;
+    if (prev) prev.hidden = total < 2;
+    if (next) next.hidden = total < 2;
     show(index);
     dialog.showModal();
-    (next || closeButton).focus();
+    (total > 1 && next ? next : closeButton).focus();
   }
 
   openers.forEach(function (button) {
