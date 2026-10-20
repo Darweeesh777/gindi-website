@@ -156,6 +156,15 @@ WHATSAPP_NUMBER = ''.join(ch for ch in os.environ.get('WHATSAPP_NUMBER', '') if 
 QUOTATION_EMAIL = os.environ.get('QUOTATION_EMAIL', '').strip()
 if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', QUOTATION_EMAIL):
     QUOTATION_EMAIL = ''
+# The site's own form backend (worker/index.js on Cloudflare: Turnstile +
+# Resend), e.g. /api/contact, and the public Turnstile site key. With both set,
+# all three forms send there directly ("Send Request"). Either empty: the
+# forms work as above (email app / WhatsApp; enquiry drawer per
+# ENQUIRY_FORM_ACTION).
+CONTACT_API_URL = os.environ.get('CONTACT_API_URL', '').strip()
+if not re.match(r'(/[^/]|https://)', CONTACT_API_URL):
+    CONTACT_API_URL = ''  # only a path on this site or an https:// address
+TURNSTILE_SITE_KEY = os.environ.get('TURNSTILE_SITE_KEY', '').strip()
 # Each free tool's agent script, loaded on its own page (/free-tools/<slug>/).
 # Empty: that page shows an honest "Coming soon" state.
 FREE_TOOL_SCRIPTS = {

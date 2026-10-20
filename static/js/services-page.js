@@ -9,7 +9,8 @@
  * Enquiry drawer: [data-enquire] links (which go to the homepage contact
  * section without JS) open a <dialog> with the service prefilled. While no
  * form destination is configured the form cannot be submitted — and nothing
- * pretends it was.
+ * pretends it was. With the site's own backend (form-backend.js) it is sent
+ * there, and says so only once the backend confirms.
  */
 (function () {
   'use strict';
@@ -78,5 +79,43 @@
   // Not connected yet: never submit, never fake a confirmation.
   if (form.hasAttribute('data-not-connected')) {
     form.addEventListener('submit', function (event) { event.preventDefault(); });
+  }
+
+  // The site's own backend (form-backend.js). The browser checks the required
+  // fields first (submit only fires once they are valid); the form clears only
+  // once the backend confirms.
+  var api = window.GindiForms;
+  if (form.hasAttribute('data-enquiry-backend') && api) {
+    var status = form.querySelector('[data-enquiry-status]');
+    var button = form.querySelector('[type="submit"]');
+    var sending = false;
+    form.addEventListener('focusin', function () { api.prepare(form); }, { once: true });
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (sending) return;
+      sending = true;
+      button.disabled = true;
+      var option = select.options[select.selectedIndex];
+      api.send(form, {
+        form: 'enquiry',
+        name: form.elements.name.value,
+        email: form.elements.email.value,
+        phone: form.elements.phone.value,
+        message: form.elements.message.value,
+        details: [[form.querySelector('label[for="enquiry-service"]').textContent, option.text]]
+      }, function (text) { status.textContent = text; }).then(function (result) {
+        var service = select.value;
+        form.reset();
+        select.value = service;
+        syncLabel();
+        status.textContent = api.successText(result);
+      }, function (error) {
+        status.textContent = api.texts[{ verify: 'verify_failed', fields: 'invalid' }[error.message] || 'failed'];
+      }).then(function () {
+        sending = false;
+        button.disabled = false;
+      });
+    });
+    drawer.addEventListener('close', function () { if (!sending) status.textContent = ''; });
   }
 })();

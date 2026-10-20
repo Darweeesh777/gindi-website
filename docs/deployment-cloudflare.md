@@ -44,6 +44,56 @@ This is the default `SITE_URL` in `cloudflare-build.sh`. Change it there, or
 set `SITE_URL` under Settings > Build > Variables and secrets, if the
 address changes.
 
+## Form backend (Worker + Resend + Turnstile)
+
+`worker/index.js` runs **only for `/api/*`** (`run_worker_first` in
+`wrangler.jsonc`); every page and file is still a free static asset. It
+receives the quotation form, the Contact page form and the enquiry drawer
+(`POST /api/contact`):
+
+- the same site only (Origin check), JSON up to 32 KB;
+- a hidden honeypot field, and a Cloudflare Turnstile check;
+- the same field rules as the forms;
+- an email to the studio with every detail: reply-to is the client, plus a
+  "Chat on WhatsApp" link when the client prefers WhatsApp;
+- a confirmation email to the client, when they gave an email address.
+
+It only works on the **Workers** deployment above (Cloudflare Pages ignores
+`worker/`). Until both build variables are set (`CONTACT_API_URL` and
+`TURNSTILE_SITE_KEY`, see below), the forms work as before.
+
+**Worker secrets** (Workers & Pages > gindi-website > Settings > Variables
+and Secrets, type **Secret**; kept across deploys, never in the repository):
+
+| Secret | Value |
+|---|---|
+| `RESEND_API_KEY` | Resend API key (`re_…`), "Sending access" |
+| `TURNSTILE_SECRET_KEY` | The Turnstile widget's **secret** key |
+| `CONTACT_TO_EMAIL` | Where requests go. With the test sender: the email of your Resend account |
+
+**Worker variables** are in `wrangler.jsonc` (`vars`): `MAIL_FROM`,
+`DEFAULT_COUNTRY_CODE` (`20`: a local `010…` number becomes `+20 10…` in the
+WhatsApp link), `TIME_ZONE`.
+
+**Testing without a domain.** `MAIL_FROM` is Resend's test sender
+`onboarding@resend.dev`, which only delivers to your Resend account's own
+address. So while it is set, the client's confirmation also goes to
+`CONTACT_TO_EMAIL`, with the subject starting `[TEST — for client@…]`.
+
+**With your own domain:** verify it in Resend (Domains), then set `MAIL_FROM`
+in `wrangler.jsonc` to e.g. `Gindi Innovations <hello@your-domain>` and push.
+Confirmations then go to the clients. Add the domain to the Turnstile
+widget's hostnames too.
+
+**Free plan limits:** Workers 100,000 requests a day (only `/api/*` counts);
+Resend free 100 emails a day and 3,000 a month (each request uses 2 when the
+client gives an email); Turnstile free.
+
+**Logs:** Workers & Pages > gindi-website > Logs (failed sends are logged
+there, never the keys).
+
+**Tests:** `node --test worker/index.test.mjs` (Turnstile and Resend mocked).
+
 ## Cloudflare Pages settings (exact values)
 
 | Setting | Value |
@@ -73,6 +123,8 @@ None are required for the preview. Optional:
 | `ENQUIRY_FORM_ACTION` | *(empty)* | Enquiry form endpoint (a form service URL). Empty: the form says it is not connected |
 | `WHATSAPP_NUMBER` | *(empty)* | Shows the WhatsApp button and enables "Submit via WhatsApp" in the quotation form (digits, international format) |
 | `QUOTATION_EMAIL` | *(empty)* | Enables "Submit via Email" in the quotation form (opens the visitor's email app addressed to it) |
+| `CONTACT_API_URL` | *(empty)* | `/api/contact`: all three forms send to the form backend ("Send Request"). Needs `TURNSTILE_SITE_KEY` too |
+| `TURNSTILE_SITE_KEY` | *(empty)* | The Turnstile widget's **site** key (public). The secret key is a Worker secret, never here |
 | `FREE_TOOL_WIRE_SCRIPT_URL`, `…_TILES_…`, `…_BRICKS_…`, `…_CEMENT_…` | *(empty)* | Loads that tool's agent. Empty: "Coming soon" |
 
 The values are built into the pages, so **after changing a variable, open
@@ -112,8 +164,8 @@ exported pages are public.
 - **The branded 500 page:** a static host has no server errors to show.
   `templates/500.html` stays for the server deployment.
 - **Server-side features added later:** for example, saving enquiries in a
-  database or sending emails. They need a server host such as Render, a VPS
-  or PythonAnywhere. The repository is ready for that (`render.yaml`,
+  database. (Sending the forms by email is done by the Worker, above.) They
+  need a server host such as Render, a VPS or PythonAnywhere. The repository is ready for that (`render.yaml`,
   `build.sh`, `gunicorn.conf.py`).
 
 ## Search engines and access

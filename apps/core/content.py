@@ -121,6 +121,20 @@ CONTENT = {
             'whatsapp_general': 'Hello, I’d like to enquire about your services.',
             'new_window': 'opens WhatsApp in a new window',
         },
+        'forms': {
+            # All three forms, once they send to the site's own backend
+            # (settings.CONTACT_API_URL; static/js/form-backend.js).
+            'send_request': 'Send Request',
+            'send_request_hint': 'Sends your request straight to our team.',
+            'sending': 'Sending…',
+            'verifying': 'Completing a quick security check…',
+            'sent': 'Thank you — your request has been sent. We’ll be in touch soon.',
+            'sent_copy': 'A confirmation is on its way to your email.',
+            'verify_failed': 'The security check did not complete. Please try again.',
+            'invalid': 'Please check your details (for example, the phone number) and try again.',
+            'failed': 'Sorry, your request could not be sent. Please try again, or contact us on WhatsApp.',
+            'honeypot': 'Leave this field empty',
+        },
         'quote': {
             # Quotation request form (templates/partials/quote_drawer.html, static/js/quote-form.js).
             'title': 'Request a Quotation',
@@ -506,6 +520,18 @@ CONTENT = {
             'whatsapp_service': 'مرحبًا، أودّ الاستفسار عن {service}.',
             'whatsapp_general': 'مرحبًا، أودّ الاستفسار عن خدماتكم.',
             'new_window': 'يفتح واتساب في نافذة جديدة',
+        },
+        'forms': {
+            'send_request': 'إرسال الطلب',
+            'send_request_hint': 'يُرسل طلبك مباشرةً إلى فريقنا.',
+            'sending': 'جارٍ الإرسال…',
+            'verifying': 'جارٍ إكمال تحقق أمني سريع…',
+            'sent': 'شكرًا لك، تم إرسال طلبك. سنتواصل معك قريبًا.',
+            'sent_copy': 'ستصلك رسالة تأكيد على بريدك الإلكتروني.',
+            'verify_failed': 'لم يكتمل التحقق الأمني. يُرجى المحاولة مرة أخرى.',
+            'invalid': 'يُرجى مراجعة بياناتك (مثل رقم الهاتف) والمحاولة مرة أخرى.',
+            'failed': 'عذرًا، تعذّر إرسال طلبك. يُرجى المحاولة مرة أخرى أو التواصل معنا عبر واتساب.',
+            'honeypot': 'اترك هذا الحقل فارغًا',
         },
         'quote': {
             'title': 'طلب عرض سعر',

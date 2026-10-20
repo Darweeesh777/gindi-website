@@ -68,7 +68,7 @@ claims the enquiry was delivered, and nothing is stored in the browser.
           </div>
 
           {# ---------- Enquiry form ---------- #}
-          <div class="cp-form-area" data-quote-root data-quote-texts="contact-data"
+          <div class="cp-form-area" data-quote-root data-quote-texts="contact-data" data-form-kind="contact"
                data-quote-email="{{ quote_email }}" data-quote-whatsapp="{{ quote_whatsapp }}">
             <span class="keystone cp-form-area__keystone" aria-hidden="true"></span>
             <h2 class="cp-form-area__title" id="cp-form-title">{{ c.contact_page.form_title }}</h2>
@@ -165,12 +165,20 @@ claims the enquiry was delivered, and nothing is stored in the browser.
               </fieldset>
 
               {# How the visitor sends the enquiry — separate from how the studio replies (above). #}
+              {% if forms_backend %}{% include "partials/form_guard.html" %}{% endif %}
               <div class="cp-form__actions">
                 <div class="quote-form__send">
-                  <button class="btn btn--primary cp-form__btn" type="button" data-quote-send="email" aria-describedby="c-send-email-hint"
-                          {% if not quote_email %}disabled{% endif %}>{{ c.contact_page.send_email }}
-                    <svg class="cp-form__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
-                  <p class="quote-form__hint" id="c-send-email-hint">{% if quote_email %}{{ c.quote.send_email_hint }}{% else %}{{ c.quote.email_unavailable }}{% endif %}</p>
+                  {% if forms_backend %}
+                    {# Straight to the studio (form-backend.js → worker/index.js). #}
+                    <button class="btn btn--primary cp-form__btn" type="button" data-quote-send="server" aria-describedby="c-send-email-hint">{{ c.forms.send_request }}
+                      <svg class="cp-form__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+                    <p class="quote-form__hint" id="c-send-email-hint">{{ c.forms.send_request_hint }}</p>
+                  {% else %}
+                    <button class="btn btn--primary cp-form__btn" type="button" data-quote-send="email" aria-describedby="c-send-email-hint"
+                            {% if not quote_email %}disabled{% endif %}>{{ c.contact_page.send_email }}
+                      <svg class="cp-form__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+                    <p class="quote-form__hint" id="c-send-email-hint">{% if quote_email %}{{ c.quote.send_email_hint }}{% else %}{{ c.quote.email_unavailable }}{% endif %}</p>
+                  {% endif %}
                 </div>
                 <div class="quote-form__send">
                   <button class="btn quote-form__whatsapp cp-form__btn" type="button" data-quote-send="whatsapp" aria-describedby="c-send-whatsapp-hint"

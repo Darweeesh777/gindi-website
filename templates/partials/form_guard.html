@@ -1,0 +1,12 @@
+{% comment %}
+Spam protection for a form that sends to the site's own backend (only when
+forms_backend is set; static/js/form-backend.js, worker/index.js):
+- the Cloudflare Turnstile box: empty, and invisible unless Cloudflare asks
+  the visitor to click;
+- a honeypot field people never see or reach; the backend silently drops
+  anything that fills it.
+{% endcomment %}
+<div class="form-guard" data-turnstile></div>
+<div class="visually-hidden" aria-hidden="true">
+  <label>{{ c.forms.honeypot }} <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+</div>

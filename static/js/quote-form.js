@@ -22,6 +22,10 @@
  *   the studio; "Submit via WhatsApp" opens WhatsApp with the message ready.
  *   Either way the visitor sends it themselves, so the page only says the app
  *   should open — never that the request was sent.
+ * - With the site's own backend configured (form-backend.js), the first
+ *   button is "Send Request" (data-quote-send="server") instead: the request
+ *   goes straight to the studio and the form clears once the backend
+ *   confirms it. "Submit via WhatsApp" stays as it is.
  * - Values stay in the form after an error or a send. The quotation form
  *   (data-quote-draft) also keeps them in sessionStorage (this tab only), so
  *   they survive a trip to another app or a reload; the Contact page stores
@@ -211,8 +215,11 @@
     }
 
     /* ---------- The request message ---------- */
-    function message() {
+    // [key, label, value] for every filled field, in page order. For the
+    // message text, numbers and links are kept left-to-right in Arabic.
+    function entries(forText) {
       var M = T.message;
+      var dir = forText ? ltr : function (text) { return text; };
       var p = project(val('project_type'));
       var property = '';
       if (p && p.properties.length) {
@@ -222,24 +229,46 @@
         property = val('property_other');
       }
       var area = westernDigits(val('area')).replace(/,/g, '.');
-      var lines = [M.heading, ''];
-      function add(key, value) { if (value && M[key]) lines.push(M[key] + ': ' + value); }
+      var list = [];
+      function add(key, value) { if (value && M[key]) list.push([key, M[key], value]); }
       add('name', val('name'));
-      add('phone', ltr(westernDigits(val('phone'))));
+      add('phone', dir(westernDigits(val('phone'))));
       add('occupation', val('occupation'));
       add('project_type', p ? p.label : '');
       add('property_type', property);
-      add('area', area ? ltr(area) + ' ' + M.area_unit : '');
+      add('area', area ? dir(area) + ' ' + M.area_unit : '');
       add('location', val('location').replace(/\s*\n\s*/g, ', '));
       add('city', val('city'));
       add('district', val('district'));
       add('address', val('address').replace(/\s*\n\s*/g, ', '));
-      add('map', ltr(val('map')));
+      add('map', dir(val('map')));
       add('contact', T.contact_methods[val('contact')] || '');
-      if (!emailField.hidden) add('email', ltr(val('email')));
+      if (!emailField.hidden) add('email', dir(val('email')));
+      return list;
+    }
+
+    function message() {
+      var M = T.message;
+      var lines = [M.heading, ''];
+      entries(true).forEach(function (entry) { lines.push(entry[1] + ': ' + entry[2]); });
       // The visitor's own description, as written, after the details.
       if (val('message') && M.message) lines.push('', M.message + ':', val('message'));
       return lines.join('\n');
+    }
+
+    // For the backend: who and how as fields, everything else as labelled rows.
+    var OWN_FIELDS = ['name', 'phone', 'email', 'contact'];
+    function request() {
+      return {
+        form: root.getAttribute('data-form-kind') || 'quote',
+        name: val('name'),
+        phone: westernDigits(val('phone')),
+        email: emailField.hidden ? '' : val('email'),
+        contact: val('contact'),
+        message: val('message'),
+        details: entries(false).filter(function (entry) { return OWN_FIELDS.indexOf(entry[0]) < 0; })
+          .map(function (entry) { return [entry[1], entry[2]]; })
+      };
     }
 
     /* ---------- Draft (quotation form only; this tab only) ---------- */
@@ -270,14 +299,63 @@
       syncEmail();
     }
 
+    function clearDraft() {
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) { /* nothing stored */ }
+    }
+
     /* ---------- Sending ---------- */
+    var buttons = Array.prototype.slice.call(form.querySelectorAll('[data-quote-send]'));
+    var sending = false;
+
+    function setBusy(busy) {
+      sending = busy;
+      form.setAttribute('aria-busy', busy ? 'true' : 'false');
+      buttons.forEach(function (button) {
+        if (busy) {
+          button.setAttribute('data-was-disabled', button.disabled ? 'true' : 'false');
+          button.disabled = true;
+        } else {
+          button.disabled = button.getAttribute('data-was-disabled') === 'true';
+        }
+      });
+    }
+
+    // Straight to the studio (form-backend.js). The form clears only once the
+    // backend confirms; on any problem the values stay for another try.
+    function sendToBackend() {
+      var api = window.GindiForms;
+      if (!api || sending) return;
+      setBusy(true);
+      api.send(form, request(), function (text) { status.textContent = text; }).then(function (result) {
+        form.reset();
+        clearDraft();
+        fillProperties('');
+        syncEmail();
+        attempted = false;
+        FIELDS.forEach(function (name) { showError(name, ''); });
+        status.textContent = api.successText(result);
+      }, function (error) {
+        if (error.message === 'fields') {
+          error.fields.forEach(function (name) { showError(name, problem(name) || T.check); });
+          status.textContent = T.check;
+        } else {
+          status.textContent = error.message === 'verify' ? api.texts.verify_failed : api.texts.failed;
+        }
+      }).then(function () { setBusy(false); });
+    }
+
     function send(how) {
+      if (sending) return;
       attempted = true;
       var first = validate();
       if (first) {
         status.textContent = T.check;
         var target = controls(first)[0];
         if (target) target.focus();
+        return;
+      }
+      if (how === 'server') {
+        sendToBackend();
         return;
       }
       var body = message();
@@ -315,9 +393,13 @@
     form.addEventListener('change', recheck);
     form.addEventListener('submit', function (event) { event.preventDefault(); });
 
-    Array.prototype.forEach.call(form.querySelectorAll('[data-quote-send]'), function (button) {
+    buttons.forEach(function (button) {
       button.addEventListener('click', function () { send(button.getAttribute('data-quote-send')); });
     });
+    // The security check starts when the visitor begins filling the form.
+    if (window.GindiForms && form.querySelector('[data-quote-send="server"]')) {
+      form.addEventListener('focusin', function () { window.GindiForms.prepare(form); }, { once: true });
+    }
 
     fillProperties('');
     syncEmail();

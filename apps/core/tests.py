@@ -450,6 +450,50 @@ class HomepageTests(SimpleTestCase):
         self.assertNotIn('disabled', drawer)
         self.assertNotIn('data-not-connected', drawer)
 
+    def test_forms_send_to_the_backend_once_configured(self):
+        from django.test import override_settings
+
+        # Not configured (the default): no backend, no Turnstile, the forms as before.
+        html = self.get('core:services')
+        self.assertNotIn('forms-backend', html)
+        self.assertNotIn('challenges.cloudflare.com', html)
+        self.assertNotIn('data-turnstile', html)
+        self.assertIn('data-quote-send="email"', html)
+        # Only one of the two settings: still not configured.
+        with override_settings(CONTACT_API_URL='/api/contact', TURNSTILE_SITE_KEY=''):
+            self.assertNotIn('forms-backend', self.get('core:services'))
+
+        with override_settings(CONTACT_API_URL='/api/contact', TURNSTILE_SITE_KEY='1x00000000000000000000AA'):
+            pages = {name: self.get(name) for name in ('core:services', 'core:about', 'core:contact', 'core:contact_ar')}
+        for name, html in pages.items():
+            self.assertIn('<script id="forms-backend" type="application/json">', html)
+            self.assertIn('"url": "/api/contact"', html)
+            self.assertIn('"sitekey": "1x00000000000000000000AA"', html)
+            self.assertIn('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit', html)
+            self.assertIn('js/form-backend', html)
+            # Quotation drawer (every page): "Send Request", WhatsApp unchanged, guarded.
+            drawer = html[html.index('data-quote-drawer'):]
+            drawer = drawer[:drawer.index('</dialog>')]
+            self.assertIn('data-quote-send="server"', drawer)
+            self.assertNotIn('data-quote-send="email"', drawer)
+            self.assertIn('data-quote-send="whatsapp"', drawer)
+            self.assertIn('data-turnstile', drawer)
+            self.assertIn('name="website" tabindex="-1"', drawer)
+        for name in ('core:services', 'core:about'):
+            drawer = pages[name][pages[name].index('<dialog class="drawer'):]
+            drawer = drawer[:drawer.index('</dialog>')]
+            self.assertIn('data-enquiry-backend', drawer)
+            self.assertNotIn('data-not-connected', drawer)
+            self.assertNotIn('disabled', drawer)
+            self.assertIn('data-turnstile', drawer)
+            self.assertIn('data-enquiry-status', drawer)
+        for name, label in (('core:contact', 'Send Request'), ('core:contact_ar', 'إرسال الطلب')):
+            form = pages[name][pages[name].index('data-form-kind="contact"'):]
+            form = form[:form.index('</form>')]
+            self.assertIn('data-quote-send="server"', form)
+            self.assertIn(label, form)
+            self.assertIn('data-turnstile', form)
+
     def test_whatsapp_button(self):
         from urllib.parse import quote
 

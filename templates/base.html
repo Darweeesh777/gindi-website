@@ -27,6 +27,12 @@
   {# The quotation form is part of every page's end (partials/footer.html). #}
   <link rel="stylesheet" href="{% static 'css/drawer.css' %}">
   <script src="{% static 'js/main.js' %}" defer></script>
+  {% if forms_backend %}
+    {# The forms send to the site's own backend, behind Cloudflare Turnstile (settings.CONTACT_API_URL). #}
+    {{ forms_backend|json_script:"forms-backend" }}
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <script src="{% static 'js/form-backend.js' %}" defer></script>
+  {% endif %}
   <script src="{% static 'js/quote-form.js' %}" defer></script>
   {% block head_extra %}{% endblock %}
 </head>

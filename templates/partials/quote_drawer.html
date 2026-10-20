@@ -7,12 +7,16 @@ sends the request themselves:
 Both carry the whole request as a formatted message. A button whose
 destination is not configured is disabled and says so. Nothing here claims a
 request was sent: the visitor completes it in their own app.
-Copy: content.py → quote (both languages). The Contact page's form runs on
-the same script and lists.
+With the site's own backend configured (forms_backend: settings.CONTACT_API_URL
+and TURNSTILE_SITE_KEY), "Submit via Email" becomes "Send Request": the
+request is sent directly (form-backend.js → worker/index.js) and the page says
+so only once the backend confirms it.
+Copy: content.py → quote, forms (both languages). The Contact page's form runs
+on the same script and lists.
 {% endcomment %}
 {# data-quote-draft: keeps the values in sessionStorage (this tab), across a trip to the email app or WhatsApp. #}
 <dialog class="drawer drawer--quote theme-light" aria-labelledby="quote-title" aria-describedby="quote-intro" data-quote-drawer
-        data-quote-root data-quote-texts="quote-data" data-quote-draft
+        data-quote-root data-quote-texts="quote-data" data-quote-draft data-form-kind="quote"
         data-quote-email="{{ quote_email }}" data-quote-whatsapp="{{ quote_whatsapp }}">
   <div class="drawer__panel">
     <div class="drawer__head quote__head">
@@ -124,11 +128,18 @@ the same script and lists.
       </div>
 
       {# How the visitor sends the request (separate from how the studio replies, above). #}
+      {% if forms_backend %}{% include "partials/form_guard.html" %}{% endif %}
       <div class="quote-form__actions">
         <div class="quote-form__send">
-          <button class="btn btn--primary" type="button" data-quote-send="email" aria-describedby="q-send-email-hint"
-                  {% if not quote_email %}disabled{% endif %}>{{ c.quote.send_email }}</button>
-          <p class="quote-form__hint" id="q-send-email-hint">{% if quote_email %}{{ c.quote.send_email_hint }}{% else %}{{ c.quote.email_unavailable }}{% endif %}</p>
+          {% if forms_backend %}
+            {# Straight to the studio (form-backend.js → worker/index.js). #}
+            <button class="btn btn--primary" type="button" data-quote-send="server" aria-describedby="q-send-email-hint">{{ c.forms.send_request }}</button>
+            <p class="quote-form__hint" id="q-send-email-hint">{{ c.forms.send_request_hint }}</p>
+          {% else %}
+            <button class="btn btn--primary" type="button" data-quote-send="email" aria-describedby="q-send-email-hint"
+                    {% if not quote_email %}disabled{% endif %}>{{ c.quote.send_email }}</button>
+            <p class="quote-form__hint" id="q-send-email-hint">{% if quote_email %}{{ c.quote.send_email_hint }}{% else %}{{ c.quote.email_unavailable }}{% endif %}</p>
+          {% endif %}
         </div>
         <div class="quote-form__send">
           <button class="btn quote-form__whatsapp" type="button" data-quote-send="whatsapp" aria-describedby="q-send-whatsapp-hint"

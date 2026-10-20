@@ -1,15 +1,32 @@
-// Cloudflare Workers (static assets only): serves the static export in dist/,
-// built by `bash cloudflare-build.sh`. No Worker code runs; requests to static
-// assets are free and unlimited. See docs/deployment-cloudflare.md.
+// Cloudflare Workers: serves the static export in dist/, built by
+// `bash cloudflare-build.sh`. Requests to static assets are free and
+// unlimited and never run Worker code. Only /api/* runs worker/index.js (the
+// form backend: Turnstile + Resend). See docs/deployment-cloudflare.md.
 {
   // Must match the Worker's name in the Cloudflare dashboard.
   "name": "gindi-website",
+  "main": "worker/index.js",
   "compatibility_date": "2025-09-01",
   "assets": {
     "directory": "./dist/",
     // Unknown URLs get the nearest 404.html (ar/404.html under /ar/), status 404.
     "not_found_handling": "404-page",
     // /about -> /about/ (pages are saved as about/index.html).
-    "html_handling": "auto-trailing-slash"
-  }
+    "html_handling": "auto-trailing-slash",
+    // Only these paths reach the Worker; everything else is a static file.
+    "run_worker_first": ["/api/*"]
+  },
+  // Not secret. The secrets (RESEND_API_KEY, TURNSTILE_SECRET_KEY,
+  // CONTACT_TO_EMAIL) are set in the Cloudflare dashboard, never here.
+  "vars": {
+    // Resend's test sender: it delivers only to your Resend account's email, so
+    // client confirmations go to CONTACT_TO_EMAIL, marked [TEST]. After
+    // verifying your domain: "Gindi Innovations <hello@your-domain>".
+    "MAIL_FROM": "Gindi Innovations <onboarding@resend.dev>",
+    // Added to local numbers ("010…") for the WhatsApp link (Egypt: 20).
+    "DEFAULT_COUNTRY_CODE": "20",
+    "TIME_ZONE": "Africa/Cairo"
+  },
+  // Worker logs in the dashboard (free plan included), for failed sends.
+  "observability": { "enabled": true }
 }

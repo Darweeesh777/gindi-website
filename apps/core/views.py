@@ -65,8 +65,19 @@ def _context(lang, page, view, kwargs=None):
         # Quotation form destinations (partials/quote_drawer.html); empty = not configured.
         'quote_email': settings.QUOTATION_EMAIL,
         'quote_whatsapp': settings.WHATSAPP_NUMBER,
+        # The site's own form backend (static/js/form-backend.js); None = not configured.
+        'forms_backend': _forms_backend(lang),
         'site_noindex': settings.SITE_NOINDEX,
     }
+
+
+def _forms_backend(lang):
+    """Where the forms send and the public Turnstile key, with the forms'
+    status texts. None unless both settings are set."""
+    if not (settings.CONTACT_API_URL and settings.TURNSTILE_SITE_KEY):
+        return None
+    return {'url': settings.CONTACT_API_URL, 'sitekey': settings.TURNSTILE_SITE_KEY,
+            'lang': lang, 'texts': CONTENT[lang]['forms']}
 
 
 # Homepage sections with a number in their heading, in page order. Projects,

@@ -1,7 +1,8 @@
 {% comment %}
 Enquiry drawer (opened by [data-enquire] links; static/js/services-page.js
-prefills the service). The site has no enquiry backend yet: the form posts to
-settings.ENQUIRY_FORM_ACTION once that is set (e.g. a form service URL).
+prefills the service). With the site's own backend configured (forms_backend),
+the script sends it there (form-backend.js → worker/index.js). Otherwise the
+form posts to settings.ENQUIRY_FORM_ACTION once that is set (e.g. a form service URL).
 Until then the fields are shown but the form cannot be sent, and says so —
 there is no simulated success.
 {% endcomment %}
@@ -15,7 +16,7 @@ there is no simulated success.
     </div>
     <p class="drawer__about"><span class="label">{{ c.enquiry.about }}</span> <strong data-drawer-service>{{ c.enquiry.general }}</strong></p>
 
-    <form class="enquiry-form"{% if enquiry_action %} method="post" action="{{ enquiry_action }}"{% else %} data-not-connected{% endif %}>
+    <form class="enquiry-form"{% if forms_backend %} data-enquiry-backend{% elif enquiry_action %} method="post" action="{{ enquiry_action }}"{% else %} data-not-connected{% endif %}>
       <div class="enquiry-form__field">
         <label for="enquiry-name">{{ c.enquiry.name }} <span class="enquiry-form__req">({{ c.enquiry.required }})</span></label>
         <input id="enquiry-name" name="name" type="text" autocomplete="name" required>
@@ -40,10 +41,16 @@ there is no simulated success.
         <textarea id="enquiry-message" name="message" rows="5" required></textarea>
       </div>
 
-      {% if not enquiry_action %}
-        <p class="enquiry-form__notice" id="enquiry-notice">{{ c.enquiry.not_connected }}</p>
+      {% if forms_backend %}
+        {% include "partials/form_guard.html" %}
+        <button class="btn btn--primary enquiry-form__send" type="submit">{{ c.enquiry.send }}</button>
+        <p class="quote-form__status" role="status" aria-live="polite" data-enquiry-status></p>
+      {% else %}
+        {% if not enquiry_action %}
+          <p class="enquiry-form__notice" id="enquiry-notice">{{ c.enquiry.not_connected }}</p>
+        {% endif %}
+        <button class="btn btn--primary enquiry-form__send" type="submit"{% if not enquiry_action %} disabled aria-describedby="enquiry-notice"{% endif %}>{{ c.enquiry.send }}</button>
       {% endif %}
-      <button class="btn btn--primary enquiry-form__send" type="submit"{% if not enquiry_action %} disabled aria-describedby="enquiry-notice"{% endif %}>{{ c.enquiry.send }}</button>
     </form>
 
     {% if whatsapp_number %}
