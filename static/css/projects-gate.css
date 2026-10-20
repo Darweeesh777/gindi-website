@@ -1,0 +1,513 @@
+/*
+ * The Gindi Gate — the Projects page's entrance (templates/core/projects.html).
+ * A gate drawn from the logo's G: fine gold outlines of its arch, uprights and
+ * inward stroke, with the keystone set into the arch.
+ *
+ * States (static/js/projects-gate.js): closed (default) → .is-opening → .is-open
+ * → .is-closing → closed.
+ *   Closed: the headline in the gate's opening, sized with the gate.
+ *   Open: the halves part and frame the introduction to the work; the keystone
+ *   stays as its crown, the inward stroke slides away. The text arrives in a
+ *   short stagger (opening) and leaves at once (closing), while the closed
+ *   headline does the opposite.
+ * Only the active layer is visible (visibility: hidden takes the other out of
+ * the tab order and the accessibility tree). Without JavaScript or with
+ * reduced motion the gate is shown open and still.
+ *
+ * The open geometry is set by --o-scale (the drawing's scale) and --o-shift
+ * (how far each half moves, in the logo's units), per screen size, so that no
+ * stroke crosses the text (checked in the browser tests).
+ */
+
+.pgate {
+  --pgate-dur: 900ms;
+  --pgate-ease: cubic-bezier(0.65, 0, 0.25, 1);
+  --o-scale: 1.06;
+  --o-shift: 300;
+  position: relative;
+  overflow: clip;                 /* the parted gate never widens the page */
+  padding-block-start: var(--header-h);
+  background: var(--gindi-navy);
+  color: var(--gindi-ivory);
+}
+
+/* At least one screen tall; taller when the text needs it (short screens, enlarged text). */
+.pgate__stage {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center;
+  min-height: calc(100vh - var(--header-h));
+  min-height: calc(100svh - var(--header-h));
+  padding: clamp(0.75rem, 2.5vh, 1.75rem) var(--gutter) clamp(0.75rem, 2.5vh, 1.5rem);
+}
+
+.pgate__body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 24rem;
+}
+
+/* The gate keeps the logo's proportions (453 x 585 G, in a 513 x 645 box with margins):
+   as tall as the room allows (never taller than the screen), never wider than the screen. */
+.pgate__frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: min(100%, calc((100vw - 2 * var(--gutter)) * 645 / 513), calc(100svh - var(--header-h) - 7rem));
+  aspect-ratio: 513 / 645;
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+  transition: top var(--pgate-dur) var(--pgate-ease), transform var(--pgate-dur) var(--pgate-ease);
+}
+
+.pgate__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 50%;
+  transition: transform var(--pgate-dur) var(--pgate-ease);
+}
+
+.pgate__svg path {
+  fill: none;
+  stroke: var(--gindi-gold);
+  stroke-width: 1.25;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;   /* fine lines at every size, also while opening */
+}
+
+.pgate__half path {
+  filter: drop-shadow(0 0 4px rgb(200 137 43 / 0.35));
+}
+
+.pgate__low {
+  transition: opacity var(--pgate-dur) var(--pgate-ease);
+}
+
+.pgate__key {
+  fill: var(--gindi-ivory);   /* ivory, as in the logo */
+  opacity: 0.92;
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.pgate__half,
+.pgate__bar,
+.pgate__key,
+.pgate__glow {
+  transition: transform var(--pgate-dur) var(--pgate-ease), opacity var(--pgate-dur) var(--pgate-ease);
+}
+
+/* ---------- The closed gate's headline: in the opening, above the inward stroke ---------- */
+.pgate__content {
+  position: absolute;
+  inset-block: 22.5% 43%;
+  inset-inline: 19%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 3cqw, 1.125rem);
+  text-align: center;
+  /* Coming back (closing): after the introduction has gone. */
+  transition: opacity 520ms var(--ease-out) 380ms, transform 700ms var(--ease-out) 300ms, visibility 0s 0s;
+}
+
+.pgate__eyebrow {
+  color: var(--gindi-gold);
+  font-size: clamp(0.625rem, 2.1cqw, 0.75rem);
+}
+
+:lang(ar) .pgate__eyebrow {
+  font-size: clamp(0.8125rem, 2.6cqw, 0.9375rem);
+}
+
+.pgate__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.0625rem, 7.4cqw, 3.125rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.08;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+:lang(ar) .pgate__title {
+  font-size: clamp(1.0625rem, 7cqw, 2.875rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.pgate__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.75rem;
+  margin-block-start: clamp(0.25rem, 1.5cqw, 0.75rem);
+  padding: 0.5rem clamp(1rem, 4cqw, 1.5rem);
+  border: 1px solid var(--gindi-gold);
+  color: var(--gindi-ivory);
+  font-size: clamp(0.8125rem, 2.6cqw, 0.9375rem);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.06em;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+:lang(ar) .pgate__cta {
+  letter-spacing: 0;
+}
+
+.pgate__cta svg,
+.pgate__intro-cta svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.pgate__cta:hover {
+  background: rgb(200 137 43 / 0.16);
+}
+
+.pgate__cta:focus-visible,
+.pgate__intro-cta:focus-visible,
+.pgate__cue:focus-visible {
+  outline: 2px solid var(--gindi-yellow);
+  outline-offset: 3px;
+}
+
+/* ---------- The open gate's introduction ---------- */
+.pgate__intro {
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  display: grid;
+  justify-items: center;
+  width: min(100%, 42rem);
+  padding-block: clamp(5rem, 16vh, 9.5rem) clamp(1rem, 4vh, 2.5rem);
+  text-align: center;
+  visibility: hidden;
+  transition: visibility 0s 260ms;
+}
+
+.pgate__intro > * {
+  opacity: 0;
+  transform: translateY(14px);
+  /* Leaving (closing): together and quickly. */
+  transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+
+.pgate__intro-eyebrow {
+  --d: 150ms;
+  color: var(--gindi-gold);
+}
+
+:lang(ar) .pgate__intro-eyebrow {
+  font-size: 0.9375rem;
+}
+
+.pgate__intro-title {
+  --d: 230ms;
+  max-width: 17ch;
+  margin-block-start: 1.125rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 1.35rem + 3.1vw, 4.25rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.06;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+:lang(ar) .pgate__intro-title {
+  max-width: 16ch;
+  font-size: clamp(2rem, 1.25rem + 2.6vw, 3.5rem);
+  line-height: 1.4;
+}
+
+/* A short gold rule with the keystone's taper at its centre. */
+.pgate__rule {
+  --d: 310ms;
+  position: relative;
+  width: 4.5rem;
+  height: 1px;
+  margin-block: clamp(1.25rem, 3vh, 1.75rem);
+  background: linear-gradient(90deg, rgb(200 137 43 / 0), var(--gindi-gold) 30%, var(--gindi-gold) 70%, rgb(200 137 43 / 0));
+}
+
+.pgate__rule::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.3125rem;
+  background: var(--gindi-gold);
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+  transform: translateX(-50%);
+}
+
+.pgate__intro-text {
+  --d: 370ms;
+  max-width: 34rem;
+  color: var(--ivory-72);
+  font-size: var(--fs-lead);
+  line-height: 1.65;
+}
+
+:lang(ar) .pgate__intro-text {
+  max-width: 32rem;
+  line-height: 1.9;
+}
+
+.pgate__by {
+  --d: 450ms;
+  margin-block-start: 1.125rem;
+  color: rgb(244 241 236 / 0.86);
+  font-size: 0.75rem;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:lang(ar) .pgate__by {
+  font-size: 0.9375rem;
+  letter-spacing: 0;
+}
+
+.pgate__intro-cta {
+  --d: 530ms;
+  margin-block-start: clamp(1.5rem, 3.5vh, 2.25rem);
+}
+
+/* ---------- The cue: a short gold line and two words, under the gate ---------- */
+.pgate__cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding-block-start: 0.25rem;
+  color: var(--ivory-72);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  transition: color 600ms var(--ease-out);
+}
+
+:lang(ar) .pgate__cue {
+  font-size: 0.875rem;
+  letter-spacing: 0;
+}
+
+.pgate__cue-text--open {
+  display: none;
+}
+
+.pgate__cue-line {
+  width: 1px;
+  height: clamp(1.25rem, 3.5vh, 2.25rem);
+  background: linear-gradient(var(--gindi-gold), rgb(200 137 43 / 0));
+  transform-origin: top;
+  animation: pgate-cue 2.4s var(--ease-in-out) infinite;
+}
+
+@keyframes pgate-cue {
+  0%, 100% { transform: scaleY(0.45); opacity: 0.6; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+/* ---------- Opening and open (and the still versions) ---------- */
+.pgate.is-opening .pgate__svg,
+.pgate.is-open .pgate__svg {
+  transform: scale(var(--o-scale));
+}
+
+.pgate.is-opening .pgate__half--left,
+.pgate.is-open .pgate__half--left {
+  transform: translateX(calc(var(--o-shift) * -1px));
+}
+
+.pgate.is-opening .pgate__half--right,
+.pgate.is-open .pgate__half--right {
+  transform: translateX(calc(var(--o-shift) * 1px));
+}
+
+.pgate.is-opening .pgate__bar,
+.pgate.is-open .pgate__bar {
+  transform: translateX(160px);
+  opacity: 0;
+}
+
+.pgate.is-opening .pgate__glow,
+.pgate.is-open .pgate__glow {
+  opacity: 0.55;
+}
+
+/* The keystone stays, smaller, as the introduction's crown. */
+.pgate.is-opening .pgate__key,
+.pgate.is-open .pgate__key {
+  transform: scale(0.6);
+}
+
+/* The closed headline leaves first, quickly. */
+.pgate.is-opening .pgate__content,
+.pgate.is-open .pgate__content {
+  opacity: 0;
+  transform: scale(0.97);
+  visibility: hidden;
+  transition: opacity 240ms var(--ease-out), transform 400ms var(--ease-out), visibility 0s 240ms;
+}
+
+.pgate.is-opening .pgate__intro,
+.pgate.is-open .pgate__intro {
+  visibility: visible;
+  transition: visibility 0s 0s;
+}
+
+/* The introduction arrives in a short stagger while the gate parts. */
+.pgate.is-opening .pgate__intro > *,
+.pgate.is-open .pgate__intro > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity 560ms var(--ease-out) var(--d), transform 680ms var(--ease-out) var(--d);
+}
+
+.pgate.is-opening .pgate__cue-text--closed,
+.pgate.is-open .pgate__cue-text--closed {
+  display: none;
+}
+
+.pgate.is-opening .pgate__cue-text--open,
+.pgate.is-open .pgate__cue-text--open {
+  display: inline;
+}
+
+/* Opened or closed at once (arriving lower down the page): no animation. */
+.pgate.is-instant,
+.pgate.is-instant * {
+  transition: none !important;
+}
+
+/* ---------- Without JavaScript or with reduced motion: the open gate, still ---------- */
+.no-js .pgate__svg { transform: scale(var(--o-scale)); }
+.no-js .pgate__half--left { transform: translateX(calc(var(--o-shift) * -1px)); }
+.no-js .pgate__half--right { transform: translateX(calc(var(--o-shift) * 1px)); }
+.no-js .pgate__bar { opacity: 0; }
+.no-js .pgate__glow { opacity: 0.55; }
+.no-js .pgate__key { transform: scale(0.6); }
+.no-js .pgate__content { display: none; }
+.no-js .pgate__intro { visibility: visible; }
+.no-js .pgate__intro > * { opacity: 1; transform: none; }
+.no-js .pgate__cue-text--closed { display: none; }
+.no-js .pgate__cue-text--open { display: inline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pgate__svg { transform: scale(var(--o-scale)); }
+  .pgate__half--left { transform: translateX(calc(var(--o-shift) * -1px)); }
+  .pgate__half--right { transform: translateX(calc(var(--o-shift) * 1px)); }
+  .pgate__bar { opacity: 0; }
+  .pgate__glow { opacity: 0.55; }
+  .pgate__key { transform: scale(0.6); }
+  .pgate__content { display: none; }
+  .pgate__intro { visibility: visible; }
+  .pgate__intro > * { opacity: 1; transform: none; }
+  .pgate__cue-text--closed { display: none; }
+  .pgate__cue-text--open { display: inline; }
+
+  .pgate *,
+  .pgate *::after {
+    transition: none !important;
+  }
+
+  .pgate__cue-line {
+    animation: none;
+  }
+}
+
+/* ---------- Other screens ---------- */
+/* Laptops and other short desktop screens: a little tighter, so the cue stays in view. */
+@media (min-width: 48em) and (max-height: 50em) {
+  .pgate__intro {
+    padding-block-start: clamp(4rem, 12vh, 6.5rem);
+  }
+
+  :lang(ar) .pgate__intro-text {
+    line-height: 1.75;
+  }
+
+  .pgate__intro-title {
+    font-size: clamp(2.25rem, 1.1rem + 2.6vw, 3.5rem);
+  }
+
+  .pgate__rule {
+    margin-block: 1.125rem;
+  }
+}
+
+/* Phones: the open gate rises to the top of the hero; its arches curve away past the
+   screen's edges, with the keystone between them, and the introduction below. */
+@media (max-width: 47.99em) {
+  .pgate {
+    --o-scale: 1;
+    --o-shift: 130;
+  }
+
+  .pgate.is-opening .pgate__frame,
+  .pgate.is-open .pgate__frame,
+  .no-js .pgate__frame {
+    top: 0;
+    transform: translate(-50%, 0);
+  }
+
+  .pgate.is-opening .pgate__low,
+  .pgate.is-open .pgate__low,
+  .no-js .pgate__low {
+    opacity: 0;
+  }
+
+  .pgate__intro {
+    align-self: start;
+    padding-block-start: 9.5rem;
+  }
+}
+
+@media (max-width: 47.99em) and (prefers-reduced-motion: reduce) {
+  .pgate__frame {
+    top: 0;
+    transform: translate(-50%, 0);
+  }
+
+  .pgate__low {
+    opacity: 0;
+  }
+}
+
+/* Very short screens (phones held sideways): no room to frame the text, so the gate
+   steps aside entirely once open. */
+@media (max-height: 34em) {
+  .pgate.is-opening .pgate__half,
+  .pgate.is-open .pgate__half,
+  .no-js .pgate__half,
+  .pgate.is-opening .pgate__key,
+  .pgate.is-open .pgate__key,
+  .no-js .pgate__key {
+    opacity: 0;
+  }
+
+  .pgate__intro {
+    padding-block-start: 5.5rem;
+  }
+}
+
+@media (max-height: 34em) and (prefers-reduced-motion: reduce) {
+  .pgate__half,
+  .pgate__key {
+    opacity: 0;
+  }
+}
+
+/* The projects after the gate: the usual section spacing (no header to clear). */
+.projects-page--after-gate {
+  padding-block: var(--space-xl);
+}

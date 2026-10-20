@@ -307,14 +307,24 @@
   clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%); /* the logo's keystone */
 }
 
-.pg-hotspot:hover::before,
-.pg-hotspot:focus-visible::before {
+.pg-hotspot:focus-visible::before,
+.pg-hotspot.is-revealed::before {
   transform: scale(1.12);
 }
 
-/* The destination's name: navy and ivory, beside the marker (towards the
-   middle of the photo near an edge). Shown on hover and focus; always on
-   touch screens, which have no hover. */
+@media (hover: hover) {
+  .pg-hotspot:hover::before {
+    transform: scale(1.12);
+  }
+}
+
+/* The destination's name: navy and ivory, part of the marker's button (so
+   tapping or clicking it opens the view too). Hidden at first; shown on
+   mouse hover (only on devices that really hover, so it never sticks after a
+   tap), on keyboard focus, and on touch after a first tap (.is-revealed, set
+   by project-gallery.js). The script also picks the side that keeps it
+   inside the photo (data-place: right, left, above, below) and nudges it
+   along if needed (--pg-nudge-x / -y). Escape hides it (.is-quiet). */
 .pg-hotspot__label {
   position: absolute;
   top: 50%;
@@ -331,9 +341,10 @@
   line-height: 1.2;
   white-space: nowrap;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  translate: -0.25rem -50%;
-  transition: opacity var(--dur-fast) var(--ease-out), translate var(--dur-fast) var(--ease-out);
+  translate: 0 calc(-50% + var(--pg-nudge-y, 0px));
+  transition: opacity var(--dur-fast) var(--ease-out), visibility 0s linear var(--dur-fast);
 }
 
 .pg-hotspot__label svg {
@@ -342,21 +353,48 @@
   color: var(--gindi-gold);
 }
 
-.pg-hotspot--right .pg-hotspot__label {
+/* Default side, before the script measures: towards the middle of the photo. */
+.pg-hotspot--right .pg-hotspot__label,
+.pg-hotspot[data-place="left"] .pg-hotspot__label {
   left: auto;
   right: calc(100% - 0.125rem);
-  translate: 0.25rem -50%;
 }
 
-.pg-hotspot:is(:hover, :focus) .pg-hotspot__label {
+.pg-hotspot[data-place="right"] .pg-hotspot__label {
+  left: calc(100% - 0.125rem);
+  right: auto;
+}
+
+.pg-hotspot[data-place="above"] .pg-hotspot__label,
+.pg-hotspot[data-place="below"] .pg-hotspot__label {
+  left: 50%;
+  right: auto;
+  translate: calc(-50% + var(--pg-nudge-x, 0px)) 0;
+}
+
+.pg-hotspot[data-place="above"] .pg-hotspot__label {
+  top: auto;
+  bottom: calc(100% - 0.125rem);
+}
+
+.pg-hotspot[data-place="below"] .pg-hotspot__label {
+  top: calc(100% - 0.125rem);
+}
+
+.pg-hotspot.is-revealed .pg-hotspot__label,
+.pg-hotspot:focus-visible:not(.is-quiet) .pg-hotspot__label {
   opacity: 1;
-  translate: 0 -50%;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
 }
 
-@media (hover: none) {
-  .pg-hotspot__label {
+@media (hover: hover) {
+  .pg-hotspot:hover:not(.is-quiet) .pg-hotspot__label {
     opacity: 1;
-    translate: 0 -50%;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
   }
 }
 

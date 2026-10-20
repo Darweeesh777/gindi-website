@@ -1,0 +1,54 @@
+{% comment %}
+"From Vision to Reality" on a project's own page: the same design/reality pair
+as the homepage comparison (apps/core/vision.py, the entry named by the
+project's 'comparison'), on its own — no project switching. Same markup and
+behaviour as the homepage (.compare*, static/js/compare-slider.js); sizing is
+scoped to .pv (css/projects-page.css). The render is always on the left and
+the photograph on the right, in Arabic too (dir="ltr" on the comparison).
+{% endcomment %}
+<section class="section pv theme-light" id="pv-compare" aria-labelledby="pv-title">
+  <div class="container">
+    <div class="pv__inner">
+      <h2 class="heading pv__title" id="pv-title">{{ c.vision.title }}</h2>
+      <div class="compare" dir="ltr" data-compare data-label-design="{{ c.vision.design_short }}"
+           data-label-reality="{{ c.vision.reality_short }}">
+        <div class="compare__frame" data-compare-frame>
+          <figure class="compare__layer compare__layer--reality">
+            <img src="{{ comparison.reality.image.src }}" srcset="{{ comparison.reality.image.srcset }}"
+                 sizes="(min-width: 90rem) 1312px, calc(100vw - 2rem)" width="{{ comparison.reality.image.width }}"
+                 height="{{ comparison.reality.image.height }}" alt="{{ comparison.reality.alt }}" loading="lazy" decoding="async">
+          </figure>
+          <figure class="compare__layer compare__layer--design">
+            <img src="{{ comparison.design.image.src }}" srcset="{{ comparison.design.image.srcset }}"
+                 sizes="(min-width: 90rem) 1312px, calc(100vw - 2rem)" width="{{ comparison.design.image.width }}"
+                 height="{{ comparison.design.image.height }}" alt="{{ comparison.design.alt }}" loading="lazy" decoding="async">
+          </figure>
+          <div class="compare__divider">
+            {# The handle is the slider: drag it, or focus it and use the arrow keys. #}
+            <div class="compare__handle" role="slider" tabindex="0" aria-label="{{ c.vision.slider }}"
+                 aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+                 aria-valuetext="50% {{ c.vision.design_short }}, 50% {{ c.vision.reality_short }}" data-compare-handle>
+              <svg viewBox="0 0 56 60" aria-hidden="true" focusable="false">
+                {# The logo's keystone, with left/right arrows. #}
+                <path d="M4 4h48l-8 52H12z" fill="#f4f1ec" stroke="#c8892b" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="m24 23-6 7 6 7M32 23l6 7-6 7" fill="none" stroke="#1c2c4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        {# The Design under the render (left), The Reality under the photograph (right). #}
+        <div class="compare__labels">
+          <span class="compare__side">
+            <span class="label compare__label" dir="auto">{{ c.vision.design }}</span>
+            <span class="compare__rule" aria-hidden="true"></span>
+          </span>
+          <span class="label compare__hint" dir="auto">{{ c.vision.hint }}</span>
+          <span class="compare__side">
+            <span class="compare__rule" aria-hidden="true"></span>
+            <span class="label compare__label" dir="auto">{{ c.vision.reality }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

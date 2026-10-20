@@ -1,0 +1,1189 @@
+/*
+ * The free calculators (templates/core/free_tool.html, static/js/tools/).
+ * A compact navy introduction; then a warm off-white workspace with a faint
+ * drawing for each tool (partials/calc_art.html), white input sections and
+ * the navy results panel (main result in gold). Desktop: inputs, then results
+ * (on the left in Arabic, on the right in English); the results panel stays
+ * in view only when it fits under the header. Narrow screens: one column,
+ * with a results bar at the bottom while the panel is out of view.
+ * Printing shows only the report (#report).
+ */
+
+/* ---------- Introduction ---------- */
+.calc-hero {
+  position: relative;
+  overflow: clip;
+  padding-block: calc(var(--header-h) + clamp(1.75rem, 3.5vw, 3rem)) clamp(2rem, 4vw, 3.25rem);
+}
+
+.calc-hero__inner {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+}
+
+.calc-hero__arch {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: clamp(0.5rem, 7vw, 8rem);
+  height: calc(100% - var(--header-h) - 1.5rem);
+  width: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.calc-hero__arch path {
+  fill: none;
+  stroke: var(--gindi-gold);
+  stroke-opacity: 0.55;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The keystone in ivory, as in the logo. */
+.calc-hero__arch polygon {
+  fill: var(--gindi-ivory);
+}
+
+.calc-back {
+  margin-block-end: 0.5rem;
+  color: var(--ivory-72);
+}
+
+.calc-back:hover {
+  color: var(--gindi-ivory);
+}
+
+.calc-back .link-arrow__icon {
+  transform: scaleX(-1);
+  color: var(--gindi-gold);
+}
+
+.calc-back:hover .link-arrow__icon {
+  transform: scaleX(-1) translateX(0.25rem);
+}
+
+[dir="rtl"] .calc-back .link-arrow__icon {
+  transform: none;
+}
+
+[dir="rtl"] .calc-back:hover .link-arrow__icon {
+  transform: translateX(-0.25rem);
+}
+
+.calc-hero__title {
+  max-width: 22ch;
+  font-family: var(--font-heading);
+  font-size: clamp(2.125rem, 1.4rem + 2.8vw, 3.75rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.08;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+:lang(ar) .calc-hero__title {
+  font-size: clamp(1.875rem, 1.3rem + 2.3vw, 3.125rem);
+  line-height: 1.4;
+}
+
+.calc-hero__lead {
+  max-width: 42rem;
+  color: var(--ivory-72);
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+}
+
+/* ---------- Workspace ---------- */
+.calc-work {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  padding-block: clamp(1.75rem, 3.5vw, 3rem) var(--space-xl);
+  background: var(--gindi-ivory);
+}
+
+.calc-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.055;
+  pointer-events: none;
+}
+
+.calc-art pattern * {
+  fill: none;
+  stroke: var(--gindi-navy);
+  stroke-width: 1.2;
+}
+
+.calc__noscript {
+  padding: 1.5rem;
+  border: 1px solid var(--navy-15);
+  background: #fff;
+}
+
+.calc__grid {
+  display: grid;
+  gap: clamp(1.25rem, 2.4vw, 2.25rem);
+  align-items: start;
+}
+
+@media (min-width: 64em) {
+  .calc__grid {
+    grid-template-columns: minmax(0, 1fr) clamp(20rem, 29vw, 25.5rem);
+  }
+
+  .calc__summary.is-sticky {
+    position: sticky;
+    inset-block-start: calc(var(--header-h) + 1.25rem);
+  }
+}
+
+.calc__form,
+.calc__panels {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* ---------- Input sections ---------- */
+.cpanel {
+  min-width: 0;
+  border: 1px solid var(--navy-08);
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(28 44 74 / 0.05);
+}
+
+.cpanel__head {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1.25rem clamp(1.125rem, 2.4vw, 1.75rem) 0;
+}
+
+/* The step number in a keystone, as in the logo. */
+.cpanel__num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.125rem;
+  height: 1.75rem;
+  padding-block-end: 0.125rem;
+  background: var(--gindi-navy);
+  color: var(--gindi-ivory);
+  clip-path: polygon(0 0, 100% 0, 82% 100%, 18% 100%);
+  font-size: 0.875rem;
+  font-weight: var(--fw-medium);
+  line-height: 1;
+}
+
+.cpanel__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
+  font-weight: var(--fw-medium);
+  line-height: 1.2;
+}
+
+:lang(ar) .cpanel__title {
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.4375rem);
+  line-height: 1.5;
+}
+
+.cpanel__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem clamp(1.125rem, 2.4vw, 1.75rem) clamp(1.25rem, 2.4vw, 1.75rem);
+}
+
+.cpanel__hint,
+.cnote {
+  max-width: 62ch;
+  color: var(--navy-75);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.cnote {
+  font-size: 0.875rem;
+}
+
+/* Collapsible sections and groups: the values stay when closed. */
+.cpanel--fold > summary,
+.cfold > summary,
+.calc-how > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.cpanel--fold > summary::-webkit-details-marker,
+.cfold > summary::-webkit-details-marker,
+.calc-how > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cpanel--fold:not([open]) > summary {
+  padding-block-end: 1.25rem;
+}
+
+/* Chevrons use physical borders so they point down in both directions of text. */
+.cpanel__chev {
+  flex: none;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-inline-start: auto;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-0.15rem) rotate(45deg);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+[open] > summary > .cpanel__chev {
+  transform: translateY(0.15rem) rotate(-135deg);
+}
+
+.cfold {
+  border-block: 1px solid var(--navy-08);
+}
+
+.cfold__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  color: var(--gindi-navy);
+  font-size: 0.9375rem;
+  font-weight: var(--fw-medium);
+}
+
+.cfold__body {
+  display: grid;
+  gap: 0.875rem;
+  padding-block: 0.25rem 1rem;
+}
+
+.cpanel summary:focus-visible,
+.cfold summary:focus-visible,
+.calc-how summary:focus-visible {
+  outline-offset: 2px;
+}
+
+/* ---------- Fields ---------- */
+.cgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 0.875rem 1rem;
+}
+
+@media (min-width: 40em) {
+  .cgrid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cgrid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cgrid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.cf {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: start;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.cf--wide {
+  grid-column: 1 / -1;
+}
+
+.cf__label {
+  color: var(--gindi-navy);
+  font-size: 0.875rem;
+  font-weight: var(--fw-medium);
+  line-height: 1.35;
+}
+
+:lang(ar) .cf__label {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.cf__box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 2.875rem;
+  border: 1px solid rgb(28 44 74 / 0.3);
+  background: #fff;
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.cf__box:hover {
+  border-color: rgb(28 44 74 / 0.55);
+}
+
+/* The focus indicator is on the whole box (field and unit). */
+.cf__box:focus-within {
+  border-color: var(--gindi-navy);
+  box-shadow: 0 0 0 1px var(--gindi-navy);
+}
+
+.cf__input:focus-visible {
+  outline: none;
+}
+
+.cf__input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--gindi-navy);
+  font: inherit;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.cf__input::-webkit-outer-spin-button,
+.cf__input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.cf__input::placeholder {
+  color: rgb(28 44 74 / 0.5);
+  opacity: 1;
+}
+
+select.cf__input {
+  padding-inline-end: 2.25rem;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.cf__box--select::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: 0.9rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 1.5px solid var(--gindi-navy);
+  border-bottom: 1.5px solid var(--gindi-navy);
+  transform: translateY(-0.15rem) rotate(45deg);
+  pointer-events: none;
+}
+
+.cf__unit {
+  flex: none;
+  padding-inline: 0.25rem 0.75rem;
+  color: var(--navy-75);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.cf__box:has([aria-invalid="true"]) {
+  border-color: #b42318;
+  box-shadow: 0 0 0 1px #b42318;
+}
+
+.cf__msg {
+  color: #b42318;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* A line of figures about the inputs ("25×12×6 cm · 54.9 bricks/m²"). */
+.cinfo {
+  padding: 0.625rem 0.875rem;
+  border-inline-start: 2px solid var(--gindi-gold);
+  background: var(--gindi-ivory);
+  color: var(--gindi-navy);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.55;
+}
+
+/* A section's total. */
+.csum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--gindi-navy);
+  color: var(--ivory-72);
+  font-size: 0.9375rem;
+}
+
+.csum__val {
+  color: var(--gindi-ivory);
+  font-size: 1.125rem;
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.csum__unit {
+  color: var(--ivory-72);
+  font-size: 0.875rem;
+}
+
+/* ---------- Repeated rows (walls, places, circuits, stages) ---------- */
+.crows {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.crow,
+.citem {
+  min-width: 0;
+  padding: 0.875rem 1rem 1rem;
+  border: 1px solid var(--navy-15);
+  background: #fbfaf7;
+}
+
+.crow__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.crow__name {
+  display: grid;
+  min-width: 0;
+}
+
+.crow__name b {
+  color: var(--gindi-navy);
+  font-weight: 600;
+}
+
+.crow__name small {
+  color: var(--navy-75);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.crow__side {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crow__tot {
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--navy-15);
+  background: var(--gindi-ivory);
+  color: var(--gindi-navy);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.del {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--navy-15);
+  background: #fff;
+  color: var(--gindi-navy);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.del svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.del:hover {
+  border-color: #b42318;
+  color: #b42318;
+}
+
+.del[hidden] {
+  display: none;
+}
+
+.crow__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.75rem), 1fr));
+  gap: 0.75rem;
+  margin-block-start: 0.75rem;
+}
+
+@media (min-width: 40em) {
+  .crow__fields--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .crow__fields--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.crow__sub {
+  margin-block-start: 0.875rem;
+  color: var(--gindi-navy);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:lang(ar) .crow__sub {
+  font-size: 0.875rem;
+  letter-spacing: 0;
+}
+
+.crow__rate {
+  margin-block-start: 0.5rem;
+  color: var(--navy-75);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.cadd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.875rem;
+  border: 1px dashed rgb(28 44 74 / 0.4);
+  background: transparent;
+  color: var(--gindi-navy);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.cadd span {
+  color: var(--gindi-gold);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.cadd:hover {
+  border-color: var(--gindi-navy);
+  background: #fff;
+}
+
+.cgroup {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.cgroup + .cgroup {
+  margin-block-start: 0.375rem;
+}
+
+/* ---------- Tables (wire sizes) and comparisons ---------- */
+.ctable {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--navy-08);
+}
+
+.ctable table {
+  width: 100%;
+  min-width: 40rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ctable th {
+  padding: 0.5rem 0.5rem;
+  background: var(--gindi-navy);
+  color: var(--gindi-ivory);
+  font-size: 0.8125rem;
+  font-weight: var(--fw-medium);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ctable td {
+  padding: 0.4rem 0.5rem;
+  border-block-end: 1px solid var(--navy-08);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ctable td.res {
+  background: var(--gindi-ivory);
+  font-weight: 600;
+}
+
+.ctable tfoot td {
+  border-block-start: 2px solid var(--gindi-navy);
+  color: var(--gindi-navy);
+  font-weight: 600;
+}
+
+.ctable .cf__box {
+  min-width: 7rem;
+  min-height: 2.5rem;
+}
+
+.ctable .cf__input {
+  min-height: 2.375rem;
+  padding-block: 0.25rem;
+  text-align: center;
+}
+
+.ccmp {
+  display: grid;
+  border-block-start: 1px solid var(--navy-08);
+}
+
+.ccmp > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding-block: 0.5rem;
+  border-block-end: 1px solid var(--navy-08);
+}
+
+.ccmp dt {
+  color: var(--navy-75);
+}
+
+.ccmp dd {
+  color: var(--gindi-navy);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cverdict {
+  padding: 0.75rem 1rem;
+  border-inline-start: 3px solid var(--navy-15);
+  background: var(--gindi-ivory);
+  color: var(--gindi-navy);
+  font-weight: var(--fw-medium);
+}
+
+.cverdict.ok {
+  border-color: #2e6b1f;
+  background: #edf5ea;
+  color: #24521a;
+}
+
+.cverdict.bad {
+  border-color: #b42318;
+  background: #fbeeec;
+  color: #8f1b12;
+}
+
+/* ---------- Actions and explanation ---------- */
+.calc__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-block-start: 0.25rem;
+}
+
+.calc__reset {
+  border-color: rgb(28 44 74 / 0.35);
+  background: transparent;
+  color: var(--gindi-navy);
+}
+
+.calc__reset:hover {
+  border-color: var(--gindi-navy);
+  background: #fff;
+}
+
+.calc-how {
+  border: 1px solid var(--navy-08);
+  background: #fff;
+}
+
+.calc-how__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.75rem clamp(1.125rem, 2.4vw, 1.75rem);
+  color: var(--gindi-navy);
+  font-family: var(--font-heading);
+  font-size: 1.375rem;
+  font-weight: var(--fw-medium);
+}
+
+:lang(ar) .calc-how__head {
+  font-size: 1.25rem;
+}
+
+.calc-how__list {
+  display: grid;
+  gap: 0.25rem 1.5rem;
+  padding: 0 clamp(1.125rem, 2.4vw, 1.75rem) 1.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.calc-how__list dt {
+  padding-block-start: 0.75rem;
+  color: var(--gindi-navy);
+  font-weight: 600;
+}
+
+.calc-how__list dd {
+  color: var(--navy-75);
+}
+
+@media (min-width: 48em) {
+  .calc-how__list {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+
+  .calc-how__list dt,
+  .calc-how__list dd {
+    padding-block: 0.625rem;
+    border-block-start: 1px solid var(--navy-08);
+  }
+}
+
+/* ---------- Results panel ---------- */
+.calc__summary {
+  position: relative;
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+  padding: clamp(1.25rem, 2.6vw, 2rem);
+  border-block-start: 2px solid var(--gindi-gold);
+  scroll-margin-block-start: calc(var(--header-h) + 1rem);
+}
+
+.calc__summary:focus {
+  outline: none;
+}
+
+.calc__summary:focus-visible {
+  outline: 2px solid var(--gindi-yellow);
+  outline-offset: 3px;
+}
+
+/* A small keystone on the gold rule. */
+.calc__summary::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -2px;
+  inset-inline-start: clamp(1.25rem, 2.6vw, 2rem);
+  width: 1.25rem;
+  height: 0.75rem;
+  background: var(--gindi-gold);
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+}
+
+.calc__summary-eyebrow {
+  color: var(--gindi-gold);
+}
+
+.calc__results {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.ckpi {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+}
+
+.ckpi__v {
+  color: var(--gindi-ivory);
+  font-size: 1.5rem;
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.ckpi__l {
+  color: var(--ivory-72);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ckpi--hero .ckpi__v {
+  color: var(--gindi-gold);
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 2.3rem + 2.4vw, 4.25rem);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+}
+
+:lang(ar) .ckpi--hero .ckpi__v {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+}
+
+.ckpi--hero .ckpi__l {
+  font-size: 0.9375rem;
+}
+
+.ckpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.ckpis .ckpi {
+  padding-block-start: 0.875rem;
+  border-block-start: 1px solid var(--ivory-18);
+}
+
+.ckpi--wide {
+  grid-column: 1 / -1;
+}
+
+.ckpi--text .ckpi__v {
+  font-size: 1.125rem;
+}
+
+.cbreak {
+  display: grid;
+  border-block-start: 1px solid var(--ivory-18);
+}
+
+.cbreak > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding-block: 0.625rem;
+  border-block-end: 1px solid var(--ivory-10);
+}
+
+.cbreak dt {
+  color: var(--ivory-72);
+  font-size: 0.875rem;
+}
+
+.cbreak dd {
+  color: var(--gindi-ivory);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.cbreak__title {
+  margin-block-start: 0.25rem;
+  color: var(--gindi-gold);
+}
+
+/* Label / value pairs as direct children (the purchase lists). */
+.cbreak--grid {
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1rem;
+}
+
+.cbreak--grid dt,
+.cbreak--grid dd {
+  padding-block: 0.5rem;
+  border-block-end: 1px solid var(--ivory-10);
+}
+
+.cbreak--grid dd {
+  max-width: 15rem;
+}
+
+.calc__alert {
+  padding: 0.625rem 0.875rem;
+  border-inline-start: 2px solid var(--gindi-yellow);
+  background: rgb(255 202 54 / 0.1);
+  color: var(--gindi-ivory);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.calc__alert:empty {
+  display: none;
+}
+
+.calc__print {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.calc__print-btn {
+  width: 100%;
+  border-color: var(--gindi-gold);
+  background: transparent;
+  color: var(--gindi-ivory);
+}
+
+.calc__print-btn svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.calc__print-btn:hover {
+  background: rgb(200 137 43 / 0.16);
+}
+
+.calc__print-hint,
+.calc__warn {
+  color: var(--ivory-72);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.calc__warn {
+  padding-block-start: 1rem;
+  border-block-start: 1px solid var(--ivory-10);
+}
+
+/* ---------- Narrow screens: the results bar ---------- */
+.calc-dock {
+  position: fixed;
+  inset-inline: 0.75rem;
+  inset-block-end: 0.75rem;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.5rem;
+  padding: 0.625rem 1rem;
+  padding-block-end: max(0.625rem, env(safe-area-inset-bottom));
+  border-block-start: 2px solid var(--gindi-gold);
+  background: var(--gindi-navy);
+  box-shadow: 0 8px 24px rgb(28 44 74 / 0.28);
+  color: var(--gindi-ivory);
+}
+
+.calc-dock[hidden] {
+  display: none;
+}
+
+.calc-dock__res {
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--ivory-72);
+}
+
+.calc-dock__value {
+  color: var(--gindi-gold);
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.calc-dock__go {
+  flex: none;
+  padding-block: 0.25rem;
+  border-block-end: 1px solid var(--gindi-gold);
+  font-size: 0.875rem;
+  font-weight: var(--fw-medium);
+}
+
+.calc-dock:focus-visible {
+  outline: 2px solid var(--gindi-yellow);
+  outline-offset: 2px;
+}
+
+@media (min-width: 64em) {
+  .calc-dock {
+    display: none !important;
+  }
+}
+
+@media (max-width: 39.99em) {
+  .calc-hero__arch {
+    height: 62%;
+    inset-inline-end: -1.5rem;
+    opacity: 0.3;
+  }
+
+  /* Room for the results bar at the end of the page. */
+  .calc-work {
+    padding-block-end: calc(var(--space-xl) + 3rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cpanel__chev,
+  .cf__box {
+    transition: none;
+  }
+}
+
+/* ---------- Report (print only) ---------- */
+.calc-report {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  body > :not(main),
+  main > :not(.calc-report) {
+    display: none !important;
+  }
+
+  .calc-report {
+    display: block !important;
+    color: var(--gindi-navy);
+    font-family: var(--font-sans);
+    font-size: 10pt;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .r-head {
+    display: flex;
+    align-items: center;
+    gap: 6mm;
+    padding: 4mm 6mm;
+    border-block-end: 1.2mm solid var(--gindi-gold);
+    background: var(--gindi-navy);
+    color: var(--gindi-ivory);
+  }
+
+  .r-logo {
+    flex: none;
+    width: auto;
+    height: 19mm;
+  }
+
+  .r-title h1 {
+    font-family: var(--font-heading);
+    font-size: 18pt;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .r-title p {
+    margin-block-start: 1mm;
+    color: var(--ivory-72);
+    font-size: 9pt;
+  }
+
+  .r-kpis {
+    display: flex;
+    gap: 3mm;
+    margin-block: 5mm 3mm;
+  }
+
+  .r-kpis div {
+    flex: 1 1 0;
+    padding: 2.5mm 3mm;
+    border: 0.3mm solid var(--navy-15);
+    border-block-start: 0.8mm solid var(--gindi-navy);
+  }
+
+  .r-kpis div:first-child {
+    border-block-start-color: var(--gindi-gold);
+    background: var(--gindi-ivory);
+  }
+
+  .r-kpis b {
+    display: block;
+    font-size: 14pt;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .r-kpis span {
+    color: var(--navy-75);
+    font-size: 8pt;
+  }
+
+  .calc-report h2 {
+    margin-block: 5mm 2mm;
+    padding-block-end: 1mm;
+    border-block-end: 0.4mm solid var(--gindi-navy);
+    font-size: 11pt;
+    font-weight: 600;
+    break-after: avoid;
+  }
+
+  .calc-report table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .calc-report thead {
+    display: table-header-group;
+  }
+
+  .calc-report tr {
+    break-inside: avoid;
+  }
+
+  .calc-report th {
+    padding: 1.4mm 1.2mm;
+    background: var(--gindi-navy);
+    color: var(--gindi-ivory);
+    font-weight: 500;
+  }
+
+  .calc-report td {
+    padding: 1.2mm;
+    border-block-end: 0.2mm solid #d9dce3;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .calc-report td.l {
+    text-align: start;
+  }
+
+  .calc-report td.hi {
+    background: var(--gindi-ivory);
+    font-weight: 600;
+  }
+
+  .calc-report tfoot td {
+    border-block-start: 0.4mm solid var(--gindi-navy);
+    font-weight: 600;
+  }
+
+  .r-note,
+  .r-cmp {
+    margin-block: 1.5mm;
+    color: var(--navy-75);
+    font-size: 8.5pt;
+  }
+
+  .r-cmp {
+    color: var(--gindi-navy);
+    font-size: 10pt;
+  }
+
+  .r-warn {
+    margin-block-start: 4mm;
+    color: #8f1b12;
+    font-size: 8.5pt;
+  }
+
+  .r-foot {
+    margin-block-start: 4mm;
+    padding-block-start: 2mm;
+    border-block-start: 0.2mm solid var(--navy-15);
+    color: var(--navy-75);
+    font-size: 8.5pt;
+    text-align: center;
+  }
+}

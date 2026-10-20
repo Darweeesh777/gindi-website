@@ -5,7 +5,7 @@ from django.template import loader
 from django.templatetags.static import static
 from django.urls import reverse
 
-from . import about, emblem, projects, services, tools, vision
+from . import about, emblem, projects, services, studio, tools, vision
 from .content import CONTENT, NAV_SECTIONS
 from .images import resolve, resolve_content
 
@@ -103,6 +103,10 @@ def home(request, lang='en'):
         'services': services.for_language(lang),
         'tools': tools.for_language(lang),  # "Free Services" in the Services section
         'visions': vision.for_language(lang),  # complete entries only
+        'studio_invite': {
+            'url': reverse('core:design_studio' + LANGUAGES[lang]['suffix']),
+            'styles': [{'name': s['name'], 'preview': studio.style_preview(s['id'])} for s in studio.for_language(lang)],
+        },
         'nums': _section_numbers(),
     })
     return render(request, 'core/home.html', context)
@@ -124,8 +128,13 @@ def project_detail(request, slug, lang='en'):
     if project is None:
         raise Http404('No such project')
     context = _context(lang, 'project', 'core:project', {'slug': slug})
-    context.update({'c': CONTENT[lang], 'project': project})
-    return render(request, 'core/project_detail.html', context)
+    # Its "From Vision to Reality" pair, the same entry as on the homepage.
+    comparison = next((v for v in vision.for_language(lang) if v['id'] == project['comparison']), None) \
+        if project.get('comparison') else None
+    context.update({'c': CONTENT[lang], 'project': project, 'comparison': comparison})
+    # A project with its own page design (projects.py 'layout'), e.g. the villa's "Follow the Light".
+    template = 'core/project_light.html' if project['layout'] == 'light' else 'core/project_detail.html'
+    return render(request, template, context)
 
 
 def about_page(request, lang='en'):
@@ -162,6 +171,35 @@ def services_page(request, lang='en'):
     return render(request, 'core/services.html', context)
 
 
+def design_studio(request, lang='en'):
+    """GINDI Design Studio (/design-studio/): three styles, each one fixed
+    concept image whose upholstery, stone and wood can be changed. Catalogue
+    and assets: apps/core/studio.py; compositor and page: static/studio/.
+    Only styles whose files all exist are offered."""
+    content = CONTENT[lang]
+    page = content['studio_page']
+    styles = studio.for_language(lang)
+    context = _context(lang, 'design_studio', 'core:design_studio')
+    context.update({
+        'c': content,
+        'styles': styles,
+        'studio_data': {
+            'lang': lang,
+            'styles': styles,
+            'quiz': studio.quiz_for_language(lang),
+            'contact_url': reverse('core:contact' + LANGUAGES[lang]['suffix']),
+            'logo': static('images/brand/gindi-logo.png'),
+            'labels': {
+                **{k: page[k] for k in (
+                    'selected', 'custom', 'copied', 'copy_failed', 'canvas_label', 'message', 'loading_material',
+                    'saving', 'saved', 'save_failed', 'board', 'quiz', 'legacy_link')},
+                'presets': page['presets'], 'reference': page['reference'],
+            },
+        },
+    })
+    return render(request, 'core/design_studio.html', context)
+
+
 def contact_page(request, lang='en'):
     """Contact Us (/contact/): the brand panel and the project enquiry form.
     The form works like the quotation form (same lists, rules and script):
@@ -186,9 +224,8 @@ def free_tools(request, lang='en'):
 
 
 def free_tool(request, slug, lang='en'):
-    """One free tool's page: the integration area for its own agent, 'Coming
-    soon' until its script is set in settings.FREE_TOOL_SCRIPTS
-    (/free-tools/<slug>/)."""
+    """One free calculator's page (/free-tools/<slug>/). The calculator itself
+    runs in the browser: static/js/tools/<slug>.js on <slug>-calc.js."""
     tool = tools.get(slug, lang)
     if tool is None:
         raise Http404('No such tool')

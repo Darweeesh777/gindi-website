@@ -1,0 +1,815 @@
+/*
+ * "Follow the light." project page (templates/core/project_light.html): the
+ * villa. A deep navy page in three story sections — the hero (photograph 1
+ * beside the project's text), then two sections of two photographs, each
+ * staggered: one upper photo with its text beside it, one lower photo on the
+ * other side with its text below the first. One line of light runs through
+ * the gaps of all three (drawn by static/js/project-light.js from the real
+ * positions). Then the "Explore the Villa" carousel, whose controls take the
+ * logo's elements: the emblem's arch with its keystone (buttons), the
+ * keystone and divider (progress, separators) and the G's right-angle foot
+ * (the current photo).
+ */
+
+.villa {
+  --villa-bg: #0d1626;            /* the brand navy, deepened for the photographs */
+  --villa-line-gap: 1.25rem;      /* the line's distance from a photograph's edge */
+  --villa-ph: clamp(20rem, 58vh, 34rem);   /* a portrait photograph's height in a pair */
+  background: var(--villa-bg);
+  color: var(--gindi-ivory);
+}
+
+.villa-container {
+  max-width: 76rem;
+}
+
+.villa-story {
+  position: relative;
+}
+
+.villa-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ---------- Hero: the project, and photograph 1 ---------- */
+.villa-hero {
+  padding-block: calc(var(--header-h) + clamp(1.25rem, 3vh, 2.5rem)) clamp(2rem, 5vh, 3.5rem);
+}
+
+.villa-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(3.5rem, 7vw, 7rem) auto;
+  min-height: calc(100svh - var(--header-h) - clamp(3.25rem, 8vh, 6rem));
+}
+
+.villa-hero__text {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block: clamp(0.5rem, 2vh, 1.5rem) 0.5rem;
+}
+
+.villa-hero__intro {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  flex: 1;
+}
+
+.villa-hero__back {
+  margin-block-end: clamp(1.5rem, 5vh, 3.5rem);
+  color: var(--ivory-72);
+}
+
+.villa-hero__back .link-arrow__icon {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .villa-hero__back .link-arrow__icon {
+  transform: none;
+}
+
+.villa-hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gindi-gold);
+}
+
+.villa-hero__name {
+  margin-block-start: 0.875rem;
+  font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.375rem);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.02em;
+  unicode-bidi: plaintext;
+}
+
+.villa-hero__title {
+  margin-block-start: 0.75rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2.75rem, 1.6rem + 3.6vw, 5.25rem);
+  font-weight: var(--fw-light);
+  line-height: 1.02;
+}
+
+.villa-hero__desc {
+  max-width: 31rem;
+  margin-block-start: clamp(1rem, 2.5vh, 1.5rem);
+  color: var(--ivory-72);
+  font-size: var(--fs-lead);
+}
+
+.villa-hero__explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.125rem;
+  margin-block-start: clamp(1.5rem, 4vh, 2.5rem);
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--gindi-gold);
+  color: var(--gindi-ivory);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.06em;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+:lang(ar) .villa-hero__explore {
+  letter-spacing: 0;
+}
+
+.villa-hero__explore svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.villa-hero__explore:hover {
+  background: rgb(200 137 43 / 0.16);
+}
+
+.villa-hero__explore:focus-visible {
+  outline: 2px solid var(--gindi-yellow);
+  outline-offset: 3px;
+}
+
+.villa-hero__count {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--ivory-72);
+}
+
+.villa-hero__count .num {
+  color: var(--gindi-gold);
+}
+
+.villa-hero__dash {
+  width: 1.75rem;
+  height: 1px;
+  background: var(--gindi-gold);
+}
+
+.moment--hero {
+  grid-column: 3;
+  align-self: center;
+}
+
+.moment--hero .moment__photo img {
+  width: auto;
+  height: clamp(26rem, calc(100svh - var(--header-h) - 6.5rem), 46rem);
+}
+
+/* ---------- Two photographs per section, staggered ---------- */
+.villa-pair {
+  padding-block: clamp(3.5rem, 9vh, 7rem) clamp(1.5rem, 4vh, 3rem);
+}
+
+.villa-pair:last-child {
+  padding-block-end: clamp(4rem, 10vh, 7.5rem);
+}
+
+/* Upper photo and its text side by side; the lower photo starts under that text, on
+   the other side, and its text sits under the upper photo. Rows follow the content. */
+.villa-pair__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(3.5rem, 6vw, 6rem) minmax(0, 1fr);
+  grid-template-areas:
+    "pa . ta"
+    "pa . pb"
+    "tb . pb";
+  row-gap: calc(var(--villa-line-gap) * 2);
+}
+
+.villa-pair__grid:has(.moment--wide.moment--a) {
+  grid-template-columns: minmax(0, 1.3fr) clamp(3.5rem, 6vw, 6rem) minmax(0, 0.9fr);
+}
+
+.moment--a {
+  grid-area: pa;
+  justify-self: end;
+}
+
+.moment--b {
+  grid-area: pb;
+  justify-self: start;
+}
+
+.moment--a .moment__photo img,
+.moment--b .moment__photo img {
+  width: auto;
+  height: var(--villa-ph);
+}
+
+.moment--wide .moment__photo img {
+  width: min(100%, 46rem);
+  height: auto;
+}
+
+.moment--wide {
+  width: 100%;
+}
+
+.moment-text {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 0.75rem;
+  max-width: 25rem;
+}
+
+.moment-text--a {
+  grid-area: ta;
+  justify-self: start;
+  padding-block-start: clamp(0.5rem, 3vh, 2rem);
+}
+
+.moment-text--b {
+  grid-area: tb;
+  justify-self: end;
+  justify-items: end;
+  text-align: end;
+}
+
+.moment-text__num {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 1.8rem + 2.2vw, 3.5rem);
+  font-weight: var(--fw-light);
+  line-height: 1;
+}
+
+.moment-text__num span {
+  color: var(--ivory-72);
+  font-size: 0.45em;
+  vertical-align: 0.5em;
+}
+
+.moment-text__rule {
+  width: 2.5rem;
+  height: 1px;
+  background: var(--gindi-gold);
+}
+
+.moment-text__title {
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+:lang(ar) .moment-text__title {
+  font-size: var(--fs-body);
+  letter-spacing: 0;
+}
+
+.moment-text__desc {
+  color: var(--ivory-72);
+  font-size: var(--fs-small);
+  line-height: 1.75;
+}
+
+/* ---------- A photograph: dim until the light arrives ---------- */
+.moment {
+  --lit: 1;
+  position: relative;
+  z-index: 0;
+}
+
+.moment__frame {
+  position: relative;
+  border-radius: 3px;
+}
+
+.moment__photo {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: #05080f;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.moment__photo img {
+  display: block;
+  max-width: 100%;
+}
+
+.moment__photo:focus-visible {
+  outline: 2px solid var(--gindi-yellow);
+  outline-offset: 4px;
+}
+
+/* --lit 0..1 (set by the script; 1 without it): a dark veil while unlit... */
+.moment__frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #05080f;
+  opacity: calc((1 - var(--lit)) * 0.74);
+  pointer-events: none;
+}
+
+/* ...and a restrained edge glow once lit: a fine gold edge and a soft halo outside. */
+.moment__frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px rgb(200 137 43 / 0.5), 0 0 1.75rem rgb(200 137 43 / 0.22);
+  opacity: var(--lit);
+  pointer-events: none;
+}
+
+/* The line (SVG, drawn by the script). */
+.villa-line__track {
+  fill: none;
+  stroke: rgb(244 241 236 / 0.13);
+  stroke-width: 1;
+}
+
+.villa-line__glow,
+.villa-line__halo,
+.villa-line__core {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.villa-line__halo {
+  stroke: rgb(200 137 43 / 0.14);
+  stroke-width: 9;
+}
+
+.villa-line__glow {
+  stroke: rgb(214 156 62 / 0.5);
+  stroke-width: 3;
+}
+
+.villa-line__core {
+  stroke: #ffe3a6;
+  stroke-width: 1.4;
+}
+
+.villa-line__head-core {
+  fill: #fff6df;
+}
+
+/* ---------- Phones and tablets: one column ----------
+   The line runs beside each photograph and crosses over the gap above the next. */
+@media (max-width: 63.99rem) {
+  .villa-hero__grid {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding-inline: calc(var(--villa-line-gap) + 0.5rem);
+  }
+
+  .villa-hero__text {
+    padding-block-end: calc(var(--villa-line-gap) * 2 + 0.5rem);
+  }
+
+  .villa-hero__count {
+    order: -1;
+    display: none;
+  }
+
+  .moment--hero {
+    grid-column: 1;
+    justify-self: center;
+  }
+
+  .moment--hero .moment__photo img,
+  .moment--a .moment__photo img,
+  .moment--b .moment__photo img {
+    width: min(100%, 26rem);
+    height: auto;
+  }
+
+  .moment--wide .moment__photo img {
+    width: 100%;
+  }
+
+  .villa-pair {
+    padding-block: clamp(2.5rem, 6vh, 4rem) 0;
+  }
+
+  .villa-pair__grid,
+  .villa-pair__grid:has(.moment--wide.moment--a) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "pa" "ta" "pb" "tb";
+    row-gap: 1.25rem;
+    padding-inline: calc(var(--villa-line-gap) + 0.5rem);
+  }
+
+  .moment--a,
+  .moment--b {
+    justify-self: center;
+  }
+
+  .moment-text,
+  .moment-text--a,
+  .moment-text--b {
+    justify-self: center;
+    justify-items: center;
+    max-width: 30rem;
+    padding: 0 0 calc(var(--villa-line-gap) * 2 + 0.75rem);
+    text-align: center;
+  }
+
+  .moment-text__num {
+    font-size: 2.25rem;
+  }
+}
+
+/* ---------- Explore the Villa ---------- */
+.explore {
+  padding-block: clamp(3rem, 2rem + 4vw, 6rem) clamp(4rem, 2.5rem + 5vw, 7rem);
+  border-block-start: 1px solid var(--ivory-10);
+}
+
+.explore__head {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.explore__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--gindi-gold);
+}
+
+.explore__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-light);
+  line-height: var(--lh-heading);
+}
+
+.explore__lead {
+  color: var(--ivory-72);
+}
+
+.explore__groups ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.explore__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ivory-72);
+  font-size: var(--fs-small);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.explore__group .keystone {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.explore__group:hover,
+.explore__group[aria-current="true"] {
+  color: var(--gindi-ivory);
+}
+
+.explore__group[aria-current="true"] .keystone {
+  opacity: 1;
+}
+
+.explore__group-count {
+  color: var(--gindi-gold);
+  font-size: 0.75rem;
+}
+
+.explore__group:focus-visible,
+.explore__track:focus-visible,
+.explore__photo:focus-visible,
+.explore__btn:focus-visible {
+  outline: 2px solid var(--gindi-yellow);
+  outline-offset: 3px;
+}
+
+/* The track: native horizontal scrolling (touch, trackpad, keys); the script adds
+   mouse dragging and the buttons. It starts in line with the heading. */
+.explore__track {
+  --slide-h: clamp(17rem, 56vh, 33rem);
+  --edge: max(var(--gutter), calc((100vw - 76rem) / 2 + var(--gutter)));
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+  margin: clamp(1.75rem, 1rem + 2vw, 2.75rem) 0 0;
+  padding: 0.25rem var(--edge) 1rem;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--edge);
+  scrollbar-width: none;
+}
+
+.explore__track::-webkit-scrollbar {
+  display: none;
+}
+
+.explore__track.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* With a mouse or trackpad the script settles on the nearest photo after a drag
+   or scroll (CSS snapping would jump back to the photo it last snapped to). */
+@media (hover: hover) and (pointer: fine) {
+  .js .explore__track {
+    scroll-snap-type: none;
+  }
+}
+
+.explore__slide {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+.explore__figure {
+  position: relative;
+  width: max-content;
+  margin: 0;
+  padding-block-start: 0.875rem;
+}
+
+.explore__photo {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: #05080f;
+  cursor: zoom-in;
+}
+
+.explore__photo img {
+  display: block;
+  width: auto;
+  height: var(--slide-h);
+  -webkit-user-drag: none;
+}
+
+.explore__slide--wide .explore__photo img {
+  width: min(calc(var(--slide-h) * 1.775), calc(100vw - 2 * var(--gutter) - 1.5rem));
+  height: auto;
+}
+
+/* The current photo: the logo's keystone and divider above it (never over the
+   photograph), and the G's right-angle foot at its lower corner. */
+.explore__figure::before,
+.explore__figure::after,
+.explore__photo::after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+
+.explore__figure::before {
+  inset-block-start: 0.375rem;
+  inset-inline: 0;
+  height: 1px;
+  background: rgb(200 137 43 / 0.7);
+}
+
+.explore__figure::after {
+  inset-block-start: 0;
+  inset-inline-start: calc(50% - 0.45rem);
+  width: 0.9rem;
+  height: 0.7rem;
+  background: var(--gindi-gold);
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+}
+
+.explore__photo::after {
+  inset-block-end: -0.5rem;
+  inset-inline-end: -0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-block-end: 3px solid var(--gindi-gold);
+  border-inline-end: 3px solid var(--gindi-gold);
+}
+
+.explore__slide.is-current .explore__figure::before,
+.explore__slide.is-current .explore__figure::after,
+.explore__slide.is-current .explore__photo::after {
+  opacity: 1;
+}
+
+.explore__caption {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.25rem 1rem;
+  padding-block-start: 0.875rem;
+  contain: inline-size; /* wraps to the photo's width */
+}
+
+.explore__caption-group {
+  grid-column: 1 / -1;
+  color: var(--gindi-gold);
+  font-size: 0.6875rem;
+}
+
+:lang(ar) .explore__caption-group {
+  font-size: 0.8125rem;
+}
+
+.explore__caption-text {
+  font-size: var(--fs-small);
+}
+
+.explore__caption-num {
+  color: var(--ivory-72);
+  font-size: 0.8125rem;
+}
+
+/* Between spaces: the keystone over a fine divider. */
+.explore__sep {
+  flex: none;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.625rem;
+  width: 1.5rem;
+  height: calc(var(--slide-h) + 0.875rem);
+  padding-block-start: 0.25rem;
+}
+
+.explore__sep:first-child {
+  display: none;
+}
+
+.explore__sep-rule {
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(var(--ivory-18), transparent);
+}
+
+.explore__bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem clamp(1.25rem, 3vw, 2.5rem);
+  margin-block-start: 1.25rem;
+}
+
+.explore__status {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: var(--fs-small);
+}
+
+.explore__status-group {
+  color: var(--gindi-ivory);
+}
+
+.explore__status-count {
+  color: var(--ivory-72);
+}
+
+/* Progress: the logo's divider; ticks where each space starts; the keystone travels. */
+.explore__progress {
+  --p: 0;
+  position: relative;
+  height: 1.25rem;
+}
+
+.explore__progress-rule {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  height: 1px;
+  background: var(--ivory-18);
+}
+
+.explore__progress-tick {
+  position: absolute;
+  inset-block-start: calc(50% - 0.25rem);
+  inset-inline-start: calc(var(--at) / 29 * 100%);
+  width: 1px;
+  height: 0.5rem;
+  background: var(--ivory-18);
+}
+
+.explore__progress-mark {
+  position: absolute;
+  inset-block-start: calc(50% - 0.65rem);
+  inset-inline-start: calc(var(--p) * (100% - 0.9rem));
+  width: 0.9rem;
+  height: 0.7rem;
+  transition: inset-inline-start var(--dur-base) var(--ease-out);
+}
+
+.explore__nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.explore__nav[hidden] {
+  display: none;
+}
+
+/* Arch buttons after the emblem: a round-topped arch, the keystone set into it. */
+.explore__btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3.5rem;
+  padding: 0.5rem 0 0;
+  border: 1.5px solid var(--gindi-gold);
+  border-block-end-width: 0;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: transparent;
+  color: var(--gindi-ivory);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.explore__btn::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.25rem;
+  inset-inline-start: calc(50% - 0.4rem);
+  width: 0.8rem;
+  height: 0.6rem;
+  background: var(--gindi-ivory);
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+}
+
+.explore__btn::after {
+  content: "";
+  position: absolute;
+  inset-inline: -1.5px;
+  inset-block-end: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--gindi-gold) 0 0.5rem, transparent 0.5rem calc(100% - 0.5rem), var(--gindi-gold) 0);
+}
+
+.explore__btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+[dir="rtl"] .explore__btn svg {
+  transform: scaleX(-1);
+}
+
+.explore__btn:hover:not(:disabled) {
+  background: rgb(200 137 43 / 0.16);
+}
+
+.explore__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (max-width: 40rem) {
+  .explore__track {
+    --slide-h: clamp(16rem, 58vh, 30rem);
+  }
+
+  .explore__bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .explore__progress {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore__progress-mark,
+  .explore__figure::before,
+  .explore__figure::after,
+  .explore__photo::after {
+    transition: none;
+  }
+}

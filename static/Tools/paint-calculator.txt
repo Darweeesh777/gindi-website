@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<title>حاسبة كميات وتكلفة الدهانات | Eng/ Mostafa Elgindi</title>
+<meta name="description" content="احسب كميات الدهانات من السيلر لحد الوش النهائي وعدد العبوات والتكلفة، بمعدلات فرد GLC وJotun الرسمية. إعداد Eng/ Mostafa Elgindi - Gindi Innovations">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A; --orange:#F5A623; --cream:#F3D9A4;
+    --input-bg:#FFF8E1; --input-bd:#E8CF85; --input-fg:#0000FF;
+    --green-bg:#E2F0D9; --green-fg:#2E6B1F; --red:#C00000;
+    --bg:#F3F5F9; --card:#FFFFFF; --text:#1B2433; --muted:#6B7280; --line:#E3E7EE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--navy);border-radius:14px;overflow:hidden;color:#fff}
+  header .top{padding:22px 20px 16px}
+  header h1{margin:0;font-size:24px;font-weight:800}
+  header p{margin:4px 0 0;color:var(--cream);font-size:14px}
+  header .brand{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--orange);color:var(--navy);padding:6px 20px;font-size:13px;font-weight:700}
+  .card{background:var(--card);border-radius:14px;padding:18px;margin-top:14px;border-top:4px solid var(--orange);box-shadow:0 1px 3px rgba(11,31,58,.08)}
+  .card h2{margin:0 0 4px;font-size:17px;color:var(--navy);padding-bottom:6px;border-bottom:2px solid var(--navy)}
+  .hint{margin:8px 0 12px;color:var(--muted);font-size:13px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
+  input[type=number],select{width:100%;min-width:0;font:inherit;font-weight:700;color:var(--input-fg);background:var(--input-bg);border:1.5px solid var(--input-bd);border-radius:8px;padding:8px;text-align:center;-moz-appearance:textfield}
+  select.prod{text-align:right;font-size:13.5px}
+  input::placeholder{color:#9AA3B2;font-weight:600;font-size:12.5px}
+  input:focus,select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,166,35,.25)}
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .size{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--green-bg);color:var(--green-fg);font-weight:700;font-size:13.5px}
+
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#F9FAFC}
+  .item .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+  .item .head b{color:var(--navy);font-size:15px}
+  .item .head small{color:var(--muted);font-size:12px;display:block;font-weight:400}
+  .item .head .tot{background:var(--green-bg);color:var(--green-fg);font-weight:800;border-radius:8px;padding:4px 10px;white-space:nowrap;font-size:14px}
+  .item .f{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+  .item label{font-size:11.5px;color:var(--navy);font-weight:600;display:block;margin-bottom:2px;white-space:nowrap}
+  .item .rate{margin-top:6px;font-size:12px;color:var(--muted)}
+  .sumline{display:flex;justify-content:space-between;margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700}
+  .sumline span:last-child{color:var(--orange);font-size:18px}
+
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{border-radius:12px;padding:14px;background:var(--green-bg);color:var(--green-fg)}
+  .kpi.hero{grid-column:1/-1;background:var(--navy);color:#fff;text-align:center}
+  .kpi .v{font-size:26px;font-weight:800;line-height:1.2}
+  .kpi.hero .v{font-size:44px;color:var(--orange)}
+  .kpi .l{font-size:13px;font-weight:600}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px}
+  .cmp div{padding:8px 12px;border-radius:8px;background:#F3F5F9;font-size:14px}
+  .cmp div:nth-child(odd){font-weight:700;color:var(--navy)}
+  .cmp div:nth-child(even){background:var(--green-bg);color:var(--green-fg);font-weight:700;text-align:center}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .warn{color:var(--red);font-size:12.5px;margin-top:10px}
+  dl{margin:10px 0 0;display:grid;grid-template-columns:120px 1fr;gap:8px 12px;font-size:13.5px}
+  dt{font-weight:700;color:var(--navy);background:#F3F5F9;border-radius:6px;padding:4px 8px;align-self:start}
+  dd{margin:0;padding:4px 0}
+  footer{margin:16px 0 8px;text-align:center;font-size:12.5px;color:var(--muted)}
+  footer b{color:var(--navy)}
+  .pdf{display:block;width:100%;margin-top:14px;font:inherit;font-weight:800;font-size:16px;color:#fff;background:var(--navy);border:0;border-radius:10px;padding:12px;cursor:pointer;border-bottom:4px solid var(--orange)}
+  .pdf:hover,.pdf:focus-visible{filter:brightness(1.15);outline:none}
+  .back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:8px;color:var(--navy);font-weight:700;font-size:14px;text-decoration:none}
+  .back:hover,.back:focus-visible{text-decoration:underline;text-decoration-color:var(--orange);text-underline-offset:4px}
+  #report{display:none}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;color:#1B2433;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wrap > *:not(#report){display:none!important}
+    .wrap{max-width:none;padding:0}
+    #report{display:block;font-size:12px}
+    #report .r-head{display:flex;justify-content:space-between;align-items:center;background:#0B1F3A;color:#fff;padding:12px 16px;border-radius:8px;border-bottom:4px solid #F5A623}
+    #report h1{margin:0;font-size:20px}
+    #report .r-head p{margin:2px 0 0;color:#F3D9A4;font-size:12px}
+    #report .r-brand{background:#F5A623;color:#0B1F3A;font-weight:800;padding:6px 10px;border-radius:6px;text-align:center;direction:ltr;font-size:11px}
+    #report .r-kpis{display:flex;gap:8px;margin:12px 0}
+    #report .r-kpis div{flex:1;background:#E2F0D9;color:#2E6B1F;border-radius:8px;padding:8px;text-align:center}
+    #report .r-kpis div:first-child{background:#0B1F3A;color:#fff}
+    #report .r-kpis div:first-child b{color:#F5A623}
+    #report .r-kpis b{display:block;font-size:20px}
+    #report .r-kpis span{font-size:10.5px}
+    #report h2{font-size:14px;color:#0B1F3A;border-bottom:2px solid #0B1F3A;padding-bottom:3px;margin:14px 0 6px}
+    #report table{width:100%;border-collapse:collapse;font-size:11.5px;margin:0;page-break-inside:auto}
+    #report tr{page-break-inside:avoid}
+    #report th{background:#0B1F3A;color:#fff;padding:5px 4px}
+    #report td{padding:4px;text-align:center;border-bottom:1px solid #E3E7EE}
+    #report td.l{text-align:right}
+    #report td.hi{background:#E2F0D9;color:#2E6B1F;font-weight:800}
+    #report tfoot td{font-weight:800;border-top:2px solid #0B1F3A}
+    #report .r-note{color:#6B7280;font-size:10.5px;margin:4px 0 0}
+    #report .r-warn{color:#C00000;font-size:10.5px;margin-top:12px}
+    #report .r-foot{text-align:center;color:#6B7280;font-size:10.5px;border-top:1px solid #E3E7EE;padding-top:6px;margin-top:10px}
+  }
+  @media (max-width:560px){
+    .grid3{grid-template-columns:1fr 1fr}
+    .item .f{grid-template-columns:repeat(3,1fr)}
+    .kpi.hero .v{font-size:38px}
+    dl{grid-template-columns:1fr}
+    dt{justify-self:start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="../index.html#services">الرجوع لخدمات Gindi Innovations</a>
+
+  <header>
+    <div class="top">
+      <h1>حاسبة كميات وتكلفة الدهانات</h1>
+      <p>من السيلر لحد الوش النهائي: الكميات والعبوات والتكلفة بمعدلات GLC وJotun</p>
+    </div>
+    <div class="brand"><span>Eng/ Mostafa Elgindi</span><span>Gindi Innovations</span></div>
+  </header>
+
+  <section class="card">
+    <h2>١ — المساحة والإعدادات</h2>
+    <p class="hint">اكتب مساحة الشقة والارتفاع بس، والحوائط والفتحات والسقف هيتقدّروا لوحدهم. ولو معاك المقاس الحقيقي لأي واحد فيهم اكتبه في خانته. الخانات الصفرا بخط أزرق مدخلات، والنتيجة بتتحسب وانت بتكتب.</p>
+    <div class="grid3">
+      <div class="field"><label for="flat">مساحة الشقة (م²)</label><input type="number" id="flat" min="0" inputmode="decimal" value="80"></div>
+      <div class="field"><label for="height">الارتفاع (م)</label><input type="number" id="height" min="0" inputmode="decimal" value="3"></div>
+      <div class="field"><label for="len">طول الحوائط (م)</label><input type="number" id="len" min="0" inputmode="decimal" placeholder="تلقائي"></div>
+      <div class="field"><label for="open">الفتحات (م²)</label><input type="number" id="open" min="0" inputmode="decimal" placeholder="تلقائي"></div>
+      <div class="field"><label for="ceil">السقف (م²)</label><input type="number" id="ceil" min="0" inputmode="decimal" placeholder="تلقائي"></div>
+      <div class="field"><label for="waste">الهالك %</label><input type="number" id="waste" min="0" inputmode="decimal" value="10"></div>
+    </div>
+    <div class="grid3">
+      <div class="field"><label for="labour">المصنعية (ج/م²)</label><input type="number" id="labour" min="0" inputmode="decimal" placeholder="سعر النقاش"></div>
+    </div>
+    <div class="size" id="areaInfo"></div>
+    <div class="sumline"><span>صافي المساحة الكلية (م²)</span><span id="sumArea">0</span></div>
+  </section>
+
+  <section class="card">
+    <h2>٢ — مراحل الدهان</h2>
+    <p class="hint">كل مرحلة بتعرض أصنافها بس. في الوش النهائي اختار الشركة الأول (GLC أو Jotun) وبعدين الخامة. لكل مرحلة اختار الخامة وعدد الأوجه (المعجون = عدد السكاكين، و0 لو المرحلة مش هتتعمل)، وهل هتتعمل على السقف كمان، واكتب سعر العبوة من المورد بتاعك.</p>
+    <div id="stages"></div>
+  </section>
+
+  <section class="card">
+    <h2>٣ — النتيجة</h2>
+    <div class="kpis" style="margin-top:12px">
+      <div class="kpi hero"><div class="v" id="kTotal">—</div><div class="l" id="kTotalL">التكلفة الإجمالية (جنيه)</div></div>
+      <div class="kpi"><div class="v" id="kMat">—</div><div class="l" id="kMatL">تكلفة الخامات (جنيه)</div></div>
+      <div class="kpi"><div class="v" id="kM2">—</div><div class="l">تكلفة المتر (ج/م²)</div></div>
+    </div>
+    <div class="cmp" id="buyList"></div>
+    <button type="button" class="pdf" id="pdfBtn">تصدير التقرير PDF</button>
+    <p class="note" style="text-align:center">هتفتحلك نافذة الطباعة، اختار منها «حفظ كـ PDF» (Save as PDF).</p>
+    <p class="warn">الحسبة تقديرية وبتتغير حسب حالة المحارة وامتصاصها وطريقة التنفيذ، ولازم يعتمدها مهندس مختص.</p>
+  </section>
+
+  <section class="card">
+    <h2>منطق الحسبة</h2>
+    <dl>
+      <dt>الحوائط</dt><dd>طول الحوائط × الارتفاع − الفتحات.</dd>
+      <dt>التقدير</dt><dd>لو سبت الخانة فاضية: طول الحوائط ≈ مساحة الشقة × 1 م (الحيطة الداخلية بتتدهن من الوشين)، والفتحات ≈ 12.5% من الحوائط، والسقف ≈ 93% من مساحة الشقة. يعني شقة 80 م² بارتفاع 3 م ≈ 210 م² حوائط + 74 م² سقف.</dd>
+      <dt>مساحة المرحلة</dt><dd>الحوائط + السقف لو اخترت «على السقف = نعم».</dd>
+      <dt>الكمية</dt><dd>مساحة المرحلة × عدد الأوجه ÷ معدل الفرد × (1 + الهالك).</dd>
+      <dt>العبوات</dt><dd>الكمية ÷ حجم العبوة، متقرّبة لأعلى لعبوة كاملة.</dd>
+      <dt>التكلفة</dt><dd>عدد العبوات × سعر العبوة، والمصنعية = صافي المساحة الكلية × سعر المتر.</dd>
+      <dt>المعدلات</dt><dd>GLC من بياناتها الرسمية (متوسط الحد الأدنى والأقصى للوش). Jotun من صفحة كل منتج على موقع Jotun مصر (التغطية للتر في الوش). الصنفرة 10 م² للفرخ تقدير.</dd>
+      <dt>عبوات Jotun</dt><dd>فينوماستيك 0.9 و3.6 و9 و18 لتر، فراجع الأحجام المتاحة مع التاجر.</dd>
+    </dl>
+  </section>
+
+  <section id="report" aria-hidden="true"></section>
+  <footer>إعداد: <b>Eng/ Mostafa Elgindi</b> | Gindi Innovations | الحسبة تقديرية وتُعتمد من مهندس مختص<br>© Gindi Innovations — ممنوع إعادة النشر أو النسخ بدون إذن كتابي</footer>
+</div>
+
+<script>
+(function(){
+  // Same logic as Eng_Mostafa_Elgindi_Paint_Calculator.xlsx (sheet «الحسبة»)
+  // [name, unit, rate m²/unit/coat (GLC average), pack size, GLC min–max] — same list as sheet «الخامات»
+  var PRODUCTS = [
+    ["GLC المقاوم 0017 — 0.65 لتر", "لتر", 11.5, 0.65, "10–13 عند GLC", "sealer"],
+    ["GLC المقاوم 0017 — 2.4 لتر", "لتر", 11.5, 2.4, "10–13 عند GLC", "sealer"],
+    ["GLC المقاوم 0017 — 9 لتر", "لتر", 11.5, 9.0, "10–13 عند GLC", "sealer"],
+    ["GLC المقاوم 0017 — 14 لتر", "لتر", 11.5, 14.0, "10–13 عند GLC", "sealer"],
+    ["GLC سوبر بلاتين برايمر مائي — 3 لتر", "لتر", 9.0, 3.0, "8–10 عند GLC", "sealer"],
+    ["GLC سوبر بلاتين برايمر مائي — 9 لتر", "لتر", 9.0, 9.0, "8–10 عند GLC", "sealer"],
+    ["GLC ستورم شيلد بنيتريتنج سيلر — 0.75 لتر", "لتر", 10.0, 0.75, "9–11 عند GLC", "sealer"],
+    ["GLC ستورم شيلد بنيتريتنج سيلر — 3 لتر", "لتر", 10.0, 3.0, "9–11 عند GLC", "sealer"],
+    ["GLC ستورم شيلد بنيتريتنج سيلر — 20 لتر", "لتر", 10.0, 20.0, "9–11 عند GLC", "sealer"],
+    ["GLC ستورم شيلد نانو بنيترايتنج برايمر — 9 لتر", "لتر", 9.5, 9.0, "8–11 عند GLC", "sealer"],
+    ["GLC ستورم شيلد نانو بنيترايتنج برايمر — 18 لتر", "لتر", 9.5, 18.0, "8–11 عند GLC", "sealer"],
+    ["GLC معجون داي-تون 100 — 1 كجم", "كجم", 2.5, 1.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون داي-تون 100 — 4 كجم", "كجم", 2.5, 4.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون داي-تون 100 — 15 كجم", "كجم", 2.5, 15.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون داي-تون 100 — 18 كجم", "كجم", 2.5, 18.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون داي-تون 100 — 20 كجم", "كجم", 2.5, 20.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون أكريليك 900 — 4 كجم", "كجم", 3.0, 4.0, "2–4 عند GLC", "putty"],
+    ["GLC معجون أكريليك 900 — 15 كجم", "كجم", 3.0, 15.0, "2–4 عند GLC", "putty"],
+    ["GLC معجون تاكت — 1 كجم", "كجم", 2.5, 1.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون تاكت — 5 كجم", "كجم", 2.5, 5.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون تاكت — 15 كجم", "كجم", 2.5, 15.0, "2–3 عند GLC", "putty"],
+    ["GLC معجون تاكت — 22 كجم", "كجم", 2.5, 22.0, "2–3 عند GLC", "putty"],
+    ["GLC برما ستار 660 — 15 كجم", "كجم", 2.5, 15.0, "2–3 عند GLC", "putty"],
+    ["GLC ستورم شيلد بريميوم فيلر — 10 كجم", "كجم", 2.5, 10.0, "2–3 عند GLC", "putty"],
+    ["GLC ستورم شيلد بريميوم فيلر — 20 كجم", "كجم", 2.5, 20.0, "2–3 عند GLC", "putty"],
+    ["GLC سوبر داي-تون 3030 — 3.8 لتر", "لتر", 10.0, 3.8, "9–11 عند GLC", "base"],
+    ["GLC سوبر داي-تون 3030 — 14 لتر", "لتر", 10.0, 14.0, "9–11 عند GLC", "base"],
+    ["GLC داي-تون 200 — 3.5 لتر", "لتر", 9.0, 3.5, "8–10 عند GLC", "base"],
+    ["GLC داي-تون 200 — 8 لتر", "لتر", 9.0, 8.0, "8–10 عند GLC", "base"],
+    ["GLC فيرست كوت أبيض 505 — 2.1 لتر", "لتر", 10.0, 2.1, "9–11 عند GLC", "base"],
+    ["GLC فيرست كوت أبيض 505 — 3.75 لتر", "لتر", 10.0, 3.75, "9–11 عند GLC", "base"],
+    ["GLC جلتكس 20000 — 0.65 لتر", "لتر", 12.5, 0.65, "11–14 عند GLC", "base"],
+    ["GLC جلتكس 20000 — 2.5 لتر", "لتر", 12.5, 2.5, "11–14 عند GLC", "base"],
+    ["GLC جلتكس 20000 — 9 لتر", "لتر", 12.5, 9.0, "11–14 عند GLC", "base"],
+    ["GLC جلتكس 20000 — 18 لتر", "لتر", 12.5, 18.0, "11–14 عند GLC", "base"],
+    ["GLC جلتكس 25000 — 0.65 لتر", "لتر", 13.5, 0.65, "12–15 عند GLC", "base"],
+    ["GLC جلتكس 25000 — 2.5 لتر", "لتر", 13.5, 2.5, "12–15 عند GLC", "base"],
+    ["GLC جلتكس 15000 — 2.5 لتر", "لتر", 11.0, 2.5, "10–12 عند GLC", "base"],
+    ["GLC جلتكس 15000 — 9 لتر", "لتر", 11.0, 9.0, "10–12 عند GLC", "base"],
+    ["GLC داي-ستون 7070 — 0.65 لتر", "لتر", 10.5, 0.65, "9–12 عند GLC", "base"],
+    ["GLC داي-ستون 7070 — 2.5 لتر", "لتر", 10.5, 2.5, "9–12 عند GLC", "base"],
+    ["GLC داي-ستون 7070 — 9 لتر", "لتر", 10.5, 9.0, "9–12 عند GLC", "base"],
+    ["GLC سوبر بلاتين داي-تون 3030 — 2.7 لتر", "لتر", 9.0, 2.7, "8–10 عند GLC", "base"],
+    ["GLC سوبر بلاتين داي-تون 3030 — 9 لتر", "لتر", 9.0, 9.0, "8–10 عند GLC", "base"],
+    ["GLC سوبر بلاتين داي ستون 7070 — 0.9 لتر", "لتر", 10.5, 0.9, "9–12 عند GLC", "base"],
+    ["GLC سوبر بلاتين داي ستون 7070 — 2.7 لتر", "لتر", 10.5, 2.7, "9–12 عند GLC", "base"],
+    ["GLC سوبر بلاتين داي ستون 7070 — 9 لتر", "لتر", 10.5, 9.0, "9–12 عند GLC", "base"],
+    ["GLC داي-ستون 7070 ألوان جاهزه — 0.65 لتر", "لتر", 10.5, 0.65, "9–12 عند GLC", "base"],
+    ["GLC داي-ستون 7070 ألوان جاهزه — 2.5 لتر", "لتر", 10.5, 2.5, "9–12 عند GLC", "base"],
+    ["GLC داي-ستون 7070 ألوان جاهزه — 9 لتر", "لتر", 10.5, 9.0, "9–12 عند GLC", "base"],
+    ["GLC ستورم شيلد أندركوت — 9 لتر", "لتر", 12.0, 9.0, "11–13 عند GLC", "base"],
+    ["GLC سوبر لاك 786 — 0.35 لتر", "لتر", 14.0, 0.35, "13–15 عند GLC", "finish"],
+    ["GLC سوبر لاك 786 — 0.7 لتر", "لتر", 14.0, 0.7, "13–15 عند GLC", "finish"],
+    ["GLC سوبر لاك 786 — 2 لتر", "لتر", 14.0, 2.0, "13–15 عند GLC", "finish"],
+    ["GLC سوبر لاك 786 — 4 لتر", "لتر", 14.0, 4.0, "13–15 عند GLC", "finish"],
+    ["GLC سوبر لاك 786 — 9 لتر", "لتر", 14.0, 9.0, "13–15 عند GLC", "finish"],
+    ["GLC جل نيل 290 — 9 لتر", "لتر", 17.0, 9.0, "16–18 عند GLC", "finish"],
+    ["GLC زيجزاج جليز 303 — 0.325 لتر", "لتر", 17.5, 0.325, "15–20 عند GLC", "finish"],
+    ["GLC زيجزاج جليز 303 — 0.75 لتر", "لتر", 17.5, 0.75, "15–20 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 15000 — 0.9 لتر", "لتر", 10.0, 0.9, "9–11 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 15000 — 2.7 لتر", "لتر", 10.0, 2.7, "9–11 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 15000 — 9 لتر", "لتر", 10.0, 9.0, "9–11 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 20000 — 0.9 لتر", "لتر", 11.5, 0.9, "10–13 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 20000 — 2.7 لتر", "لتر", 11.5, 2.7, "10–13 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 20000 — 9 لتر", "لتر", 11.5, 9.0, "10–13 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك لامع — 0.9 لتر", "لتر", 14.0, 0.9, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك لامع — 2.7 لتر", "لتر", 14.0, 2.7, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك لامع — 9 لتر", "لتر", 14.0, 9.0, "13–15 عند GLC", "finish"],
+    ["GLC أمبيانس ارمادا — 0.9 لتر", "لتر", 7.0, 0.9, "6–8 عند GLC", "finish"],
+    ["GLC أمبيانس ارمادا — 2.7 لتر", "لتر", 7.0, 2.7, "6–8 عند GLC", "finish"],
+    ["GLC أمبيانس ماربللو ستوكو — 0.9 لتر", "لتر", 3.5, 0.9, "3–4 عند GLC", "finish"],
+    ["GLC أمبيانس ماربللو ستوكو — 2.7 لتر", "لتر", 3.5, 2.7, "3–4 عند GLC", "finish"],
+    ["GLC أمبيانس ماربللو ستوكو — 9 لتر", "لتر", 3.5, 9.0, "3–4 عند GLC", "finish"],
+    ["GLC أمبيانس كراكيل فينيش — 1 لتر", "لتر", 9.0, 1.0, "8–10 عند GLC", "finish"],
+    ["GLC أمبيانس دايموند — 0.32 لتر", "لتر", 9.0, 0.32, "8–10 عند GLC", "finish"],
+    ["GLC أمبيانس دايموند — 0.9 لتر", "لتر", 9.0, 0.9, "8–10 عند GLC", "finish"],
+    ["GLC أمبيانس هاي سينس — 0.4 لتر", "لتر", 9.0, 0.4, "8–10 عند GLC", "finish"],
+    ["GLC أمبيانس هاي سينس — 0.75 لتر", "لتر", 9.0, 0.75, "8–10 عند GLC", "finish"],
+    ["GLC أمبيانس شيل شاين — 0.32 لتر", "لتر", 9.0, 0.32, "8–10 عند GLC", "finish"],
+    ["GLC أمبيانس شيل شاين — 0.9 لتر", "لتر", 9.0, 0.9, "8–10 عند GLC", "finish"],
+    ["GLC أمبيانس سيناو — 0.9 لتر", "لتر", 4.0, 0.9, "3–5 عند GLC", "finish"],
+    ["GLC أمبيانس سيناو — 2.7 لتر", "لتر", 4.0, 2.7, "3–5 عند GLC", "finish"],
+    ["GLC أمبيانس سينفوني — 0.9 لتر", "لتر", 4.0, 0.9, "3–5 عند GLC", "finish"],
+    ["GLC أمبيانس سينفوني — 2.7 لتر", "لتر", 4.0, 2.7, "3–5 عند GLC", "finish"],
+    ["GLC لؤلؤ — 0.7 لتر", "لتر", 15.0, 0.7, "14–16 عند GLC", "finish"],
+    ["GLC لؤلؤ — 2 لتر", "لتر", 15.0, 2.0, "14–16 عند GLC", "finish"],
+    ["GLC لؤلؤ — 3.75 لتر", "لتر", 15.0, 3.75, "14–16 عند GLC", "finish"],
+    ["GLC سوبر لاك 500 — 2.15 لتر", "لتر", 14.0, 2.15, "13–15 عند GLC", "finish"],
+    ["GLC جل نيل 29 — 2.25 لتر", "لتر", 12.0, 2.25, "10–14 عند GLC", "finish"],
+    ["GLC جل نيل 29 — 8.5 لتر", "لتر", 12.0, 8.5, "10–14 عند GLC", "finish"],
+    ["GLC برما كول 001 — 2.5 لتر", "لتر", 10.0, 2.5, "9–11 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 25000 — 0.9 لتر", "لتر", 13.5, 0.9, "12–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 25000 — 2.7 لتر", "لتر", 13.5, 2.7, "12–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين جلتكس 25000 — 9 لتر", "لتر", 13.5, 9.0, "12–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك نصف لامع — 0.9 لتر", "لتر", 14.0, 0.9, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك نصف لامع — 2.7 لتر", "لتر", 14.0, 2.7, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك نصف لامع — 9 لتر", "لتر", 14.0, 9.0, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك مط — 0.9 لتر", "لتر", 14.0, 0.9, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك مط — 2.7 لتر", "لتر", 14.0, 2.7, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين سوبر لاك مط — 9 لتر", "لتر", 14.0, 9.0, "13–15 عند GLC", "finish"],
+    ["GLC سوبر بلاتين لاكشري مط 7000 — 0.9 لتر", "لتر", 10.0, 0.9, "9–11 عند GLC", "finish"],
+    ["GLC سوبر بلاتين لاكشري مط 7000 — 2.7 لتر", "لتر", 10.0, 2.7, "9–11 عند GLC", "finish"],
+    ["GLC سوبر بلاتين لاكشري مط 7000 — 9 لتر", "لتر", 10.0, 9.0, "9–11 عند GLC", "finish"],
+    ["GLC سوبر بلاتين هايجين سيلك 8000 — 0.9 لتر", "لتر", 11.0, 0.9, "10–12 عند GLC", "finish"],
+    ["GLC سوبر بلاتين هايجين سيلك 8000 — 2.7 لتر", "لتر", 11.0, 2.7, "10–12 عند GLC", "finish"],
+    ["GLC سوبر بلاتين هايجين سيلك 8000 — 9 لتر", "لتر", 11.0, 9.0, "10–12 عند GLC", "finish"],
+    ["GLC أمبيانس ڤلڤتووا — 0.9 لتر", "لتر", 7.0, 0.9, "6–8 عند GLC", "finish"],
+    ["GLC أمبيانس ڤلڤتووا — 2.7 لتر", "لتر", 7.0, 2.7, "6–8 عند GLC", "finish"],
+    ["GLC أمبيانس موزايك نيو — 0.9 لتر", "لتر", 6.5, 0.9, "5–8 عند GLC", "finish"],
+    ["GLC أمبيانس موزايك نيو — 2.7 لتر", "لتر", 6.5, 2.7, "5–8 عند GLC", "finish"],
+    ["GLC أمبيانس ميكسيكانو نيو — 2.5 لتر", "لتر", 1.5, 2.5, "1–2 عند GLC", "finish"],
+    ["GLC أمبيانس ميكسيكانو نيو — 9 لتر", "لتر", 1.5, 9.0, "1–2 عند GLC", "finish"],
+    ["GLC أمبيانس كلر ڤاروني — 0.9 لتر", "لتر", 7.0, 0.9, "6–8 عند GLC", "finish"],
+    ["GLC أمبيانس كلر ڤاروني — 2.7 لتر", "لتر", 7.0, 2.7, "6–8 عند GLC", "finish"],
+    ["GLC ستورم شيلد بريميوم توب كوت مط — 1 لتر", "لتر", 10.0, 1.0, "9–11 عند GLC", "finish"],
+    ["GLC ستورم شيلد بريميوم توب كوت مط — 9 لتر", "لتر", 10.0, 9.0, "9–11 عند GLC", "finish"],
+    ["GLC ستورم شيلد بريميوم توب كوت سيلك — 1 لتر", "لتر", 13.0, 1.0, "12–14 عند GLC", "finish"],
+    ["GLC ستورم شيلد بريميوم توب كوت سيلك — 9 لتر", "لتر", 13.0, 9.0, "12–14 عند GLC", "finish"],
+    ["GLC فليكس أنتي-كاربونيشن — 9 لتر", "لتر", 10.5, 9.0, "10–11 عند GLC", "finish"],
+    ["GLC ستورم شيلد بلاتزو هاي تكس — 20 لتر", "لتر", 1.5, 20.0, "1–2 عند GLC", "finish"],
+    ["GLC ستورم شيلد بلاتزو هاي تكس لايت — 20 لتر", "لتر", 1.5, 20.0, "1–2 عند GLC", "finish"],
+    ["GLC ستورم شيلد بلاتزو هاي تكس رويال — 20 لتر", "لتر", 1.5, 20.0, "1–2 عند GLC", "finish"],
+    ["GLC ستورم شيلد بلاتزو ميديوم تكس — 9 لتر", "لتر", 1.5, 9.0, "1–2 عند GLC", "finish"],
+    ["Jotun فينوماستيك بيتي مطفي غني (My Home Rich Matt) — 0.9 لتر", "لتر", 10.3, 0.9, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك بيتي مطفي غني (My Home Rich Matt) — 3.6 لتر", "لتر", 10.3, 3.6, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك بيتي مطفي غني (My Home Rich Matt) — 9 لتر", "لتر", 10.3, 9, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك بيتي مطفي غني (My Home Rich Matt) — 18 لتر", "لتر", 10.3, 18, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك بيتي ناعم حريري (My Home Smooth Silk) — 0.9 لتر", "لتر", 9.06, 0.9, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك بيتي ناعم حريري (My Home Smooth Silk) — 3.6 لتر", "لتر", 9.06, 3.6, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك بيتي ناعم حريري (My Home Smooth Silk) — 9 لتر", "لتر", 9.06, 9, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك بيتي ناعم حريري (My Home Smooth Silk) — 18 لتر", "لتر", 9.06, 18, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك مذهل راقي (Wonderwall Lux) — 0.9 لتر", "لتر", 10, 0.9, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك مذهل راقي (Wonderwall Lux) — 3.6 لتر", "لتر", 10, 3.6, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك مذهل راقي (Wonderwall Lux) — 9 لتر", "لتر", 10, 9, "تغطية Jotun", "finish"],
+    ["Jotun فينوماستيك مذهل راقي (Wonderwall Lux) — 18 لتر", "لتر", 10, 18, "تغطية Jotun", "finish"],
+    ["Jotun ليدي لمسة شامواه (Touch of Suede) — 0.9 لتر", "لتر", 11.8, 0.9, "تغطية Jotun", "finish"],
+    ["Jotun ليدي لمسة شامواه (Touch of Suede) — 2.7 لتر", "لتر", 11.8, 2.7, "تغطية Jotun", "finish"],
+    ["Jotun ليدي بيرل (Pearl) — 0.9 لتر", "لتر", 9, 0.9, "تغطية Jotun", "finish"],
+    ["Jotun ليدي بيرل (Pearl) — 3.6 لتر", "لتر", 9, 3.6, "تغطية Jotun", "finish"],
+    ["Jotun ليدي رويال فلفيت (Royal Velvet) — 0.9 لتر", "لتر", 9, 0.9, "تغطية Jotun", "finish"],
+    ["Jotun ليدي رويال فلفيت (Royal Velvet) — 3.6 لتر", "لتر", 9, 3.6, "تغطية Jotun", "finish"],
+    ["Jotun ليدي جليز (Glaze) — 0.45 لتر", "لتر", 14, 0.45, "تغطية Jotun", "finish"],
+    ["Jotun ليدي جليز (Glaze) — 0.9 لتر", "لتر", 14, 0.9, "تغطية Jotun", "finish"],
+    ["Jotun ليدي ستوكو أنتيكا (Stucco Antica) — 1 لتر", "لتر", 1.95, 1, "تغطية Jotun", "finish"],
+    ["Jotun ليدي ستوكو أنتيكا (Stucco Antica) — 4 لتر", "لتر", 1.95, 4, "تغطية Jotun", "finish"],
+    ["Jotun ليدي ستوكو أنتيكا (Stucco Antica) — 10 لتر", "لتر", 1.95, 10, "تغطية Jotun", "finish"],
+    ["Jotun ليدي ستوكو أنتيكا (Stucco Antica) — 14 لتر", "لتر", 1.95, 14, "تغطية Jotun", "finish"],
+    ["Jotun ليدي رومانو (Romano) — 1 لتر", "لتر", 2.1, 1, "تغطية Jotun", "finish"],
+    ["Jotun ليدي رومانو (Romano) — 4 لتر", "لتر", 2.1, 4, "تغطية Jotun", "finish"],
+    ["ورق صنفرة", "فرخ", 10, 1, "", "sand"]
+  ];
+  var BRANDS = {GLC: "GLC سوبر بلاتين لاكشري مط 7000 — 9 لتر", Jotun: "Jotun فينوماستيك بيتي مطفي غني (My Home Rich Matt) — 3.6 لتر"};
+  var brandOf = function(p){ return p[0].indexOf("Jotun ") === 0 ? "Jotun" : p[0].indexOf("GLC ") === 0 ? "GLC" : ""; };
+  // [stage, default product name, coats, on ceiling]
+  var STAGES = [
+    ["سيلر", "GLC المقاوم 0017 — 9 لتر", 1, true],
+    ["معجون", "GLC معجون داي-تون 100 — 15 كجم", 2, true],
+    ["صنفرة", "ورق صنفرة", 2, true],
+    ["بطانة", "GLC سوبر داي-تون 3030 — 3.8 لتر", 1, true],
+    ["الوش النهائي", "Jotun فينوماستيك بيتي مطفي غني (My Home Rich Matt) — 3.6 لتر", 2, true]
+  ];
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n, d){ return n.toLocaleString("en-US", {maximumFractionDigits: d || 0}); };
+  var num = function(el){ var v = parseFloat(el.value); return isFinite(v) && v >= 0 ? v : null; };
+  var up = function(x){ return Math.ceil(x - 1e-9); }; // ROUNDUP(x,0) for x >= 0
+  var idx = function(name){ for (var i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i][0] === name) return i; return 0; };
+  // each stage lists only its own kind of product (PRODUCTS[i][5]): base = 3030 / 7070 / Gltex, finish = Fenomastic-type finishes
+  var CATS = [["sealer"], ["putty"], ["sand"], ["base"], ["finish"]];
+  var optsFor = function(brand, cats){ return PRODUCTS.map(function(p, i){ return (!brand || brandOf(p) === brand) && cats.indexOf(p[5]) >= 0 ? '<option value="' + i + '">' + p[0] + "</option>" : ""; }).join(""); };
+  var FIN = STAGES.length - 1; // the finish coat gets a GLC / Jotun picker
+
+  var box = $("stages");
+  STAGES.forEach(function(s, i){
+    var d = document.createElement("div");
+    d.className = "item";
+    d.innerHTML =
+      '<div class="head"><div><b>' + (i + 1) + ". " + s[0] + '</b><small id="m' + i + '">0 م²</small></div>' +
+      '<div class="tot" id="g' + i + '">—</div></div>' +
+      (i === FIN ? '<div class="field" style="margin-bottom:8px"><label for="brand">الشركة</label><select id="brand"><option>Jotun</option><option>GLC</option></select></div>' : "") +
+      '<div class="field"><label for="p' + i + '">الخامة</label><select class="prod" id="p' + i + '">' + optsFor(i === FIN ? "Jotun" : "", CATS[i]) + '</select></div>' +
+      '<div class="rate" id="r' + i + '"></div>' +
+      '<div class="f">' +
+        '<div><label for="c' + i + '">عدد الأوجه</label><select id="c' + i + '">' + [0, 1, 2, 3, 4].map(function(n){ return "<option" + (n === s[2] ? " selected" : "") + ">" + n + "</option>"; }).join("") + '</select></div>' +
+        '<div><label for="s' + i + '">على السقف كمان؟</label><select id="s' + i + '"><option>نعم</option><option' + (s[3] ? "" : " selected") + '>لا</option></select></div>' +
+        '<div><label for="v' + i + '">سعر العبوة (ج)</label><input type="number" min="0" inputmode="decimal" id="v' + i + '" placeholder="0"></div>' +
+      '</div>';
+    box.appendChild(d);
+    $("p" + i).value = idx(s[1]);
+  });
+  $("brand").addEventListener("change", function(){
+    var b = $("brand").value, sel = $("p" + FIN);
+    sel.innerHTML = optsFor(b, CATS[FIN]); sel.value = idx(BRANDS[b]);
+  });
+
+  function calc(){
+    var flat = num($("flat")) || 0, H = num($("height")) || 0;
+    var lenIn = num($("len")), openIn = num($("open")), ceilIn = num($("ceil"));
+    var L = lenIn === null ? flat : lenIn;
+    var O = openIn === null ? 0.125 * L * H : openIn;
+    var walls = Math.max(0, L * H - O);
+    var ceil = ceilIn === null ? 0.93 * flat : ceilIn;
+    var total = walls + ceil;
+    var waste = (num($("waste")) || 0) / 100, labour = num($("labour"));
+
+    $("areaInfo").textContent = "الحوائط: " + fmt(L, 1) + " م × " + fmt(H, 2) + " م − فتحات " + fmt(O, 1) + " م² = " + fmt(walls, 1) + " م²" +
+      (lenIn === null ? " (الطول متقدّر)" : "") + " · السقف " + fmt(ceil, 1) + " م²" + (ceilIn === null ? " (متقدّر)" : "");
+    $("sumArea").textContent = fmt(total, 2);
+
+    var mat = 0, priced = true, S = [], buy = "";
+    STAGES.forEach(function(s, i){
+      var p = PRODUCTS[$("p" + i).value], coats = +$("c" + i).value, onCeil = $("s" + i).value === "نعم";
+      var price = num($("v" + i));
+      var area = coats === 0 ? 0 : walls + (onCeil ? ceil : 0);
+      var qty = area * coats / p[2] * (1 + waste), packs = up(qty / p[3]);
+      var cost = price === null ? null : packs * price;
+      if (packs > 0 && cost === null) priced = false;
+      mat += cost || 0;
+      var pack = fmt(p[3], 3) + " " + p[1];
+      $("m" + i).textContent = fmt(area, 1) + " م² · " + fmt(qty, 1) + " " + p[1];
+      $("g" + i).textContent = packs ? packs + " × " + pack : "—";
+      $("r" + i).textContent = "معدل الفرد " + fmt(p[2], 2) + " م²/" + p[1] + " للوش" + (p[4] ? " (" + p[4] + ")" : "") + " · العبوة " + pack;
+      if (packs) buy += "<div>" + (i + 1) + ". " + s[0] + "</div><div>" + packs + " × " + pack + "</div>";
+      S.push({name: s[0], prod: p[0], unit: p[1], rate: p[2], coats: coats, area: area, qty: qty, packs: packs, pack: pack, cost: cost});
+    });
+    var lab = labour === null ? 0 : total * labour, grand = mat + lab;
+    var anyPrice = mat > 0 || labour !== null;
+
+    $("kTotal").textContent = anyPrice ? fmt(grand) : "—";
+    $("kTotalL").textContent = anyPrice ? "التكلفة الإجمالية (جنيه)" + (priced ? "" : " · فيه أسعار ناقصة") : "اكتب أسعار العبوات والمصنعية عشان تطلع التكلفة";
+    $("kMat").textContent = mat > 0 ? fmt(mat) : "—";
+    $("kMatL").textContent = "تكلفة الخامات شامل " + fmt(waste * 100, 1) + "% هالك";
+    $("kM2").textContent = anyPrice && total > 0 ? fmt(grand / total, 2) : "—";
+    $("buyList").innerHTML = buy || "<div>للشراء</div><div>—</div>";
+
+    buildReport(S, {flat: flat, H: H, L: L, O: O, walls: walls, ceil: ceil, total: total, waste: waste, labour: labour, lab: lab, mat: mat, grand: grand, anyPrice: anyPrice, est: lenIn === null || ceilIn === null});
+  }
+
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(ch){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]; }); }
+  function buildReport(S, a){
+    var d = new Date(), date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+    var rows = S.map(function(s, i){
+      return "<tr><td class='l'>" + (i + 1) + ". " + esc(s.name) + "</td><td class='l'>" + esc(s.prod) + "</td><td>" + s.coats + "</td><td>" + fmt(s.area, 1) +
+        "</td><td>" + fmt(s.rate, 2) + "</td><td>" + fmt(s.qty, 1) + " " + s.unit + "</td><td class='hi'>" + (s.packs ? s.packs + " × " + esc(s.pack) : "—") +
+        "</td><td>" + (s.cost === null ? "—" : fmt(s.cost)) + "</td></tr>";
+    }).join("");
+    $("report").innerHTML =
+      "<div class='r-head'><div><h1>تقرير كميات وتكلفة الدهانات</h1><p>حاسبة كميات وتكلفة الدهانات · " + date + "</p></div>" +
+      "<div class='r-brand'>Eng/ Mostafa Elgindi<br>Gindi Innovations</div></div>" +
+      "<div class='r-kpis'><div><b>" + (a.anyPrice ? fmt(a.grand) : "—") + "</b><span>التكلفة الإجمالية (جنيه)</span></div>" +
+      "<div><b>" + fmt(a.total, 1) + "</b><span>صافي المساحة الكلية (م²)</span></div>" +
+      "<div><b>" + (a.mat > 0 ? fmt(a.mat) : "—") + "</b><span>تكلفة الخامات (جنيه)</span></div>" +
+      "<div><b>" + (a.labour === null ? "—" : fmt(a.lab)) + "</b><span>المصنعية (جنيه)</span></div></div>" +
+      "<p class='r-note'>مساحة الشقة " + fmt(a.flat, 1) + " م² · الحوائط " + fmt(a.L, 1) + " م × " + fmt(a.H, 2) + " م − فتحات " + fmt(a.O, 1) + " م² = " + fmt(a.walls, 1) +
+      " م² · السقف " + fmt(a.ceil, 1) + " م² · الهالك " + fmt(a.waste * 100, 1) + "%" + (a.labour === null ? "" : " · المصنعية " + fmt(a.labour, 2) + " ج/م²") +
+      (a.est ? " · (فيه مقاسات متقدّرة من مساحة الشقة)" : "") + "</p>" +
+      "<h2>الكميات لكل مرحلة</h2><table><thead><tr><th>المرحلة</th><th>الخامة</th><th>الأوجه</th><th>المساحة (م²)</th><th>معدل الفرد</th><th>الكمية</th><th>للشراء</th><th>التكلفة (ج)</th></tr></thead><tbody>" + rows +
+      "</tbody><tfoot><tr><td>إجمالي الخامات</td><td></td><td></td><td></td><td></td><td></td><td></td><td class='hi'>" + (a.mat > 0 ? fmt(a.mat) : "—") + "</td></tr></tfoot></table>" +
+      "<p class='r-note'>الكمية = مساحة المرحلة × عدد الأوجه ÷ معدل الفرد × (1 + الهالك)، والعبوات متقرّبة لأعلى. المعدلات من بيانات GLC وJotun الرسمية.</p>" +
+      "<p class='r-warn'>الحسبة تقديرية وبتتغير حسب حالة المحارة وامتصاصها وطريقة التنفيذ، ولازم يعتمدها مهندس مختص.</p>" +
+      "<p class='r-foot'>إعداد: Eng/ Mostafa Elgindi | Gindi Innovations</p>";
+  }
+
+  $("pdfBtn").addEventListener("click", function(){ calc(); window.print(); });
+  document.addEventListener("input", calc);
+  document.addEventListener("change", calc);
+  calc();
+})();
+</script>
+</body>
+</html>

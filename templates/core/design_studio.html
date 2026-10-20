@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% comment %}
+GINDI Design Studio (/design-studio/, /ar/design-studio/): three styles,
+each one fixed concept image whose upholstery, stone and wood change in
+place (static/studio/compositor.js), with its own configuration panel
+(static/studio/studio-page.js). One image is shown at a time; the style
+cards switch it and each style keeps its own selections. The catalogue and
+the "Discover your style" questions come from apps/core/studio.py. The
+options are rendered here, so the selections, summary and enquiry work even
+where the previews cannot be shown. Styles: css/design-studio.css.
+{% endcomment %}
+{% load static %}
+
+{% block title %}{{ c.studio_page.meta_title }}{% endblock %}
+{% block description %}{{ c.studio_page.meta_description }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/design-studio.css' %}">
+  {# three.js r169 (vendored, MIT) and the studio modules, by bare name: the export may rename files. #}
+  {# The compositor by bare name: the export may rename files. #}
+  <script type="importmap">{"imports": {"gindi/compositor": "{% static 'studio/compositor.js' %}"}}</script>
+  <script type="module" src="{% static 'studio/studio-page.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  {% with t=c.studio_page %}
+  <main id="main" class="ds" tabindex="-1">
+    <section class="ds-head theme-light" id="top" aria-labelledby="ds-title">
+      <div class="container ds-container ds-head__grid">
+        <div>
+          <p class="ds-eyebrow label"><span class="keystone" aria-hidden="true"></span>{{ t.eyebrow }}</p>
+          <h1 class="ds-title" id="ds-title">{{ t.title }}</h1>
+          <p class="ds-lead">{{ t.lead }}</p>
+        </div>
+        {# The optional guide: five visual questions, then a suggested style (scoring: studio.QUIZ). #}
+        <div class="ds-invite" data-ds-invite hidden>
+          <p class="ds-invite__text"><strong>{{ t.invite }}</strong> {{ t.invite_text }}</p>
+          <button class="ds-btn-outline" type="button" data-ds-quiz-open>{{ t.invite_cta }}
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    {# ---------- The three styles ---------- #}
+    <section class="ds-styles theme-light" aria-labelledby="ds-styles-title">
+      <div class="container ds-container">
+        <div class="ds-styles__head">
+          <h2 class="ds-styles__title" id="ds-styles-title">{{ t.styles_title }}</h2>
+          <p class="ds-styles__lead">{{ t.styles_lead }}</p>
+        </div>
+        <ul class="ds-cards" role="list">
+          {% for style in styles %}
+            <li class="ds-card{% if forloop.first %} is-current{% endif %}" data-ds-card="{{ style.id }}">
+              <img class="ds-card__img" src="{{ style.preview }}" width="1002" height="626" alt="" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async">
+              <div class="ds-card__body">
+                <h3 class="ds-card__name">{{ style.name }}</h3>
+                <p class="ds-card__text">{{ style.text }}</p>
+                <a class="ds-card__cta" href="?style={{ style.id }}#studio" data-ds-choose="{{ style.id }}" aria-describedby="ds-card-current-{{ style.id }}">
+                  <span>{{ t.customize }}</span>
+                  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                </a>
+                <span class="ds-card__current" id="ds-card-current-{{ style.id }}" data-ds-card-current{% if not forloop.first %} hidden{% endif %}>{{ t.current }}</span>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    {% if styles %}
+    <section class="ds-studio theme-light" id="studio" tabindex="-1" aria-label="{{ t.eyebrow }}" data-ds>
+      <div class="container ds-container ds-grid">
+        {# ---------- The image (one, shared by the styles; its own proportions) ---------- #}
+        {% with first=styles.0 %}
+        <div class="ds-stage">
+          <div class="ds-viewport" data-ds-viewport style="aspect-ratio: {{ first.room.width }} / {{ first.room.height }}">
+            <img class="ds-photo" src="{{ first.room.photo }}" width="{{ first.room.width }}" height="{{ first.room.height }}" alt="" data-ds-photo>
+            <canvas class="ds-canvas" role="img" aria-label="" data-ds-canvas hidden></canvas>
+          </div>
+          <p class="ds-error" data-ds-error hidden>{{ t.error }}</p>
+          <div class="ds-stage__bar">
+            <button class="ds-link ds-fullview" type="button" data-ds-full hidden>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+              {{ t.full_view }}</button>
+          </div>
+          <p class="ds-note">{{ t.note }} <span class="ds-sources">{{ t.sources }}</span></p>
+        </div>
+        {% endwith %}
+
+        {# ---------- The configuration: one panel per style ---------- #}
+        {% for style in styles %}
+        <div class="ds-panel" data-ds-panel="{{ style.id }}"{% if not forloop.first %} hidden{% endif %}>
+          <p class="label ds-panel__label">{{ t.style }}</p>
+          <h2 class="ds-style" id="ds-style-name-{{ style.id }}">{{ style.name }}</h2>
+          <p class="ds-style__text">{{ style.text }}</p>
+
+          <div class="ds-presets">
+            <h3 class="label ds-subhead" id="ds-presets-title-{{ style.id }}">{{ t.presets }}</h3>
+            <div class="ds-presets__list" role="group" aria-labelledby="ds-presets-title-{{ style.id }}">
+              {% for p in style.presets %}
+                <button class="ds-preset" type="button" aria-pressed="{% if p.id == style.default_preset %}true{% else %}false{% endif %}" data-ds-preset="{{ p.id }}">{{ p.name }}</button>
+              {% endfor %}
+            </div>
+            <p class="ds-custom" data-ds-custom hidden>{{ t.custom }}</p>
+          </div>
+
+          {% for ctl in style.controls %}
+            <div class="ds-group" data-ds-group="{{ ctl.slot }}">
+              <h3 class="ds-group__title" id="ds-group-{{ ctl.slot }}-{{ style.id }}">{{ ctl.label }} <span>{{ ctl.surfaces }}</span></h3>
+              <div class="ds-options" role="radiogroup" aria-labelledby="ds-group-{{ ctl.slot }}-{{ style.id }}">
+                {% for m in ctl.options %}
+                  <button class="ds-option" type="button" role="radio" aria-checked="false" tabindex="-1"
+                          data-ds-option data-slot="{{ ctl.slot }}" data-id="{{ m.id }}">
+                    <img src="{{ m.swatch }}" width="240" height="240" alt="" loading="lazy" decoding="async">
+                    <span class="ds-option__name">{{ m.name }}</span>
+                  </button>
+                {% endfor %}
+              </div>
+              <p class="ds-group__current" data-ds-current="{{ ctl.slot }}"></p>
+            </div>
+          {% endfor %}
+
+          <div class="ds-summary">
+            <h3 class="label ds-subhead">{{ t.summary }}</h3>
+            <dl class="ds-summary__list">
+              {% for ctl in style.controls %}
+                <div><dt>{{ ctl.label }}</dt><dd data-ds-summary="{{ ctl.slot }}"></dd></div>
+              {% endfor %}
+              <div><dt>{{ t.reference }}</dt><dd class="num" dir="ltr" data-ds-ref></dd></div>
+            </dl>
+            <div class="ds-actions">
+              <a class="btn btn--primary ds-discuss" href="{{ studio_data.contact_url }}" data-ds-discuss>{{ t.discuss }}
+                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a>
+              <button class="ds-btn-outline ds-save" type="button" data-ds-save hidden>
+                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                {{ t.save }}</button>
+              <div class="ds-actions__row">
+                <button class="ds-link" type="button" data-ds-share>{{ t.share }}</button>
+                <button class="ds-link" type="button" data-ds-reset>{{ t.reset }}</button>
+              </div>
+            </div>
+            <p class="ds-status" role="status" aria-live="polite" data-ds-status></p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {# ---------- The image at full size (scrolls on small screens) ---------- #}
+    <dialog class="ds-full theme-dark" aria-label="{{ t.full_view }}" data-ds-full-dialog>
+      <button class="ds-full__close" type="button" data-ds-full-close aria-label="{{ t.close }}">
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+      <div class="ds-full__scroll"><img class="ds-full__img" alt="" data-ds-full-img></div>
+    </dialog>
+
+    {# ---------- Discover your style (filled by studio-page.js) ---------- #}
+    <dialog class="ds-quiz theme-light" aria-labelledby="ds-quiz-title" data-ds-quiz>
+      <div class="ds-quiz__inner">
+        <div class="ds-quiz__top">
+          <p class="label ds-quiz__title" id="ds-quiz-title">{{ t.quiz.title }}</p>
+          <button class="ds-quiz__close" type="button" data-ds-quiz-close aria-label="{{ t.quiz.close }}">
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          </button>
+        </div>
+        <div class="ds-quiz__body" data-ds-quiz-body></div>
+      </div>
+    </dialog>
+  </main>
+  {% endwith %}
+
+  {{ studio_data|json_script:"studio-data" }}
+  {% include "partials/footer.html" %}
+{% endblock %}

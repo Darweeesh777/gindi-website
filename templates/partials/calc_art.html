@@ -1,0 +1,46 @@
+{% comment %}
+Faint background drawing for a calculator's workspace (decorative; opacity in
+css/calculator.css, about 5%). It shows only in the space around the white
+panels. Parameter: slug (wire, tiles, bricks, paint).
+{% endcomment %}
+<svg class="calc-art" aria-hidden="true" focusable="false" width="100%" height="100%">
+  <defs>
+    {% if slug == "bricks" %}
+      {# Staggered masonry courses with mortar joints. #}
+      <pattern id="calc-art-p" width="132" height="56" patternUnits="userSpaceOnUse">
+        <path d="M0 0.5H132M0 28.5H132M0.5 0V28M66.5 0V28M33.5 28V56M99.5 28V56"/>
+        <path d="M0 4H132M0 32H132" opacity=".35"/>
+      </pattern>
+    {% elif slug == "tiles" %}
+      {# Tiles with joints, and now and then a dimension mark along an edge. #}
+      <pattern id="calc-art-p" width="300" height="300" patternUnits="userSpaceOnUse">
+        <path d="M0 0.5H300M0 3.5H300M0 150.5H300M0 153.5H300M0.5 0V300M3.5 0V300M150.5 0V300M153.5 0V300"/>
+        <path d="M14 172H140M14 167V177M140 167V177M70 169l-4 3 4 3M84 169l4 3-4 3" opacity=".8"/>
+        <path d="M172 14V140M167 14H177M167 140H177" opacity=".8"/>
+        <path d="M200 210l50 50M215 200l45 45" opacity=".4"/>
+      </pattern>
+    {% elif slug == "wire" %}
+      {# Wiring runs with rounded turns, a cable curve, junctions and a switch symbol. #}
+      <pattern id="calc-art-p" width="420" height="300" patternUnits="userSpaceOnUse">
+        <path d="M0 60H120q20 0 20 20V180q0 20 20 20H300q20 0 20-20V60q0-20 20-20H420"/>
+        <path d="M0 66H116q18 0 18 18V176" opacity=".5"/>
+        <path d="M60 300C80 240 150 250 190 270S290 300 320 240"/>
+        <circle cx="140" cy="130" r="5"/><circle cx="320" cy="120" r="5"/><circle cx="230" cy="200" r="5"/>
+        <path d="M230 200V250M222 250h16M225 256h10M228 262h4"/>
+        <path d="M30 150h30l24-14M84 150h26"/><circle cx="60" cy="150" r="3"/><circle cx="84" cy="150" r="3"/>
+      </pattern>
+    {% elif slug == "paint" %}
+      {# Overlapping coats and the outlines of roller strokes. #}
+      <pattern id="calc-art-p" width="440" height="320" patternUnits="userSpaceOnUse">
+        <rect x="30" y="40" width="170" height="110" rx="10"/>
+        <rect x="70" y="72" width="170" height="110" rx="10" opacity=".7"/>
+        <rect x="110" y="104" width="170" height="110" rx="10" opacity=".45"/>
+        <path d="M250 250c40-30 80 30 120 0s80 30 120 0M250 280c40-30 80 30 120 0s80 30 120 0" opacity=".7"/>
+        <rect x="300" y="40" width="96" height="30" rx="15"/>
+        <path d="M396 55h14v34h-58v26M352 115v55"/>
+        <path d="M0 250c40-30 80 30 120 0" opacity=".5"/>
+      </pattern>
+    {% endif %}
+  </defs>
+  <rect width="100%" height="100%" fill="url(#calc-art-p)"/>
+</svg>

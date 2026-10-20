@@ -53,7 +53,7 @@ class HomepageTests(SimpleTestCase):
         for name, label in (('core:home', 'Illustrative image'), ('core:home_ar', 'صورة توضيحية')):
             html = self.get(name)
             self.assertIn('<source media="(orientation: portrait)"', html)
-            self.assertEqual(html.count('class="media__tag"'), 4)  # projects 02-04 (01 is real) + about
+            self.assertEqual(html.count('class="media__tag"'), 3)  # projects 03-04 (01 and 02 are real) + about
             self.assertIn(label, html)
             self.assertNotIn('{#', html)  # no template comments leaking into the page
 
@@ -233,14 +233,35 @@ class HomepageTests(SimpleTestCase):
         with mock.patch.object(projects, 'PROJECTS', [long_name] + projects.PROJECTS[1:]):
             html = self.get('core:home')
         self.assertIn('class="featured__name featured__name--long">Residence at the Garden Courtyard, Phase II<', html)
-        self.assertIn('class="featured__name">Project 02<', html)
+        self.assertIn('class="featured__name">Project 03<', html)
 
     def test_projects_page(self):
         from .projects import PROJECTS
 
-        for name, prefix, title in (('core:projects', '', 'Spaces &amp; Stories'), ('core:projects_ar', '/ar', 'مساحات وحكايات')):
+        for name, prefix, title in (('core:projects', '', 'Every space begins with a vision.'), ('core:projects_ar', '/ar', 'كل مساحة تبدأ برؤية.')):
             html = self.get(name)
-            self.assertIn(f'>{title}</h1>', html)
+            # The Gindi Gate: the entrance, its headline, and the way on to the projects.
+            self.assertIn(f'id="pgate-title">{title}</h1>', html)
+            self.assertIn('data-gate', html)
+            self.assertIn('href="#projects-list" data-gate-go', html)
+            self.assertIn('id="projects-list"', html)
+            self.assertIn('js/projects-gate.js', html)
+            self.assertNotIn('<img', html[html.index('data-gate'):html.index('id="projects-list"')])  # no photos in the gate
+            # The open gate's introduction: the approved copy, no figures or credentials.
+            intro = html[html.index('class="pgate__intro"'):html.index('class="pgate__cue"')]
+            copy = (('Behind every detail', 'From vision to spaces you can experience.',
+                     'Explore projects brought to life by Eng. Mostafa Elgindi and his team, where thoughtful planning, '
+                     'coordinated execution, and attention to detail come together.',
+                     'Eng. Mostafa Elgindi &amp; the Gindi Innovations team', 'Explore the projects') if prefix == '' else
+                    ('وراء كل تفصيلة', 'من رؤية إلى مساحات تعيشها.',
+                     'اكتشف مشروعات نفّذها المهندس مصطفى الجندي وفريقه، يجتمع فيها التخطيط المدروس وتكامل التنفيذ والاهتمام بالتفاصيل.',
+                     'المهندس مصطفى الجندي وفريق جندي إنوفيشنز', 'استكشف المشروعات'))
+            for text in copy:
+                self.assertIn(text, intro)
+            self.assertIn('id="pgate-intro-title"', intro)
+            self.assertIn('href="#projects-list" data-gate-go', intro)
+            self.assertIn('Scroll down to discover' if prefix == '' else 'مرّر لأسفل لاكتشاف المشروعات', html)
+            self.assertNotRegex(re.sub(r'<[^>]+>', '', intro), r'\d')  # no counts, years or other figures in the text
             for number, project in enumerate(PROJECTS, start=1):
                 slug = project['slug']
                 # The anchor the homepage links to, and the link on to the project page.
@@ -273,8 +294,8 @@ class HomepageTests(SimpleTestCase):
             html = response.content.decode()
             self.assertIn(f'href="/projects/#{project["slug"]}"', html)  # Back to Projects
             self.assertIn('Back to Projects', html)
-            if project['interactive']:
-                continue  # KK Barbershop: test_interactive_project_page
+            if project['interactive'] or project['layout']:
+                continue  # KK Barbershop and the villa have their own tests
             self.assertIn(f'id="project-title" data-reveal>{project["name"]}</h1>', html)
             self.assertEqual(html.count('data-lightbox-open='), len(project['photos']))
             self.assertEqual(html.count('Photo to be added'), sum(1 for m in project['media'] if m['kind'] == 'placeholder'))
@@ -285,6 +306,54 @@ class HomepageTests(SimpleTestCase):
         self.assertEqual(self.client.get('/ar/projects/project-1/').status_code, 200)
         self.assertEqual(self.client.get('/projects/no-such-project/').status_code, 404)
         self.assertEqual(len(PROJECTS), len({p['slug'] for p in PROJECTS}))
+
+    def test_villa_follow_the_light_page(self):
+        import os
+
+        from .images import IMAGES
+        from .projects import PROJECTS, get
+
+        villa = PROJECTS[1]
+        self.assertEqual(villa['slug'], 'project-2')  # the existing route
+        # Every photograph in the folder, once, in the carousel; the originals stay where they are.
+        folder = 'static/images/Villa ( pictures )'
+        files = sorted(f[:8].lower() for f in os.listdir(folder) if f.lower().endswith('.png'))
+        keys = [item['image'] for item in villa['media']]
+        self.assertEqual(sorted(k[len('villa-'):] for k in keys), files)
+        self.assertEqual(len(keys), 30)
+        self.assertTrue(all(IMAGES[k]['illustrative'] is False for k in keys))
+        moments = [m['image'] for m in villa['moments']]
+        self.assertEqual(moments, ['villa-4e987bed', 'villa-63aed22b', 'villa-a32d2d56', 'villa-6cc5e965', 'villa-3e7ab2b8'])
+        groups = [g for g, _ in villa['groups']]
+        self.assertEqual(groups, ['entrance', 'kitchen', 'stairs', 'doors', 'bathrooms', 'terrace'])
+        for lang, prefix, title, explore in (('en', '', 'Follow the light.', 'Explore the Villa'),
+                                             ('ar', '/ar', 'اتبع الضوء.', 'استكشف تفاصيل الفيلا')):
+            response = self.client.get(f'{prefix}/projects/project-2/')
+            self.assertEqual(response.status_code, 200)
+            html = response.content.decode()
+            self.assertIn('<title>villa-New El Sheikh Zayed City — ', html)
+            self.assertIn('<p class="villa-hero__name">villa-New El Sheikh Zayed City</p>', html)
+            self.assertIn(f'id="villa-title">{title}</h1>', html)
+            self.assertIn(f'id="explore-title">{explore}</h2>', html)
+            self.assertIn('href="#villa-moments-2"', html)  # Explore the villa: the second section
+            self.assertIn('id="villa-moments-2"', html)
+            self.assertEqual(html.count('data-moment>'), 5)
+            self.assertEqual(html.count('class="villa-pair"'), 2)
+            self.assertEqual(html.count('data-lightbox-item='), 30)
+            self.assertEqual(html.count('class="explore__sep"'), 6)
+            self.assertIn('js/project-light.js', html)
+            self.assertNotIn('#}', html)  # no template comment leaking
+            # The approved copy.
+            self.assertIn('A cascade of illuminated pendants draws the eye' if lang == 'en' else 'تمتد وحدات الإضاءة المعلّقة', html)
+            self.assertIn('The Terrace' if lang == 'en' else 'التراس', html)
+        # Listing card and homepage: the villa's own photographs, no "illustrative" label.
+        card = get('project-2', 'en')
+        self.assertEqual(card['image']['src'].split('?')[0], '/static/images/site/villa-4e987bed-945.webp')
+        self.assertFalse(card['image']['illustrative'])
+        index = self.client.get('/projects/').content.decode()
+        entry = index[index.index('id="project-2"'):index.index('id="project-3"')]
+        self.assertIn('villa-New El Sheikh Zayed City', entry)
+        self.assertIn('+27', entry)
 
     def test_interactive_project_page(self):
         from .images import IMAGES
@@ -323,7 +392,26 @@ class HomepageTests(SimpleTestCase):
             self.assertIn('data-pg-step="-1"', concept)
             self.assertIn('<span data-pg-count>01</span> / 06', concept)
             self.assertFalse(any(r in completed for r in renders))
-            self.assertNotIn('kk-img-', concept)
+            self.assertNotIn('kk-img-', concept.split('id="pv-compare"')[0])
+            # "From Vision to Reality": below the gallery, above the closing call to action, with
+            # exactly the homepage's KK pair, and none of the homepage's project switching.
+            self.assertLess(html.index('id="pg-concept"'), html.index('id="pv-compare"'))
+            self.assertLess(html.index('id="pv-compare"'), html.index('id="contact"'))
+            section = html[html.index('id="pv-compare"'):html.index('</section>', html.index('id="pv-compare"'))]
+            home = self.client.get(f'{prefix}/').content.decode()
+            home_slide = home[home.index('id="vision-kk-barbershop"'):home.index('</div>', home.index('compare__layer--design'))]
+            for layer in ('reality', 'design'):
+                src = re.search(rf'compare__layer--{layer}">\s*<img src="([^"]+)"', home_slide).group(1)
+                self.assertIn(f'src="{src}"', section)
+            self.assertLess(section.index('compare__layer--reality'), section.index('compare__layer--design'))
+            self.assertEqual(section.count('role="slider"'), 1)
+            self.assertIn('aria-valuenow="50"', section)
+            for absent in ('data-vision-nav', 'data-vision-dot', 'data-vision-slide', 'vision-nav'):
+                self.assertNotIn(absent, section)
+            self.assertIn('js/compare-slider.js', html)
+            ids = re.findall(r'\sid="([^"]+)"', html)
+            self.assertEqual(len(ids), len(set(ids)), [i for i in ids if ids.count(i) > 1])
+            self.assertNotIn('pv-compare', self.client.get(f'{prefix}/projects/project-2/').content.decode())
             self.assertNotIn('media__tag', html)
             self.assertNotIn('tile--placeholder', html)
             # The Projects page entry: the real name, three real photos, the neutral line.
@@ -411,11 +499,18 @@ class HomepageTests(SimpleTestCase):
                 self.assertIn(f'aria-haspopup="dialog" data-enquire="{slug}"', card)
                 self.assertIn('class="sp-card__list"', card)  # verified deliverables kept
                 self.assertNotIn('keystone"></span>', card)  # no badge beside the number
-            # Free planning tools: each to its own localized page, "Coming soon" while not connected.
+            # Free planning tools: each opens its working calculator, in this language.
             tools = html[html.index('class="sp-tools'):html.index('class="footer-cta')]
-            for slug in ('wire', 'tiles', 'bricks', 'cement'):
-                self.assertIn(f'<a class="sp-tool__link" href="{prefix}/free-tools/{slug}/">', tools)
-            self.assertEqual(tools.count('class="sp-tool__status"'), 4)
+            self.assertIn('id="free-tools"', tools)  # the calculators' "back" links land here
+            start = 'Start calculating' if prefix == '' else 'ابدأ الحساب'
+            for slug in ('wire', 'tiles', 'bricks', 'paint'):
+                self.assertIn(f'<a class="sp-tool__link" href="{prefix}/free-tools/{slug}/">{start}', tools)
+            self.assertEqual(tools.count('class="sp-tool__link"'), 4)
+            self.assertNotIn('sp-tool__status', tools)
+            self.assertNotIn('Coming soon', tools)
+            self.assertNotIn('قريبًا', tools)
+            self.assertNotIn('cement', tools)
+            self.assertIn('Paint Quantity &amp; Cost Calculator' if prefix == '' else 'حاسبة كميات وتكلفة الدهانات', tools)
             self.assertEqual(tools.count('class="sp-tool__icon"'), 4)
             self.assertIn('class="sp-tools__mark"', tools)  # the monogram watermark, decorative
             # Get Quotation opens the existing quotation form.
@@ -516,44 +611,130 @@ class HomepageTests(SimpleTestCase):
         self.assertIn('تواصل معنا عبر واتساب', ar)
 
     def test_free_tools(self):
-        from django.test import override_settings
-
         from .tools import TOOLS
 
         slugs = [tool['slug'] for tool in TOOLS]
-        self.assertEqual(slugs, ['wire', 'tiles', 'bricks', 'cement'])
+        self.assertEqual(slugs, ['wire', 'tiles', 'bricks', 'paint'])
         for name, prefix in (('core:free_tools', ''), ('core:free_tools_ar', '/ar')):
             html = self.get(name)
-            self.assertEqual(html.count('class="tool-card__status label"'), 4)  # all coming soon
-            self.assertNotIn('tool-card__cta', html)  # ...so no "Start Free Estimate" button
+            # Every card starts its calculator; nothing is "coming soon".
+            self.assertEqual(html.count('tool-card__cta'), 4)
+            for slug in slugs:
+                self.assertIn(f'class="btn btn--primary tool-card__cta" href="{prefix}/free-tools/{slug}/"', html)
+            self.assertNotIn('tool-card__status', html)
             self.assertIn(f'href="{prefix}/services/" aria-current="true"', html)
-            self.assertNotIn('<input', html[html.index('<main'):html.index('</main>')])
-        for slug in slugs:
-            for prefix in ('', '/ar'):
+        self.assertEqual(self.client.get('/free-tools/no-such-tool/').status_code, 404)
+
+    def test_calculator_pages(self):
+        # Titles and introductions as approved; each page loads its own calculator.
+        expected = {
+            'wire': (('Electrical Wire Calculator', 'Estimate wire lengths, the number of rolls and the cost from your project’s details.'),
+                     ('حاسبة كميات أسلاك الكهرباء', 'قدّر أطوال الأسلاك وعدد اللفات والتكلفة وفق بيانات مشروعك.')),
+            'tiles': (('Tile &amp; Ceramic Calculator', 'Calculate what your floors, walls and skirting need, with waste and a purchase breakdown.'),
+                      ('حاسبة السيراميك والبلاط', 'احسب احتياجات الأرضيات والحوائط والوزرات، مع الهالك وتفاصيل الشراء.')),
+            'bricks': (('Brick Quantity &amp; Cost Calculator', 'Plan quantities and cost before the work begins.'),
+                       ('حاسبة كميات وتكلفة الطوب', 'خطّط للكميات والتكلفة قبل التنفيذ.')),
+            'paint': (('Paint Quantity &amp; Cost Calculator', 'Estimate the quantities for each painting stage, the number of packs and the cost, '
+                       'from the area and the products you choose.'),
+                      ('حاسبة كميات وتكلفة الدهانات', 'قدّر كميات مراحل الدهان وعدد العبوات والتكلفة حسب المساحة والمنتجات المختارة.')),
+        }
+        for slug, langs in expected.items():
+            for (title, intro), prefix in zip(langs, ('', '/ar')):
                 response = self.client.get(f'{prefix}/free-tools/{slug}/')
                 self.assertEqual(response.status_code, 200)
                 html = response.content.decode()
-                # Its own integration area, "Coming soon", nothing calculated, no agent loaded.
-                self.assertIn(f'id="tool-{slug}" aria-live="polite" data-tool-root="{slug}"', html)
-                self.assertIn('data-tool-placeholder', html)
-                self.assertIn(f'href="{prefix}/free-tools/"', html)  # back to Free Tools
-                self.assertNotIn('data-tool-script', html)
-                main = html[html.index('<main'):html.index('</main>')]  # the quotation form is in the shared page end
-                self.assertNotIn('<input', main)
-                self.assertNotIn('<form', main)
-        self.assertIn('Coming soon', self.client.get('/free-tools/tiles/').content.decode())
-        self.assertEqual(self.client.get('/free-tools/no-such-tool/').status_code, 404)
-        # Each agent is independent: connecting one loads only that one.
-        with override_settings(FREE_TOOL_SCRIPTS={'tiles': 'https://agents.example.com/tiles.js'}):
-            tiles = self.client.get('/free-tools/tiles/').content.decode()
-            wire = self.client.get('/free-tools/wire/').content.decode()
-            overview = self.get('core:free_tools')
-        self.assertIn('<script src="https://agents.example.com/tiles.js" defer data-tool-script="tiles"></script>', tiles)
-        self.assertNotIn('data-tool-script', wire)
-        self.assertEqual(overview.count('class="tool-card__status label"'), 3)
-        # Only the connected tool's card offers to start it.
-        self.assertEqual(overview.count('tool-card__cta'), 1)
-        self.assertIn('class="btn btn--primary tool-card__cta" href="/free-tools/tiles/"', overview)
+                self.assertIn(f'id="tool-title">{title}</h1>', html)
+                self.assertIn(f'<p class="calc-hero__lead">{intro}</p>', html)
+                self.assertRegex(html, rf'<div class="calc" data-calc="{slug}" data-logo="/static/images/brand/gindi-logo\.png[^"]*">')
+                for script in ('calc-ui', f'{slug}-calc', slug):
+                    self.assertRegex(html, rf'<script src="/static/js/tools/{script}\.js[^"]*" defer></script>')
+                self.assertIn('css/calculator.css', html)
+                self.assertIn('<section class="calc-report" id="report" aria-hidden="true"></section>', html)
+                self.assertIn(f'href="{prefix}/services/#free-tools"', html)  # back to the planning tools
+                self.assertIn('<svg class="calc-art"', html)  # the tool's faint drawing
+                self.assertIn('<noscript>', html)
+                self.assertNotIn('<iframe', html)
+                for soon in ('Coming soon', 'قريبًا', 'data-tool-placeholder'):
+                    self.assertNotIn(soon, html)
+        # The cement page was replaced by the paint calculator.
+        for prefix in ('', '/ar'):
+            response = self.client.get(f'{prefix}/free-tools/cement/')
+            self.assertEqual((response.status_code, response['Location']), (302, f'{prefix}/free-tools/'))
+
+    def test_calculator_originals_and_their_logic(self):
+        # The originals stay as they are; the modules carry their data and formulas word for word.
+        # (Every figure on the pages is compared with the originals by tools/calc-tests/run.py.)
+        import hashlib
+        import os
+
+        from django.conf import settings
+
+        tools_dir = os.path.join(settings.BASE_DIR, 'static', 'Tools')
+        js_dir = os.path.join(settings.BASE_DIR, 'static', 'js', 'tools')
+        originals = {
+            'bricks': ('brick-calculator.txt', '1216817fa653fef11df590c00dd777cf', ('var BRICKS = [', 'var THICK')),
+            'tiles': ('ceramic-calculator.txt', '49abfc48fe02596ca6198cc697bd7d4e', ('var TYPES = [', 'var $ =')),
+            'wire': ('wire-calculator.txt', '6fa41a02581895acef5125d2efa19d91', ('var TYPES = [', 'var $ =')),
+            'paint': ('paint-calculator.txt', '5a33720980b4a1b77a9655b8c13e6e0f', ('var PRODUCTS = [', 'var BRANDS')),
+        }
+        # Lines of each original's calc() that must appear unchanged in its module.
+        formulas = {
+            'bricks': ['var half = 10000 / ((b[1] + j) * (b[3] + j)), full = 10000 / ((b[2] + j) * (b[3] + j));',
+                       'var a = Math.max(0, L * H - O);',
+                       'var rate = t === THICK[1] ? full : t === THICK[2] ? half + full : half;',
+                       'var gross = net * (1 + waste), buy = up(gross);',
+                       'var cost = price === null ? null : buy / 1000 * price;'],
+            'tiles': ['var a = L === null || W === null ? 0 : Math.max(0, L * W * n - o);',
+                      'var ctn = function(w){ return t.area + t.sk === 0 || !t.C ? 0 : up((t.area * (1 + w + wX) + t.sk * (1 + w + wX + skX)) / t.C); };',
+                      't.after = t.area * (1 + wAvg + wX) + t.sk * (1 + wAvg + wX + skX);',
+                      't.cost = t.avg && t.P !== null ? t.avg * t.C * t.P : null;',
+                      't.perCtn = t.L && t.W && t.C ? Math.round(t.C / (t.L * t.W / 10000)) : null;',
+                      't.pieces = t.L && t.W ? up(t.after / (((t.L + j / 10) * (t.W + j / 10)) / 10000)) : 0;',
+                      'var all = tot.cost === null ? null : tot.cost + (glueCost || 0);'],
+            'wire': ['var factor = (area === null || !ref) ? 1 : area / ref;',
+                     'var L = bySize[s], D = L * (1 + wavg);',
+                     'var mn = roll ? up(L * (1 - margin) * (1 + wmin) / roll) : 0;',
+                     'var av = roll ? up(D / roll) : 0;',
+                     'var mx = roll ? up(L * (1 + margin) * (1 + wmax) / roll) : 0;'],
+            'paint': ['var O = openIn === null ? 0.125 * L * H : openIn;',
+                      'var walls = Math.max(0, L * H - O);',
+                      'var ceil = ceilIn === null ? 0.93 * flat : ceilIn;',
+                      'var area = coats === 0 ? 0 : walls + (onCeil ? ceil : 0);',
+                      'var qty = area * coats / p[2] * (1 + waste), packs = up(qty / p[3]);',
+                      'var lab = labour === null ? 0 : total * labour, grand = mat + lab;',
+                      'var anyPrice = mat > 0 || labour !== null;'],
+        }
+        for slug, (name, md5, (first, last)) in originals.items():
+            with open(os.path.join(tools_dir, name), 'rb') as f:
+                raw = f.read()
+            self.assertEqual(hashlib.md5(raw).hexdigest(), md5, f'{name} has changed')
+            source = [line.strip() for line in raw.decode('utf-8').splitlines()]
+            with open(os.path.join(js_dir, f'{slug}-calc.js'), encoding='utf-8') as f:
+                module = [line.strip() for line in f.read().splitlines()]
+            start = next(i for i, line in enumerate(source) if line.startswith(first))
+            end = next(i for i in range(start + 1, len(source)) if source[i].startswith(last))
+            data = [line for line in source[start:end] if line]
+            at = module.index(data[0])
+            self.assertEqual(module[at:at + len(data)], data, f'{slug}: data differs from {name}')
+            for line in formulas[slug] + ['var up = function(x){ return Math.ceil(x - 1e-9); }; // ROUNDUP(x,0) for x >= 0']:
+                self.assertIn(line, source, f'{slug}: not in {name}: {line}')
+                self.assertIn(line, module, f'{slug}: not in the module: {line}')
+
+    def test_calculator_regression_in_browser(self):
+        # Opt-in (needs Chrome, takes a few minutes): every scenario on the originals vs the new pages.
+        import os
+        import subprocess
+        import sys
+        import unittest
+
+        if os.environ.get('CALC_BROWSER_TESTS') != '1':
+            raise unittest.SkipTest('set CALC_BROWSER_TESTS=1 to run tools/calc-tests/run.py in headless Chrome')
+        from django.conf import settings
+
+        runner = os.path.join(settings.BASE_DIR, 'tools', 'calc-tests', 'run.py')
+        for mode in ('pure', 'check'):
+            result = subprocess.run([sys.executable, runner, mode], capture_output=True, text=True, encoding='utf-8', errors='replace')
+            self.assertEqual(result.returncode, 0, result.stdout[-3000:] + result.stderr[-2000:])
 
     def test_old_estimate_route_redirects(self):
         response = self.client.get('/free-estimate/')
@@ -570,10 +751,10 @@ class HomepageTests(SimpleTestCase):
             for service in SERVICES:
                 self.assertIn(f'<a class="svc-cell__link" href="{prefix}/services/#{service["slug"]}">', section)
             self.assertIn(f'<a class="svc-panel__more" href="{prefix}/services/">', section)  # Explore services
-            # Free Services: each tool opens its own page, "Coming soon" while not connected.
-            for slug in ('wire', 'tiles', 'bricks', 'cement'):
+            # Free Services: each tool opens its calculator.
+            for slug in ('wire', 'tiles', 'bricks', 'paint'):
                 self.assertIn(f'<a class="svc-cell__link" href="{prefix}/free-tools/{slug}/">', section)
-            self.assertEqual(section.count('class="svc-cell__status"'), 4)
+            self.assertNotIn('svc-cell__status', section)
             self.assertEqual(section.count('class="svc-cell__icon"'), 4)
             self.assertIn(f'<a class="svc-panel__more" href="{prefix}/free-tools/">', section)  # Explore free tools
             header = html[html.index('<header class="site-header'):html.index('</header>')]
@@ -592,16 +773,16 @@ class HomepageTests(SimpleTestCase):
                      'Prepare your space for everyday use.', 'Plan your project', '>Free Services<',
                      'Start with an initial material estimate.', 'Estimate electrical wire quantities.',
                      'Plan tiles for floors and walls.', 'Calculate initial brick quantities.',
-                     'Plan cement quantities for your work.', 'Explore free tools'):
+                     'Estimate paint quantities and cost.', 'Explore free tools'):
             self.assertIn(text, en)
-        # Order: 2D, 3D, Interior Finishing, Fit-Out; then Wire, Tile, Brick, Cement.
+        # Order: 2D, 3D, Interior Finishing, Fit-Out; then Wire, Tile, Brick, Paint.
         self.assertEqual(re.findall(r'<a class="svc-cell__link" href="/services/#[^"]+">([^<]+)<', en),
                          ['2D Design', '3D Design', 'Interior Finishing', 'Fit-Out'])
         self.assertEqual(re.findall(r'<a class="svc-cell__link" href="/free-tools/[^"]+">([^<]+)<', en),
-                         ['Wire Estimator', 'Tile Estimator', 'Brick Estimator', 'Cement Estimator'])
+                         ['Wire Calculator', 'Tile Calculator', 'Brick Calculator', 'Paint Calculator'])
         ar = self.get('core:home_ar')
         for text in ('خدماتنا', 'تصميم مدروس. تنفيذ متكامل.', 'خدمات الاستوديو', 'الخدمات المجانية',
-                     'حاسبة الأسلاك', 'احسب كميات الطوب المبدئية.', 'استكشف الأدوات المجانية'):
+                     'حاسبة الأسلاك', 'احسب كميات الطوب المبدئية.', 'حاسبة الدهانات', 'استكشف الأدوات المجانية'):
             self.assertIn(text, ar)
 
     def test_about_page(self):
@@ -721,9 +902,10 @@ class PublicContentTests(SimpleTestCase):
     """What visitors see by default: no editorial notes, no dummy blocks, honest states."""
 
     PAGES = ['/', '/ar/', '/about/', '/ar/about/', '/services/', '/ar/services/', '/free-tools/', '/ar/free-tools/',
-             *[f'{p}/free-tools/{s}/' for p in ('', '/ar') for s in ('wire', 'tiles', 'bricks', 'cement')]]
+             *[f'{p}/free-tools/{s}/' for p in ('', '/ar') for s in ('wire', 'tiles', 'bricks', 'paint')]]
     # Editing notes and temporary-content annotations, English and Arabic.
-    EDITORIAL = re.compile(r'(?i)placeholder|ph-badge|to be (?:added|confirmed)|temporary|published here|'
+    # (word boundary: "temporary" alone, not inside the style name "Contemporary".)
+    EDITORIAL = re.compile(r'(?i)placeholder|ph-badge|to be (?:added|confirmed)|\btemporary|published here|'
                            r'replace later|sample image|demo content|lorem|'
                            r'محتوى مؤقت|قيد التأكيد|ستُضاف|سيُضاف|مؤقتة|ستُنشر|لاحقًا')
 
@@ -784,9 +966,12 @@ class PublicContentTests(SimpleTestCase):
         self.assertRegex(services, r'class="btn btn--primary enquiry-form__send" type="submit" disabled')
         self.assertNotIn('data-whatsapp', services)
         self.assertIn('إرسال الاستفسارات عبر الموقع غير متاح بعد', self.client.get('/ar/services/').content.decode())
-        tool = self.client.get('/free-tools/tiles/').content.decode()
-        self.assertIn('Coming soon', tool)
-        self.assertNotIn('data-tool-script', tool)
+        # The calculators work, so none of them says "Coming soon" any more.
+        for prefix in ('', '/ar'):
+            for slug in ('wire', 'tiles', 'bricks', 'paint'):
+                tool = self.client.get(f'{prefix}/free-tools/{slug}/').content.decode()
+                self.assertNotIn('Coming soon', tool)
+                self.assertNotIn('قريبًا', tool)
 
     def test_generated_images_keep_their_disclosure(self):
         html = self.client.get('/').content.decode()
@@ -797,14 +982,142 @@ class PublicContentTests(SimpleTestCase):
         self.assertIn('صورة توضيحية', self.client.get('/ar/').content.decode())
 
 
+class DesignStudioTests(SimpleTestCase):
+    """GINDI Design Studio: the catalogue (apps/core/studio.py), the guide's scoring and the page."""
+
+    def test_catalogue_is_complete_and_valid(self):
+        import itertools
+        import os
+
+        from django.conf import settings
+
+        from . import studio
+        self.assertEqual(studio.validate(), [])
+        styles = studio.available_styles()
+        self.assertEqual([s['id'] for s in styles], ['classic', 'modern', 'organic_modern'])
+        self.assertEqual([s['name']['ar'] for s in styles], ['كلاسيك', 'مودرن', 'مودرن عضوي'])
+        combinations = set()
+        for s in styles:
+            room = os.path.join(settings.BASE_DIR, 'static', 'studio', 'rooms', s['id'])
+            for f in studio.ROOM_FILES:
+                self.assertTrue(os.path.isfile(os.path.join(room, f)), (s['id'], f))
+            default = next(p for p in s['presets'] if p['id'] == s['default_preset'])
+            for slot in studio.SLOTS:
+                options = s['materials'][slot]
+                self.assertEqual(len(options), 4, (s['id'], slot))
+                self.assertTrue(options[0].get('original'), (s['id'], slot))  # the default is the image as supplied
+                self.assertEqual(default[slot], options[0]['id'])
+                for m in options[1:]:
+                    if slot == 'stone':
+                        self.assertTrue(m.get('scan'), m['id'])  # a real scan, not a tint
+            for u, st, w in itertools.product(*(s['materials'][slot] for slot in studio.SLOTS)):
+                combinations.add((s['id'], u['id'], st['id'], w['id']))
+            self.assertEqual(len([c for c in combinations if c[0] == s['id']]), studio.combinations(s))
+            # Every control is named and in display order, once.
+            self.assertEqual(sorted(c[0] for c in s['controls']), sorted(studio.SLOTS))
+        self.assertEqual(len(combinations), sum(studio.combinations(s) for s in styles))
+        self.assertEqual(len(combinations), 192)  # three controls with four options in each style
+        by_id = {s['id']: s for s in styles}
+        # Classic: sofa and armchairs keep their two-tone patterns (ground and motif colours per zone);
+        # the third control is the gilded "Furniture finish", with metal finishes and one wood tone.
+        classic = by_id['classic']
+        self.assertEqual(len(classic['render']['upholstery']['zones']), 2)
+        self.assertTrue(all(len(m['colors']) == 2 and all(len(c) == 2 for c in m['colors']) for m in classic['materials']['upholstery'][1:]))
+        self.assertEqual(dict((c[0], c[1]['en']) for c in classic['controls'])['wood'], 'Furniture finish')
+        self.assertEqual([m.get('finish') for m in classic['materials']['wood'][1:]], ['metal', 'metal', 'wood'])
+        # Modern: sofa and cream armchair, then the olive armchair, each with its own colour; no option
+        # claims leather (the seats are fabric).
+        modern = by_id['modern']
+        self.assertTrue(all(len(m['colors']) == 2 for m in modern['materials']['upholstery'][1:]))
+        self.assertFalse(any('leather' in m['name']['en'].lower() for m in modern['materials']['upholstery']))
+        # Organic Modern: no exposed wood, so its third control is the accent chairs' fabric.
+        organic = by_id['organic_modern']
+        self.assertEqual(dict((c[0], c[1]['en']) for c in organic['controls'])['wood'], 'Accent chairs')
+        self.assertEqual(organic['render']['wood']['kind'], 'fabric')
+        # Round tables: the stone is mapped per part (a planar top, then curved sides / base), not one warp.
+        for s in styles:
+            self.assertEqual(s['render']['stone']['parts'][0]['type'], 'plane')
+        self.assertEqual([p['type'] for p in modern['render']['stone']['parts']], ['plane', 'curve', 'curve'])
+        self.assertEqual([p['type'] for p in organic['render']['stone']['parts']], ['plane', 'curve'])
+
+    def test_guide_scoring_is_deterministic_and_reaches_every_style(self):
+        import itertools
+        import os
+
+        from django.conf import settings
+
+        from . import studio
+        self.assertEqual(len(studio.QUIZ), 5)
+        style_ids = {s['id'] for s in studio.STYLES}
+        for q in studio.QUIZ:
+            self.assertEqual(len(q['answers']), 3, q['id'])
+            for a in q['answers']:
+                self.assertTrue(set(a['points']) <= style_ids, a['id'])
+                f = studio.quiz_image(a['image'])
+                self.assertTrue(os.path.isfile(os.path.join(settings.BASE_DIR, 'static', *f.split('/'))), f)
+        # The documented examples.
+        self.assertEqual(studio.recommend({'mood': 'formal', 'shapes': 'carved', 'materials': 'damask', 'detail': 'ornate', 'palette': 'blue_ivory'}),
+                         ('classic', None))
+        self.assertEqual(studio.recommend({'mood': 'grounded', 'shapes': 'tailored', 'materials': 'walnut', 'detail': 'balanced', 'palette': 'earthy'}),
+                         ('modern', None))
+        self.assertEqual(studio.recommend({'mood': 'serene', 'shapes': 'sculptural', 'materials': 'textured', 'detail': 'minimal', 'palette': 'soft_white'}),
+                         ('organic_modern', None))
+        self.assertEqual(studio.recommend({'mood': 'formal', 'shapes': 'sculptural', 'materials': 'textured', 'detail': 'minimal', 'palette': 'blue_ivory'}),
+                         ('classic', 'organic_modern'))  # C 7, M 1, O 7: a tie keeps the catalogue order
+        # All 243 answer sets: every style can be recommended; the rule never depends on chance.
+        winners = set()
+        for picks in itertools.product(*([a['id'] for a in q['answers']] for q in studio.QUIZ)):
+            answers = dict(zip([q['id'] for q in studio.QUIZ], picks))
+            first, second = studio.recommend(answers)
+            self.assertEqual((first, second), studio.recommend(answers))
+            totals = studio.score(answers)
+            self.assertEqual(totals[first], max(totals.values()))
+            winners.add(first)
+        self.assertEqual(winners, style_ids)
+
+    def test_page_in_both_languages(self):
+        import json
+        from collections import Counter
+        for path, lang, dir_, title in (('/design-studio/', 'en', 'ltr', 'Your Space. Your Signature.'),
+                                        ('/ar/design-studio/', 'ar', 'rtl', 'مساحتك. بصمتك.')):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            html = response.content.decode()
+            self.assertIn(f'<html lang="{lang}" dir="{dir_}"', html)
+            self.assertIn(title, html)
+            self.assertEqual(html.count('data-ds-card="'), 3)
+            self.assertEqual(html.count('data-ds-panel="'), 3)
+            self.assertEqual(html.count('role="radio"'), 36)
+            self.assertIn('data-ds-quiz', html)
+            self.assertIn('data-ds-full-dialog', html)  # the image at full size
+            duplicates = [k for k, n in Counter(re.findall(r'\sid="([^"]+)"', html)).items() if n > 1]
+            self.assertEqual(duplicates, [], path)
+            data = json.loads(re.search(r'<script id="studio-data" type="application/json">(.*?)</script>', html, re.S).group(1))
+            self.assertEqual(len(data['styles']), 3)
+            self.assertEqual(len(data['quiz']['questions']), 5)
+            self.assertTrue(all(s['preview'] and s['room']['photo'] for s in data['styles']))
+            self.assertEqual([s['name'] for s in data['styles']],
+                             ['Classic', 'Modern', 'Organic Modern'] if lang == 'en' else ['كلاسيك', 'مودرن', 'مودرن عضوي'])
+            self.assertIn('Furniture finish' if lang == 'en' else 'تشطيب الأثاث', html)
+            self.assertIn('Accent chairs' if lang == 'en' else 'الكراسي المميزة', html)
+            self.assertEqual(sum(s['combinations'] for s in data['styles']), 192)
+            # Honest labelling: an AI-generated concept image, not a completed project.
+            self.assertIn('AI-generated concept image, not a photograph of a completed GINDI project' if lang == 'en'
+                          else 'صورة تصوّرية مولّدة بالذكاء الاصطناعي، وليست صورة لمشروع منفذ لجيندي', html)
+            self.assertNotIn('100%', html)
+            self.assertIn('not a personality assessment' if lang == 'en' else 'وليس تقييمًا للشخصية', data['labels']['quiz']['disclaimer'])
+
+    def test_homepage_invites_to_the_studio(self):
+        for home, prefix in (('/', ''), ('/ar/', '/ar')):
+            html = self.client.get(home).content.decode()
+            self.assertIn('id="design-studio"', html)
+            self.assertIn(f'href="{prefix}/design-studio/#discover"', html)
+            self.assertIn(f'href="{prefix}/design-studio/"', html)
+            self.assertLess(html.index('id="design-studio"'), html.index('id="services"'))
+
+
 class DeploymentTests(SimpleTestCase):
     """Preview/production plumbing: noindex, robots, errors."""
-
-    def test_free_tools_stay_coming_soon_without_scripts(self):
-        for slug in ('wire', 'tiles', 'bricks', 'cement'):
-            html = self.client.get(reverse('core:free_tool', kwargs={'slug': slug})).content.decode()
-            self.assertIn('data-tool-placeholder', html)
-            self.assertNotIn('data-tool-script', html)
 
     def test_noindex_header_meta_and_robots(self):
         response = self.client.get(reverse('core:home'))
@@ -900,16 +1213,28 @@ class StaticExportTests(SimpleTestCase):
             published = tmp / 'published' / 'dist'
             for page in ('projects/index.html', 'projects/project-1/index.html', 'ar/projects/project-4/index.html'):
                 self.assertTrue((published / page).is_file(), page)
-            self.assertEqual(len(list(published.rglob('index.html'))), 28)
+            self.assertEqual(len(list(published.rglob('index.html'))), 30)
             dist = tmp / 'dist'
             for page in ('index.html', 'ar/index.html', 'about/index.html', 'services/index.html',
-                         'contact/index.html', 'ar/contact/index.html', 'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/cement/index.html',
+                         'contact/index.html', 'ar/contact/index.html', 'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/paint/index.html',
                          '404.html', 'ar/404.html', 'robots.txt'):
                 self.assertTrue((dist / page).is_file(), page)
             # Projects switched off: no project pages at all.
             self.assertFalse((dist / 'projects').exists())
             self.assertFalse((dist / 'ar' / 'projects').exists())
-            self.assertEqual(len(list(dist.rglob('index.html'))), 18)
+            self.assertEqual(len(list(dist.rglob('index.html'))), 20)
+            # The Design Studio: both pages, its modules by bare name (import map) and its assets.
+            studio_page = (dist / 'design-studio' / 'index.html').read_text(encoding='utf-8')
+            self.assertTrue((dist / 'ar' / 'design-studio' / 'index.html').is_file())
+            self.assertRegex(studio_page, r'"gindi/compositor": "/static/studio/compositor\.[0-9a-f]{12}\.js"')
+            static_dir = dist / 'static' / 'studio'
+            for style in ('classic', 'modern', 'organic_modern'):
+                for name in ('photo', 'mask', 'light', 'zone'):
+                    self.assertTrue(list((static_dir / 'rooms' / style).glob(f'{name}.*.*')), (style, name))
+            self.assertEqual(len(list((static_dir / 'materials').glob('*/color.*.webp'))), 9)  # the stone scans in use
+            # Cloudflare serves files of at most 25 MiB.
+            biggest = max(f.stat().st_size for f in (dist / 'static').rglob('*') if f.is_file())
+            self.assertLess(biggest, 25 * 1024 * 1024)
             home = (dist / 'index.html').read_text(encoding='utf-8')
             self.assertIn('href="https://preview.example/ar/"', home)
             self.assertRegex(home, r'/static/css/base\.[0-9a-f]{12}\.css')
@@ -918,6 +1243,12 @@ class StaticExportTests(SimpleTestCase):
             redirects = (dist / '_redirects').read_text()
             self.assertIn('/free-estimate/ /free-tools/ 301', redirects)
             self.assertIn('/ar/free-estimate/ /ar/free-tools/ 301', redirects)
+            self.assertIn('/free-tools/cement/ /free-tools/ 302', redirects)
+            self.assertIn('/ar/free-tools/cement/ /ar/free-tools/ 302', redirects)
+            # The calculators' scripts are published; the reference originals (static/Tools/) are not.
+            for name in ('calc-ui', 'bricks-calc', 'bricks', 'tiles-calc', 'tiles', 'wire-calc', 'wire', 'paint-calc', 'paint'):
+                self.assertTrue(list((dist / 'static' / 'js' / 'tools').glob(f'{name}.*.js')), name)
+            self.assertFalse((dist / 'static' / 'Tools').exists())
             self.assertRegex(redirects, r'/favicon.ico /static/images/brand/favicon-32\.[0-9a-f]{12}\.png 302')
             headers = (dist / '_headers').read_text()
             self.assertIn('X-Robots-Tag: noindex, nofollow', headers)

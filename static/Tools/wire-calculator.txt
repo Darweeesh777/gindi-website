@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حاسبة لفات سلك الكهرباء | Eng/ Mostafa Elgindi</title>
+<meta name="description" content="احسب عدد لفات سلك الكهرباء لشقتك وقارنها بطلب الكهربائي. إعداد Eng/ Mostafa Elgindi - Gindi Innovations">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A; --orange:#F5A623; --cream:#F3D9A4;
+    --input-bg:#FFF8E1; --input-bd:#E8CF85; --input-fg:#0000FF;
+    --green-bg:#E2F0D9; --green-fg:#2E6B1F; --red:#C00000;
+    --bg:#F3F5F9; --card:#FFFFFF; --text:#1B2433; --muted:#6B7280; --line:#E3E7EE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--navy);border-radius:14px;overflow:hidden;color:#fff}
+  header .top{padding:22px 20px 16px}
+  header h1{margin:0;font-size:24px;font-weight:800}
+  header p{margin:4px 0 0;color:var(--cream);font-size:14px}
+  header .brand{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--orange);color:var(--navy);padding:6px 20px;font-size:13px;font-weight:700}
+  .card{background:var(--card);border-radius:14px;padding:18px;margin-top:14px;border-top:4px solid var(--orange);box-shadow:0 1px 3px rgba(11,31,58,.08)}
+  .card h2{margin:0 0 4px;font-size:17px;color:var(--navy);padding-bottom:6px;border-bottom:2px solid var(--navy)}
+  .hint{margin:8px 0 12px;color:var(--muted);font-size:13px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
+  input[type=number],input[type=text],select{width:100%;min-width:0;font:inherit;font-weight:700;color:var(--input-fg);background:var(--input-bg);border:1.5px solid var(--input-bd);border-radius:8px;padding:8px;text-align:center;-moz-appearance:textfield}
+  input[type=text]{text-align:right}
+  input.fixed{background:var(--line);border-color:var(--line);color:var(--text);cursor:not-allowed}
+  input:focus,select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,166,35,.25)}
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .sub{grid-column:1/-1;font-size:13px;font-weight:700;color:var(--muted);margin-top:4px}
+
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#F9FAFC}
+  .item .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+  .item .head b{color:var(--navy);font-size:15px}
+  .item .head small{color:var(--muted);font-size:12px;display:block;font-weight:400}
+  .item .head .tot{background:var(--green-bg);color:var(--green-fg);font-weight:800;border-radius:8px;padding:4px 10px;white-space:nowrap;font-size:14px}
+  .item .head .right{display:flex;align-items:center;gap:6px}
+  .group .item:first-child{margin-top:10px}
+  .group .item + .item{margin-top:8px}
+  .add{display:block;width:100%;margin-top:8px;font:inherit;font-weight:700;font-size:14px;color:var(--navy);background:transparent;border:1.5px dashed var(--orange);border-radius:10px;padding:8px;cursor:pointer}
+  .add:hover,.add:focus-visible{background:var(--input-bg);outline:none}
+  .del{font:inherit;font-weight:800;font-size:18px;line-height:1;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--red);cursor:pointer}
+  .item .f{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+  .item .f label{font-size:11.5px;color:var(--navy);font-weight:600;display:block;margin-bottom:2px;white-space:nowrap}
+  .item .name{margin-bottom:8px}
+  .sub2{font-size:12.5px;font-weight:800;color:var(--orange);margin:6px 0 4px}
+  .sumline{display:flex;justify-content:space-between;margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700}
+  .sumline span:last-child{color:var(--orange);font-size:18px}
+
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{border-radius:12px;padding:14px;background:var(--green-bg);color:var(--green-fg)}
+  .kpi.hero{grid-column:1/-1;background:var(--navy);color:#fff;text-align:center}
+  .kpi .v{font-size:26px;font-weight:800;line-height:1.2}
+  .kpi.hero .v{font-size:44px;color:var(--orange)}
+  .kpi .l{font-size:13px;font-weight:600}
+  .tbl{overflow-x:auto;margin-top:14px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{background:var(--navy);color:#fff;font-weight:600;padding:7px 4px;font-size:13px}
+  td{padding:6px 4px;text-align:center;border-bottom:1px solid var(--line)}
+  tbody tr:nth-child(even) td{background:#F9FAFC}
+  td.res{background:var(--green-bg)!important;color:var(--green-fg);font-weight:700}
+  td input[type=number]{min-width:64px;max-width:90px;padding:5px}
+  tfoot td{font-weight:800;color:var(--navy);border-top:2px solid var(--navy)}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px}
+  .cmp div{padding:8px 12px;border-radius:8px;background:#F3F5F9;font-size:14px}
+  .cmp div:nth-child(odd){font-weight:700;color:var(--navy)}
+  .cmp div:nth-child(even){background:var(--green-bg);color:var(--green-fg);font-weight:700;text-align:center}
+  .verdict{margin-top:12px;padding:12px 14px;border-radius:10px;font-weight:700;background:var(--bg);color:var(--navy)}
+  .verdict.ok{background:var(--green-bg);color:var(--green-fg)}
+  .verdict.bad{background:#FDECEC;color:var(--red)}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .warn{color:var(--red);font-size:12.5px;margin-top:10px}
+  dl{margin:10px 0 0;display:grid;grid-template-columns:120px 1fr;gap:8px 12px;font-size:13.5px}
+  dt{font-weight:700;color:var(--navy);background:#F3F5F9;border-radius:6px;padding:4px 8px;align-self:start}
+  dd{margin:0;padding:4px 0}
+  footer{margin:16px 0 8px;text-align:center;font-size:12.5px;color:var(--muted)}
+  footer b{color:var(--navy)}
+  .pdf{display:block;width:100%;margin-top:14px;font:inherit;font-weight:800;font-size:16px;color:#fff;background:var(--navy);border:0;border-radius:10px;padding:12px;cursor:pointer;border-bottom:4px solid var(--orange)}
+  .pdf:hover,.pdf:focus-visible{filter:brightness(1.15);outline:none}
+  #report{display:none}
+  .back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:8px;color:var(--navy);font-weight:700;font-size:14px;text-decoration:none}
+  .back:hover,.back:focus-visible{text-decoration:underline;text-decoration-color:var(--orange);text-underline-offset:4px}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;color:#1B2433;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wrap > *:not(#report){display:none!important}
+    .wrap{max-width:none;padding:0}
+    #report{display:block;font-size:12px}
+    #report .r-head{display:flex;justify-content:space-between;align-items:center;background:#0B1F3A;color:#fff;padding:12px 16px;border-radius:8px;border-bottom:4px solid #F5A623}
+    #report h1{margin:0;font-size:20px}
+    #report .r-head p{margin:2px 0 0;color:#F3D9A4;font-size:12px}
+    #report .r-brand{background:#F5A623;color:#0B1F3A;font-weight:800;padding:6px 10px;border-radius:6px;text-align:center;direction:ltr;font-size:11px}
+    #report .r-kpis{display:flex;gap:8px;margin:12px 0}
+    #report .r-kpis div{flex:1;background:#E2F0D9;color:#2E6B1F;border-radius:8px;padding:8px;text-align:center}
+    #report .r-kpis div:first-child{background:#0B1F3A;color:#fff}
+    #report .r-kpis div:first-child b{color:#F5A623}
+    #report .r-kpis b{display:block;font-size:20px}
+    #report .r-kpis span{font-size:10.5px}
+    #report h2{font-size:14px;color:#0B1F3A;border-bottom:2px solid #0B1F3A;padding-bottom:3px;margin:14px 0 6px}
+    #report table{font-size:11.5px;margin:0;page-break-inside:auto}
+    #report tr{page-break-inside:avoid}
+    #report th{background:#0B1F3A;color:#fff;padding:5px 4px}
+    #report td{padding:4px;border-bottom:1px solid #E3E7EE}
+    #report td.l{text-align:right}
+    #report td.hi{background:#E2F0D9;color:#2E6B1F;font-weight:800}
+    #report tfoot td{font-weight:800;border-top:2px solid #0B1F3A}
+    #report .r-note{color:#6B7280;font-size:10.5px;margin:4px 0 0}
+    #report .r-cmp{font-size:12.5px}
+    #report .r-warn{color:#C00000;font-size:10.5px;margin-top:12px}
+    #report .r-foot{text-align:center;color:#6B7280;font-size:10.5px;border-top:1px solid #E3E7EE;padding-top:6px;margin-top:10px}
+  }
+  @media (max-width:560px){
+    .grid3{grid-template-columns:1fr 1fr}
+    .item .f{grid-template-columns:repeat(2,1fr)}
+    .kpi.hero .v{font-size:38px}
+    table{font-size:12.5px}
+    dl{grid-template-columns:1fr}
+    dt{justify-self:start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="../index.html#services">الرجوع لخدمات Gindi Innovations</a>
+
+  <header>
+    <div class="top">
+      <h1>حاسبة لفات سلك الكهرباء</h1>
+      <p>تقدير كميات أسلاك شقة التشطيب، ومقارنتها باللي الكهربائي طلبه</p>
+    </div>
+    <div class="brand"><span>Eng/ Mostafa Elgindi</span><span>Gindi Innovations</span></div>
+  </header>
+
+  <section class="card">
+    <h2>١ — المدخلات العامة</h2>
+    <p class="hint">الخانات الصفرا بخط أزرق مدخلات تقدر تغيّرها، والنتيجة بتتحسب لوحدها وانت بتكتب.</p>
+    <div class="grid2">
+      <div class="field"><label for="area">مساحة الشقة (م²)</label><input type="number" id="area" min="0" inputmode="decimal" placeholder="مثلاً 120"></div>
+      <div class="field"><label for="ref">المساحة المرجعية للأطوال (م²)</label><input type="number" id="ref" min="0" value="100"></div>
+      <div class="field"><label for="roll">طول اللفة الواحدة (متر)</label><input type="number" id="roll" min="0" value="100"></div>
+      <div class="field"><label for="margin">هامش اختلاف الأطوال (±%)</label><input type="number" id="margin" min="0" value="15"></div>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="sub">نسبة الهالك</div>
+      <div class="field"><label for="wmin">الحد الأدنى %</label><input type="number" id="wmin" min="0" value="10"></div>
+      <div class="field"><label for="wavg">المتوسط %</label><input type="number" id="wavg" min="0" value="12"></div>
+      <div class="field"><label for="wmax">الحد الأعلى %</label><input type="number" id="wmax" min="0" value="15"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>٢ — تفصيل الدوائر (اللينيات)</h2>
+    <p class="hint">لكل بند اكتب العدد وطول الوحدة. كل غرفة فيها لينية الإنارة ومفتاحها، ولينية بريزة واحدة والبرايز التانية تمديدات منها، وكل خانة تكييف أو سخان فوري = جهاز واحد. لو عندك أكتر دوس «+ إضافة». الإجمالي = العدد × الطول × عدد الأسلاك، والبنود اللي «تتأثر بالمساحة» بتتضرب في (مساحة الشقة ÷ المساحة المرجعية).</p>
+    <div id="items"></div>
+    <div class="sumline"><span>إجمالي الأطوال (متر)</span><span id="sumLen">0</span></div>
+  </section>
+
+  <section class="card">
+    <h2>٣ — ملخص اللفات حسب المقاس</h2>
+    <div class="kpis" style="margin-top:12px">
+      <div class="kpi hero"><div class="v" id="kTotal">0</div><div class="l">إجمالي اللفات (متوسط) بعد الهالك</div></div>
+      <div class="kpi"><div class="v" id="kRange">—</div><div class="l">النطاق المتوقع (لفة)</div></div>
+      <div class="kpi"><div class="v" id="kLen">0</div><div class="l" id="kLenL">متر قبل الهالك</div></div>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>المقاس</th><th>الطول (م)</th><th>بعد الهالك (م)</th><th>أدنى</th><th>متوسط</th><th>أعلى</th><th>سعر اللفة (ج)</th><th>التكلفة</th></tr></thead>
+        <tbody id="sizes"></tbody>
+        <tfoot><tr><td>الإجمالي</td><td id="tLen">0</td><td id="tAfter">0</td><td id="tMin">0</td><td id="tAvg">0</td><td id="tMax">0</td><td></td><td id="tCost"></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="note">اللفات متقرّبة لأعلى لكل مقاس. الأسعار مكتوبة من <b>لستة أسعار السويدي للكابلات (سلك نحاس مجدول، لفة 100 م، شامل الضريبة)</b> <span id="priceDate"></span>، وتقدر تعدّلها لو سعر السوق عندك مختلف.</p>
+  </section>
+
+  <section class="card">
+    <h2>٤ — المقارنة مع طلب الكهربائي</h2>
+    <div class="field" style="margin-top:12px"><label for="elec">عدد اللفات اللي الكهربائي طلبها</label>
+      <input type="number" id="elec" min="0" inputmode="numeric" placeholder="سيبها فاضية لو مفيش"></div>
+    <div class="cmp">
+      <div>اللفات اللي الكهربائي طلبها</div><div id="cElec">—</div>
+      <div>نطاق الحسبة (أدنى – أعلى)</div><div id="cRange">—</div>
+      <div>الفرق عن المتوسط</div><div id="cDiff">—</div>
+    </div>
+    <div class="verdict" id="verdict">اكتب عدد اللفات اللي الكهربائي طلبها عشان تقارن.</div>
+    <button type="button" class="pdf" id="pdfBtn">تصدير التقرير PDF</button>
+    <p class="note" style="text-align:center">هتفتحلك نافذة الطباعة، اختار منها «حفظ كـ PDF» (Save as PDF).</p>
+    <p class="warn">الحسبة تقريبية وبتتغير حسب توزيع اللوحة وعدد النقاط وأطوال المسارات والأحمال، ولازم يعتمدها مهندس كهرباء مختص.</p>
+  </section>
+
+  <section class="card">
+    <h2>منطق الحسبة</h2>
+    <dl>
+      <dt>اللينية</dt><dd>الدايرة اللي بتطلع من قاطع في اللوحة وتخدم مجموعة نقاط أو جهاز واحد.</dd>
+      <dt>عدد الأسلاك</dt><dd>كل لينية = 3 أسلاك: فاز + نيوترال + أرضي، فالطول بيتضرب في 3.</dd>
+      <dt>مفتاح إنارة</dt><dd>السلك اللي نازل من السقف للمفتاح، وبيتحسب مع كل غرفة: سلكين (المفتاح بيقطع الفاز بس) بطول ثابت 5 متر لكل مفتاح، مقاس 1.5 مم.</dd>
+      <dt>البرايز</dt><dd>كل غرفة ليها لينية بريزة واحدة من اللوحة لأول بريزة، وباقي برايز الغرفة تمديدات منها. الطول = طول اللينية + (عدد البرايز − 1) × طول التمديدة، وبيتضرب في 3 أسلاك (فاز + نيوترال + أرضي) بمقاس 2 مم، أو سلكين بس لو البرايز مش متأرضة.</dd>
+      <dt>المقاسات</dt><dd>إنارة 1.5 مم، برايز 2 مم، غسالات وتكييفات 4 مم، سخان فوري وفرن 6 مم.</dd>
+      <dt>المساحة</dt><dd>الإنارة ومفاتيح الإنارة والبرايز بيتضرب طولها في مساحة الشقة ÷ المساحة المرجعية. لو مساحة الشقة فاضية بيتحسب من غير تحجيم. الأجهزة لينيات مستقلة ومش بتتأثر بالمساحة.</dd>
+      <dt>الهالك والنطاق</dt><dd>الهالك 10% أدنى و12% متوسط و15% أعلى، وهامش ±15% للأطوال بيدي النطاق الأدنى والأعلى للفات.</dd>
+      <dt>الغرف والأجهزة</dt><dd>كل غرفة = لينية إنارة + مفتاح إنارة + لينية برايز بتمديداتها (تقدر تزود عدد المفاتيح لو الغرفة فيها أكتر من مفتاح). كل خانة تكييف أو سخان فوري = جهاز واحد. دوس «+ إضافة» وهتتفتح خانة جديدة بنفس المواصفات.</dd>
+      <dt>مش محسوب</dt><dd>كابل العداد للوحة (غالبًا 10 أو 16 مم) وتقدر تضيفه في بند إضافي، والتيار الخفيف (إنتركم ودش وإنترنت وكاميرات).</dd>
+    </dl>
+  </section>
+
+  <section id="report" aria-hidden="true"></section>
+  <footer>إعداد: <b>Eng/ Mostafa Elgindi</b> | Gindi Innovations | الحسبة تقديرية وتُعتمد من مهندس كهرباء مختص<br>© Gindi Innovations — ممنوع إعادة النشر أو النسخ بدون إذن كتابي</footer>
+</div>
+
+<script>
+(function(){
+  // Same logic as Eng_Mostafa_Elgindi_Wire_Calculator.xlsx (sheet «الحسبة»)
+  // repeat: one line per box (count fixed at 1), the + button adds another box with the same specs
+  var TYPES = [
+    {name:"غرفة",                  unit:"غرفة", repeat:true, room:true, note:"إنارة الغرفة ومفتاحها + لينية البرايز وتمديداتها", size:1.5, wires:3, scale:true, len:15},
+    {name:"غسالة",                 note:"لينية مستقلة",                size:4,   wires:3, scale:false, len:12},
+    {name:"غسالة أطباق",           note:"لينية مستقلة",                size:4,   wires:3, scale:false, len:12},
+    {name:"تكييفات",               unit:"تكييف", repeat:true, note:"كل خانة = تكييف واحد", size:4, wires:3, scale:false, len:15},
+    {name:"سخان فوري",             unit:"سخان فوري", repeat:true, note:"كل خانة = سخان واحد على لينية مستقلة", size:6, wires:3, scale:false, len:10},
+    {name:"فرن / بوتاجاز كهربائي", note:"لينية مستقلة",                size:6,   wires:3, scale:false, len:10},
+    {extra:true, name:"بند إضافي ١", note:"مثلاً كابل العداد أو أي لينية زيادة", size:4,  wires:3, scale:false, len:""},
+    {extra:true, name:"بند إضافي ٢", note:"مثلاً كابل العداد أو أي لينية زيادة", size:10, wires:3, scale:false, len:""}
+  ];
+  var SIZES = [1.5, 2, 4, 6, 10, 16];
+  // لستة أسعار السويدي للكابلات: سلك نحاس مجدول، لفة 100 م، جنيه شامل الضريبة (حدّث الأرقام والتاريخ هنا)
+  var PRICE_DATE = "تحديث 2 يونيو 2026";
+  var PRICES = {1.5: 1510.45, 2: 2008.73, 4: 3800.71, 6: 5722.30, 10: 9401.24, 16: 15047.57};
+  var SWITCH = {len:5, wires:2, size:1.5}; // مفتاح إنارة: 5 م ثابتة × سلكين، 1.5 مم
+  var SOCKET = {len:15, ext:3, wires:3, size:2}; // لينية بريزة واحدة للغرفة + تمديدة لكل بريزة زيادة
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n, d){ return n.toLocaleString("en-US", {maximumFractionDigits: d || 0}); };
+  var num = function(el){ var v = parseFloat(el.value); return isFinite(v) && v >= 0 ? v : null; };
+  var up = function(x){ return Math.ceil(x - 1e-9); }; // ROUNDUP(x,0) for x >= 0
+
+  var box = $("items"), nextId = 0;
+  TYPES.forEach(function(t, ti){
+    var g = document.createElement("div");
+    g.className = "group"; g.id = "grp" + ti;
+    box.appendChild(g);
+    if (t.repeat) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "add"; b.id = "add" + ti;
+      b.textContent = "+ إضافة " + t.unit;
+      b.addEventListener("click", function(){ addRow(ti, true); calc(); });
+      g.appendChild(b);
+    }
+    addRow(ti, false);
+  });
+
+  function addRow(ti, focus){
+    var t = TYPES[ti], i = nextId++, g = $("grp" + ti);
+    var opts = SIZES.map(function(s){ return '<option value="' + s + '"' + (s === t.size ? " selected" : "") + ">" + s + "</option>"; }).join("");
+    var d = document.createElement("div");
+    d.className = "item"; d.dataset.row = i; d.dataset.type = ti;
+    d.innerHTML =
+      '<div class="head"><div><b class="ttl"></b><small>' + t.note + '</small></div>' +
+      '<div class="right"><div class="tot" id="g' + i + '">0 م</div>' +
+      (t.repeat ? '<button type="button" class="del" aria-label="شيل الخانة دي">×</button>' : '') + '</div></div>' +
+      (t.extra ? '<div class="name"><input type="text" id="n' + i + '" placeholder="اسم البند (اختياري)" aria-label="اسم البند"></div>' : '') +
+      (t.room ? '<div class="sub2">الإنارة</div>' : '') +
+      '<div class="f">' +
+        (t.repeat ? '' : '<div><label for="c' + i + '">العدد</label><input type="number" min="0" inputmode="numeric" id="c' + i + '" placeholder="0"></div>') +
+        (t.room ? '<div><label for="k' + i + '">مفاتيح الإنارة</label><input type="number" min="0" inputmode="numeric" id="k' + i + '" value="1"></div>' : '') +
+        '<div><label for="l' + i + '">' + (t.room ? "طول لينية الإنارة (م)" : t.repeat ? "الطول (م)" : "طول الوحدة (م)") + '</label><input type="number" min="0" inputmode="decimal" id="l' + i + '" value="' + t.len + '"' + (t.fixedLen ? ' readonly class="fixed"' : '') + '></div>' +
+        '<div><label for="s' + i + '">المقاس (مم)</label><select id="s' + i + '">' + opts + '</select></div>' +
+        '<div><label for="w' + i + '">أسلاك في الخط</label><input type="number" min="0" id="w' + i + '" value="' + t.wires + '"></div>' +
+        '<div><label for="a' + i + '">يتأثر بالمساحة؟</label><select id="a' + i + '"><option' + (t.scale ? " selected" : "") + '>نعم</option><option' + (t.scale ? "" : " selected") + '>لا</option></select></div>' +
+      '</div>' +
+      (t.room ?
+        '<div class="sub2">البرايز (مقاس 2 مم)</div><div class="f">' +
+          '<div><label for="sn' + i + '">عدد البرايز</label><input type="number" min="0" inputmode="numeric" id="sn' + i + '" value="1"></div>' +
+          '<div><label for="sl' + i + '">طول لينية البريزة (م)</label><input type="number" min="0" inputmode="decimal" id="sl' + i + '" value="' + SOCKET.len + '"></div>' +
+          '<div><label for="se' + i + '">طول التمديدة لكل بريزة (م)</label><input type="number" min="0" inputmode="decimal" id="se' + i + '" value="' + SOCKET.ext + '"></div>' +
+          '<div><label for="se_e' + i + '">البرايز متأرضة؟</label><select id="se_e' + i + '"><option value="3" selected>نعم (3 أسلاك)</option><option value="2">لا (سلكين)</option></select></div>' +
+        '</div>' : '');
+    var del = d.querySelector(".del");
+    if (del) del.addEventListener("click", function(){ d.remove(); renumber(ti); calc(); });
+    var add = $("add" + ti);
+    g.insertBefore(d, add || null);
+    renumber(ti);
+    if (focus) $("l" + i).focus();
+  }
+
+  function renumber(ti){
+    var t = TYPES[ti], rows = $("grp" + ti).querySelectorAll(".item");
+    rows.forEach(function(r, k){
+      r.querySelector(".ttl").textContent = t.repeat ? t.unit + " " + (k + 1) : t.name;
+      var del = r.querySelector(".del");
+      if (del) del.hidden = rows.length === 1;
+    });
+  }
+
+  var tb = $("sizes");
+  SIZES.forEach(function(s, i){
+    tb.insertAdjacentHTML("beforeend",
+      "<tr><td>" + s + ' مم</td><td id="L' + i + '"></td><td id="D' + i + '"></td><td id="E' + i + '"></td><td class="res" id="F' + i +
+      '"></td><td id="G' + i + '"></td><td><input type="number" min="0" id="p' + i + '" value="' + (PRICES[s] || "") + '" aria-label="سعر لفة ' + s + ' مم"></td><td id="I' + i + '"></td></tr>');
+  });
+
+  function calc(){
+    var area = num($("area")), ref = num($("ref"));
+    var roll = num($("roll")) || 0;
+    var margin = (num($("margin")) || 0) / 100;
+    var wmin = (num($("wmin")) || 0) / 100, wavg = (num($("wavg")) || 0) / 100, wmax = (num($("wmax")) || 0) / 100;
+    var factor = (area === null || !ref) ? 1 : area / ref;
+
+    var bySize = {}; SIZES.forEach(function(s){ bySize[s] = 0; });
+    var sum = 0, P = [];
+    box.querySelectorAll(".item").forEach(function(r){
+      var i = r.dataset.row, cEl = $("c" + i);
+      var c = cEl ? (num(cEl) || 0) : 1, l = num($("l" + i)) || 0, w = num($("w" + i)) || 0;
+      var f = $("a" + i).value === "نعم" ? factor : 1;
+      var g = c * l * w * f, nm = r.querySelector(".ttl").textContent, sz = parseFloat($("s" + i).value);
+      var nmEl = $("n" + i); if (nmEl && nmEl.value.trim()) nm = nmEl.value.trim();
+      bySize[sz] += g;
+      P.push({name: nm + ($("k" + i) ? " — إنارة" : ""), size: sz, qty: cEl ? c : 1, len: g});
+      var kEl = $("k" + i);
+      if (kEl) { var sw = (num(kEl) || 0) * SWITCH.len * SWITCH.wires * f; bySize[SWITCH.size] += sw; g += sw;
+        P.push({name: nm + " — مفتاح إنارة", size: SWITCH.size, qty: num(kEl) || 0, len: sw}); }
+      var nEl = $("sn" + i);
+      if (nEl) {
+        var n = num(nEl) || 0;
+        var so = n > 0 ? ((num($("sl" + i)) || 0) + (n - 1) * (num($("se" + i)) || 0)) * parseFloat($("se_e" + i).value) * f : 0;
+        bySize[SOCKET.size] += so; g += so;
+        P.push({name: nm + " — برايز" + ($("se_e" + i).value === "2" ? " (من غير أرضي)" : ""), size: SOCKET.size, qty: n, len: so});
+      }
+      sum += g;
+      $("g" + i).textContent = fmt(g, 1) + " م";
+    });
+    $("sumLen").textContent = fmt(sum, 1);
+
+    var T = {len:0, after:0, min:0, avg:0, max:0, cost:0}, anyPrice = false, S = [];
+    SIZES.forEach(function(s, i){
+      var L = bySize[s], D = L * (1 + wavg);
+      var mn = roll ? up(L * (1 - margin) * (1 + wmin) / roll) : 0;
+      var av = roll ? up(D / roll) : 0;
+      var mx = roll ? up(L * (1 + margin) * (1 + wmax) / roll) : 0;
+      var p = num($("p" + i));
+      $("L" + i).textContent = fmt(L, 1); $("D" + i).textContent = fmt(D, 1);
+      $("E" + i).textContent = mn; $("F" + i).textContent = av; $("G" + i).textContent = mx;
+      $("I" + i).textContent = p === null ? "" : fmt(av * p);
+      if (p !== null) { anyPrice = true; T.cost += av * p; }
+      S.push({size: s, L: L, D: D, mn: mn, av: av, mx: mx, cost: p === null ? null : av * p});
+      T.len += L; T.after += D; T.min += mn; T.avg += av; T.max += mx;
+    });
+    $("tLen").textContent = fmt(T.len, 1); $("tAfter").textContent = fmt(T.after, 1);
+    $("tMin").textContent = T.min; $("tAvg").textContent = T.avg; $("tMax").textContent = T.max;
+    $("tCost").textContent = anyPrice ? fmt(T.cost) + " ج" : "";
+
+    var range = T.max === 0 ? "—" : T.min + " – " + T.max;
+    $("kTotal").textContent = T.avg;
+    $("kRange").textContent = range;
+    $("kLen").textContent = fmt(T.len, 1);
+    $("kLenL").textContent = area === null ? "متر قبل الهالك" : "متر قبل الهالك — شقة " + fmt(area, 1) + " م²";
+
+    var e = num($("elec")), v = $("verdict");
+    $("cElec").textContent = e === null ? "—" : fmt(e, 1);
+    $("cRange").textContent = T.max === 0 ? "—" : range + " لفة";
+    $("cDiff").textContent = e === null ? "—" : (e - T.avg > 0 ? "+" : "") + fmt(e - T.avg, 1) + " لفة";
+    if (e === null) { v.className = "verdict"; v.textContent = "اكتب عدد اللفات اللي الكهربائي طلبها عشان تقارن."; }
+    else if (e > T.max) { v.className = "verdict bad"; v.textContent = "أعلى من النطاق: اسأله الرقم جاي منين وبالتفصيل."; }
+    else if (e < T.min) { v.className = "verdict bad"; v.textContent = "أقل من النطاق: اتأكد إن مفيش بند ناقص."; }
+    else { v.className = "verdict ok"; v.textContent = "داخل النطاق المعقول ✓"; }
+
+    buildReport(P, S, T, anyPrice, area, e, v.textContent);
+  }
+
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(ch){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]; }); }
+  function buildReport(P, S, T, anyPrice, area, e, verdict){
+    var d = new Date(), date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+    var parts = P.filter(function(x){ return x.len > 0; }).map(function(x){
+      return "<tr><td class='l'>" + esc(x.name) + "</td><td>" + x.size + " مم</td><td>" + fmt(x.qty, 1) + "</td><td>" + fmt(x.len, 1) + "</td></tr>";
+    }).join("") || "<tr><td colspan='4'>مفيش بنود متسجلة</td></tr>";
+    var sizes = S.filter(function(x){ return x.L > 0; }).map(function(x){
+      return "<tr><td>" + x.size + " مم</td><td>" + fmt(x.L, 1) + "</td><td>" + fmt(x.D, 1) + "</td><td>" + x.mn + "</td><td class='hi'>" + x.av + "</td><td>" + x.mx + "</td>" +
+        (anyPrice ? "<td>" + (x.cost === null ? "—" : fmt(x.cost)) + "</td>" : "") + "</tr>";
+    }).join("");
+    $("report").innerHTML =
+      "<div class='r-head'><div><h1>تقرير كميات أسلاك الكهرباء</h1><p>حاسبة لفات سلك الكهرباء · " + date + "</p></div>" +
+      "<div class='r-brand'>Eng/ Mostafa Elgindi<br>Gindi Innovations</div></div>" +
+      "<div class='r-kpis'><div><b>" + T.avg + "</b><span>إجمالي اللفات (متوسط)</span></div>" +
+      "<div><b>" + (T.max ? T.min + " – " + T.max : "—") + "</b><span>النطاق المتوقع (لفة)</span></div>" +
+      "<div><b>" + fmt(T.len, 1) + "</b><span>إجمالي الأطوال (متر قبل الهالك)</span></div>" +
+      (area !== null ? "<div><b>" + fmt(area, 1) + "</b><span>مساحة الشقة (م²)</span></div>" : "") + "</div>" +
+      "<h2>عدد اللفات لكل مقاس سلك</h2><table><thead><tr><th>المقاس</th><th>الطول (م)</th><th>بعد الهالك (م)</th><th>أدنى</th><th>متوسط</th><th>أعلى</th>" + (anyPrice ? "<th>التكلفة (ج)</th>" : "") + "</tr></thead><tbody>" + sizes +
+      "</tbody><tfoot><tr><td>الإجمالي</td><td>" + fmt(T.len, 1) + "</td><td>" + fmt(T.after, 1) + "</td><td>" + T.min + "</td><td class='hi'>" + T.avg + "</td><td>" + T.max + "</td>" + (anyPrice ? "<td>" + fmt(T.cost) + "</td>" : "") + "</tr></tfoot></table>" +
+      "<p class='r-note'>طول اللفة " + fmt(num($("roll")) || 0) + " م · الهالك " + fmt(num($("wmin")) || 0, 1) + "% / " + fmt(num($("wavg")) || 0, 1) + "% / " + fmt(num($("wmax")) || 0, 1) + "% · هامش الأطوال ±" + fmt(num($("margin")) || 0, 1) + "% · اللفات متقرّبة لأعلى لكل مقاس." + (anyPrice ? " · الأسعار من لستة السويدي (مجدول) " + PRICE_DATE + "، وممكن تتغير." : "") + "</p>" +
+      "<h2>تفصيل البنود</h2><table><thead><tr><th>البند</th><th>المقاس</th><th>العدد</th><th>الطول (م)</th></tr></thead><tbody>" + parts + "</tbody></table>" +
+      (e !== null ? "<h2>المقارنة مع طلب الكهربائي</h2><p class='r-cmp'>الكهربائي طلب <b>" + fmt(e, 1) + "</b> لفة · " + esc(verdict) + "</p>" : "") +
+      "<p class='r-warn'>الحسبة تقريبية وبتتغير حسب توزيع اللوحة وعدد النقاط وأطوال المسارات والأحمال، ولازم يعتمدها مهندس كهرباء مختص.</p>" +
+      "<p class='r-foot'>إعداد: Eng/ Mostafa Elgindi | Gindi Innovations</p>";
+  }
+
+  $("priceDate").textContent = "(" + PRICE_DATE + ")";
+  $("pdfBtn").addEventListener("click", function(){ calc(); window.print(); });
+
+  document.addEventListener("input", calc);
+  document.addEventListener("change", calc);
+  calc();
+})();
+</script>
+</body>
+</html>

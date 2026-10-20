@@ -380,25 +380,6 @@
   transform: scaleX(-1) translateX(0.25rem);
 }
 
-/* Not connected yet (its page says so too). */
-.sp-tool__status {
-  padding: 0.0625rem 0.375rem;
-  border: 1px solid var(--sp-gold-line);
-  color: var(--gindi-gold);
-  font-size: 0.625rem;
-  font-weight: var(--fw-medium);
-  letter-spacing: 0.14em;
-  line-height: 1.5;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-:lang(ar) .sp-tool__status {
-  font-size: 0.75rem;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
 /* ---------- Smaller screens ---------- */
 /* Tablets: two cards per row stays; the tools become 2 x 2. */
 @media (max-width: 64rem) {

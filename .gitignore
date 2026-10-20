@@ -61,3 +61,7 @@ htmlcov/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Design Studio room preparation: intermediate files and the browser profile (see tools/studio/README.md).
+/tools/studio/work/
+/tools/calc-tests/work/

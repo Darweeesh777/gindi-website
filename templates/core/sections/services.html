@@ -46,8 +46,6 @@ services. Styles: home.css (homepage only).
             <li class="svc-cell svc-cell--tool">
               <div class="svc-cell__top">
                 {% include "partials/tool_icon.html" with slug=tool.slug %}
-                {# Not connected yet: said here as well as on the tool's page. #}
-                {% if not tool.script %}<span class="svc-cell__status">{{ c.tools_page.status }}</span>{% endif %}
               </div>
               <h4 class="svc-cell__title"><a class="svc-cell__link" href="{{ tool.url }}">{{ tool.short_name }}</a></h4>
               <p class="svc-cell__text">

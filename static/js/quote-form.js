@@ -404,6 +404,9 @@
     fillProperties('');
     syncEmail();
     restore();
+    // The Design Studio's "Discuss this design" link: its selection as the message.
+    var design = new URLSearchParams(location.search).get('design');
+    if (design && control('message') && !val('message')) control('message').value = design.slice(0, 2000);
 
     return {
       clearStatus: function () { status.textContent = ''; },

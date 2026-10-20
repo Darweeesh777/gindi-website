@@ -125,7 +125,6 @@ None are required for the preview. Optional:
 | `QUOTATION_EMAIL` | *(empty)* | Enables "Submit via Email" in the quotation form (opens the visitor's email app addressed to it) |
 | `CONTACT_API_URL` | *(empty)* | `/api/contact`: all three forms send to the form backend ("Send Request"). Needs `TURNSTILE_SITE_KEY` too |
 | `TURNSTILE_SITE_KEY` | *(empty)* | The Turnstile widget's **site** key (public). The secret key is a Worker secret, never here |
-| `FREE_TOOL_WIRE_SCRIPT_URL`, `…_TILES_…`, `…_BRICKS_…`, `…_CEMENT_…` | *(empty)* | Loads that tool's agent. Empty: "Coming soon" |
 
 The values are built into the pages, so **after changing a variable, open
 Deployments and choose "Retry deployment"** on the latest one. The build
@@ -154,7 +153,7 @@ exported pages are public.
   `workers.dev` gets the page without a redirect. With a custom domain,
   turn on Cloudflare's "Always Use HTTPS".
 - "Illustrative image" labels on generated images, the not-available
-  enquiry form and "Coming soon" tools, all unchanged. The Projects pages are
+  enquiry form, all unchanged. The Projects pages are
   exported while `apps/core/projects.py` has `PUBLISHED = True` (the default).
 
 ## What a static host does not include

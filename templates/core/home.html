@@ -31,6 +31,7 @@
     {# Only once there are real projects (apps/core/projects.py PUBLISHED). #}
     {% if show_projects %}{% include "core/sections/projects.html" %}{% endif %}
     {% if visions %}{% include "core/sections/vision.html" %}{% endif %}
+    {% if studio_invite.styles %}{% include "core/sections/studio_invite.html" %}{% endif %}
     {% include "core/sections/services.html" %}
     {% include "core/sections/process.html" %}
     {% include "core/sections/about.html" %}

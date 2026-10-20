@@ -13,7 +13,13 @@
  *   announced.
  * - Completed adds markers on each photo (links to its connected views; the
  *   outgoing photo's markers hide at once, the new photo's appear with it),
- *   "Previous View" and "Overview". Previous View returns to the photo
+ *   "Previous View" and "Overview". A marker's label (its destination)
+ *   shows on mouse hover or keyboard focus, where a click or Enter/Space
+ *   opens the view. On touch, the first tap only shows the label; a second
+ *   tap on the marker, or a tap on its label, opens the view. One label at a
+ *   time; tapping elsewhere, Escape, or any change of image or tab hides it.
+ *   Each label is placed beside, above or below its marker so it stays
+ *   inside the photo. Previous View returns to the photo
  *   visited before, as long as there is one: an in-page history of the
  *   photos shown (thumbnails, markers and Overview add to it; going back
  *   does not; choosing the photo already shown changes nothing). The
@@ -62,6 +68,7 @@
 
   /* ---------- Tabs ---------- */
   var tabs = $$('[data-pg-tab]');
+  var hideLabels = function () {}; // set by the Completed gallery below
 
   function selectTab(tab, focus) {
     tabs.forEach(function (t) {
@@ -73,6 +80,7 @@
       panel.hidden = !on;
     });
     if (focus) tab.focus();
+    hideLabels(null);
     remeasure();
   }
 
@@ -218,8 +226,62 @@
       else homeButton.removeAttribute('aria-current');
     };
 
-    completed.onLeave = function () { showSpots(-1); };
+    /* Marker labels: placement, touch reveal, dismissal. */
+    var frameEl = completedEl.querySelector('[data-pg-frame]');
+    var spots = $$('[data-pg-goto]', completedEl);
+    var EDGE = 4; // px kept between a label and the photo's edge
+
+    // Put the label on the first side where it fits inside the photo:
+    // towards the middle first, then the other side, above, below. If none
+    // fits (very narrow photos), above or below, nudged inside.
+    var place = function (spot) {
+      var label = spot.querySelector('.pg-hotspot__label');
+      var f = frameEl.getBoundingClientRect();
+      var sides = spot.classList.contains('pg-hotspot--right') ? ['left', 'right', 'above', 'below'] : ['right', 'left', 'above', 'below'];
+      spot.style.removeProperty('--pg-nudge-x');
+      spot.style.removeProperty('--pg-nudge-y');
+      var fits = function (r) {
+        return r.left >= f.left + EDGE && r.right <= f.right - EDGE && r.top >= f.top + EDGE && r.bottom <= f.bottom - EDGE;
+      };
+      for (var i = 0; i < sides.length; i++) {
+        spot.setAttribute('data-place', sides[i]);
+        if (fits(label.getBoundingClientRect())) return;
+      }
+      var s = spot.getBoundingClientRect();
+      spot.setAttribute('data-place', s.top - f.top > f.bottom - s.bottom ? 'above' : 'below');
+      var r = label.getBoundingClientRect();
+      var dx = r.left < f.left + EDGE ? f.left + EDGE - r.left : r.right > f.right - EDGE ? f.right - EDGE - r.right : 0;
+      spot.style.setProperty('--pg-nudge-x', Math.round(dx) + 'px');
+    };
+
+    hideLabels = function (except) {
+      spots.forEach(function (spot) {
+        if (spot !== except) spot.classList.remove('is-revealed');
+      });
+    };
+
+    var reveal = function (spot) {
+      hideLabels(spot);
+      place(spot);
+      spot.classList.add('is-revealed');
+    };
+
+    // A tap anywhere else (the photo, the page) hides a revealed label.
+    document.addEventListener('click', function (event) {
+      if (!event.target.closest || !event.target.closest('.pg-hotspot')) hideLabels(null);
+    });
+
+    // Escape hides the label of the focused or revealed marker.
+    completedEl.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      var spot = event.target.closest && event.target.closest('.pg-hotspot');
+      if (spot) spot.classList.add('is-quiet');
+      hideLabels(null);
+    });
+
+    completed.onLeave = function () { hideLabels(null); showSpots(-1); };
     completed.onShow = function (index, previous) {
+      hideLabels(null);
       if (previous !== null && previous !== index) {
         if (goingBack) visited.pop();
         else visited.push(previous);
@@ -237,11 +299,29 @@
       else completed.expand.focus();
     };
 
-    $$('[data-pg-goto]', completedEl).forEach(function (spot) {
+    spots.forEach(function (spot) {
       var target = +spot.getAttribute('data-pg-goto');
-      spot.addEventListener('pointerenter', function () { completed.prefetch(target); });
-      spot.addEventListener('focus', function () { completed.prefetch(target); });
-      spot.addEventListener('click', function () { goingBack = false; completed.select(target, focusAfter); });
+      var pointer = ''; // how the current press started: 'mouse', 'touch', 'pen'
+      spot.addEventListener('pointerdown', function (event) { pointer = event.pointerType; });
+      spot.addEventListener('pointerenter', function (event) {
+        completed.prefetch(target);
+        if (event.pointerType === 'mouse') place(spot);
+      });
+      spot.addEventListener('focus', function () { completed.prefetch(target); place(spot); });
+      spot.addEventListener('blur', function () { spot.classList.remove('is-quiet'); });
+      spot.addEventListener('click', function (event) {
+        // Touch (or pen): the first tap only shows the destination. Mouse
+        // clicks and the keyboard (Enter/Space: detail 0) open it at once.
+        var touch = event.detail !== 0 && (event.pointerType || pointer) !== 'mouse' && (event.pointerType || pointer) !== '';
+        pointer = '';
+        if (touch && !spot.classList.contains('is-revealed')) {
+          reveal(spot);
+          return;
+        }
+        hideLabels(null);
+        goingBack = false;
+        completed.select(target, focusAfter);
+      });
     });
 
     previousButton.addEventListener('click', function () {

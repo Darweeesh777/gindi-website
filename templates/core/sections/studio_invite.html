@@ -1,0 +1,30 @@
+{% comment %}
+Homepage invitation to the GINDI Design Studio (/design-studio/). Copy:
+content.py → studio_invite; images: still renders of the studio's three rooms
+(static/studio/styles/).
+{% endcomment %}
+<section class="section studio-invite theme-dark" id="design-studio" aria-labelledby="studio-invite-title">
+  <div class="container studio-invite__grid">
+    <div class="studio-invite__copy">
+      <p class="label studio-invite__eyebrow"><span class="keystone" aria-hidden="true"></span>{{ c.studio_invite.eyebrow }}</p>
+      <h2 class="studio-invite__title" id="studio-invite-title">{{ c.studio_invite.title }}</h2>
+      <p class="studio-invite__text">{{ c.studio_invite.text }}</p>
+      <div class="studio-invite__actions">
+        <a class="btn btn--primary" href="{{ studio_invite.url }}#discover">{{ c.studio_invite.discover }}</a>
+        <a class="link-arrow studio-invite__explore" href="{{ studio_invite.url }}">{{ c.studio_invite.explore }}
+          {% include "partials/arrow.html" %}</a>
+      </div>
+    </div>
+    <figure class="studio-invite__media">
+      <ul class="studio-invite__rooms" role="list">
+        {% for style in studio_invite.styles %}
+          <li class="studio-invite__room">
+            <img src="{{ style.preview }}" width="1002" height="626" alt="" loading="lazy" decoding="async">
+            <span class="studio-invite__name">{{ style.name }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+      <figcaption class="studio-invite__caption">{{ c.studio_invite.caption }}</figcaption>
+    </figure>
+  </div>
+</section>

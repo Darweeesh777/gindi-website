@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 {% comment %}
-One free tool's page (/free-tools/<slug>/): wire, tiles, bricks, cement.
-
-INTEGRATION AREA — each tool has its own, independent agent:
-- Set FREE_TOOL_<SLUG>_SCRIPT_URL (environment / .env), e.g.
-  FREE_TOOL_TILES_SCRIPT_URL; it reaches this page as tool.script
-  (settings.FREE_TOOL_SCRIPTS). The page then loads that script, deferred.
-- The agent renders into #tool-<slug> ([data-tool-root="<slug>"]) and should
-  replace or remove [data-tool-placeholder], the "Coming soon" state.
-- Nothing on this page calculates anything by itself.
+One free calculator's page (/free-tools/<slug>/): wire, tiles, bricks, paint
+(apps/core/tools.py). A compact navy introduction, then the calculator on a
+warm off-white workspace: inputs, the navy results panel and "How was this
+calculated?". The calculator is built by static/js/tools/<slug>.js (page and
+wording) on static/js/tools/calc-ui.js (shared frame); its arithmetic is
+static/js/tools/<slug>-calc.js, unchanged from the original in
+static/Tools/*.txt. #report is the printable report (print only).
+Styles: css/calculator.css.
 {% endcomment %}
 
 {% block title %}{{ tool.name }} — {{ c.tools_page.meta_title }}{% endblock %}
@@ -22,32 +21,42 @@ INTEGRATION AREA — each tool has its own, independent agent:
 
 {% block head_extra %}
   {% load static %}
-  <link rel="stylesheet" href="{% static 'css/services-page.css' %}">
-  {% if tool.script %}<script src="{{ tool.script }}" defer data-tool-script="{{ tool.slug }}"></script>{% endif %}
+  <link rel="stylesheet" href="{% static 'css/calculator.css' %}">
+  <script src="{% static 'js/tools/calc-ui.js' %}" defer></script>
+  <script src="{% static 'js/tools/'|add:tool.slug|add:'-calc.js' %}" defer></script>
+  <script src="{% static 'js/tools/'|add:tool.slug|add:'.js' %}" defer></script>
 {% endblock %}
 
 {% block body %}
   {% include "partials/header.html" %}
 
   <main id="main" tabindex="-1">
-    <section class="section estimate theme-light" id="top" aria-labelledby="tool-title">
-      <div class="container estimate__layout">
-        <a class="link-arrow svc-back" href="{{ tools_url }}">{% include "partials/arrow.html" %}<span>{{ c.tools_page.back }}</span></a>
-        <header class="estimate__head">
-          <p class="svc-eyebrow label" data-reveal>{{ c.tools_page.eyebrow }}</p>
-          <h1 class="estimate__title" id="tool-title" data-reveal>{{ tool.name }}</h1>
-          <p class="estimate__lead" data-reveal>{{ tool.description }}</p>
-        </header>
+    <section class="calc-hero theme-dark" id="top" aria-labelledby="tool-title">
+      {# The logo's arch and keystone, as a fine gold outline (decorative). #}
+      <svg class="calc-hero__arch" viewBox="0 0 240 300" aria-hidden="true" focusable="false">
+        <path d="M30 300V120A90 90 0 0 1 210 120V300"/>
+        <path d="M58 300V122A62 62 0 0 1 182 122V300"/>
+        <polygon points="104,22 136,22 131,60 109,60"/>
+      </svg>
+      <div class="container calc-hero__inner">
+        <a class="link-arrow calc-back" href="{{ services_url }}#free-tools">{% include "partials/arrow.html" %}<span>{{ c.tools_page.back_tools }}</span></a>
+        <p class="calc-hero__eyebrow label">{{ c.tools_page.eyebrow }}</p>
+        <h1 class="calc-hero__title" id="tool-title">{{ tool.name }}</h1>
+        <p class="calc-hero__lead">{{ tool.description }}</p>
+      </div>
+    </section>
 
-        {# This tool's agent mounts here. #}
-        <div class="estimator" id="tool-{{ tool.slug }}" aria-live="polite" data-tool-root="{{ tool.slug }}">
-          <div class="estimator__soon" data-tool-placeholder>
-            <span class="estimator__status label">{{ c.tools_page.status }}</span>
-            <p class="estimator__text">{{ c.tools_page.soon }}</p>
-          </div>
+    <section class="calc-work theme-light" aria-labelledby="tool-title" data-tool="{{ tool.slug }}">
+      {% include "partials/calc_art.html" with slug=tool.slug %}
+      <div class="container calc-work__inner">
+        <div class="calc" data-calc="{{ tool.slug }}" data-logo="{% static 'images/brand/gindi-logo.png' %}">
+          <noscript><p class="calc__noscript">{{ c.tools_page.noscript }}</p></noscript>
         </div>
       </div>
     </section>
+
+    {# Filled with every calculation; shown only when printing. #}
+    <section class="calc-report" id="report" aria-hidden="true"></section>
   </main>
 
   {% include "partials/footer.html" %}

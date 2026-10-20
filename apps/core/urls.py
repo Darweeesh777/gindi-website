@@ -16,10 +16,15 @@ urlpatterns = [
     path('ar/about/', views.about_page, {'lang': 'ar'}, name='about_ar'),
     path('services/', views.services_page, {'lang': 'en'}, name='services'),
     path('ar/services/', views.services_page, {'lang': 'ar'}, name='services_ar'),
+    path('design-studio/', views.design_studio, {'lang': 'en'}, name='design_studio'),
+    path('ar/design-studio/', views.design_studio, {'lang': 'ar'}, name='design_studio_ar'),
     path('contact/', views.contact_page, {'lang': 'en'}, name='contact'),
     path('ar/contact/', views.contact_page, {'lang': 'ar'}, name='contact_ar'),
     path('free-tools/', views.free_tools, {'lang': 'en'}, name='free_tools'),
     path('ar/free-tools/', views.free_tools, {'lang': 'ar'}, name='free_tools_ar'),
+    # The cement page ("Coming soon") was replaced by the paint calculator: its address leads to the overview.
+    path('free-tools/cement/', RedirectView.as_view(pattern_name='core:free_tools', permanent=False)),
+    path('ar/free-tools/cement/', RedirectView.as_view(pattern_name='core:free_tools_ar', permanent=False)),
     path('free-tools/<slug:slug>/', views.free_tool, {'lang': 'en'}, name='free_tool'),
     path('ar/free-tools/<slug:slug>/', views.free_tool, {'lang': 'ar'}, name='free_tool_ar'),
     # The earlier single-tool page now lives in the overview.

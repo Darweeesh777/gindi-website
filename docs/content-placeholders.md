@@ -163,20 +163,21 @@ app: "Submit via Email" opens their email app addressed to `QUOTATION_EMAIL`,
 request filled in. **Neither is configured yet**, so both buttons are disabled
 and say so.
 
-**Free tools** are listed in **`apps/core/tools.py`** (`TOOLS`): wire,
-tiles, bricks, cement. Pages: `/free-tools/` (overview) and
-`/free-tools/<slug>/`; `/free-estimate/` redirects to the overview. Each
-tool has its own independent agent:
+**Free calculators** are listed in **`apps/core/tools.py`** (`TOOLS`):
+wire, tiles, bricks, paint. Pages: `/free-tools/` (overview) and
+`/free-tools/<slug>/`; `/free-estimate/` redirects to the overview and the
+earlier `/free-tools/cement/` page to it as well. They run entirely in the
+browser:
 
-1. Set its script URL: `FREE_TOOL_WIRE_SCRIPT_URL`,
-   `FREE_TOOL_TILES_SCRIPT_URL`, `FREE_TOOL_BRICKS_SCRIPT_URL` or
-   `FREE_TOOL_CEMENT_SCRIPT_URL` (environment / `.env`). That tool's page
-   then loads it; the others are unaffected.
-2. The agent renders into `#tool-<slug>` (`[data-tool-root="<slug>"]`) and
-   removes or replaces `[data-tool-placeholder]`, the "Coming soon" state.
+- `static/js/tools/<slug>-calc.js` — the arithmetic, data and constants,
+  taken unchanged from the originals kept in `static/Tools/*.txt` (reference
+  copies; never edited).
+- `static/js/tools/<slug>.js` — the page and its English / Arabic wording, on
+  the shared frame `static/js/tools/calc-ui.js`; styles `css/calculator.css`.
+- `tools/calc-tests/` — regression checks: every scenario is run on the
+  original and on the new page (English and Arabic) and every figure compared
+  (`python tools/calc-tests/run.py check`; see that folder's README).
 
-Until then each page shows "Coming soon" and calculates nothing, and the
-tool's card shows "Coming soon" with no "Start Free Estimate" button.
 Template: `templates/core/free_tool.html`; copy: `content.py` → `tools_page`.
 
 ## About page

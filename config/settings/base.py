@@ -165,14 +165,6 @@ CONTACT_API_URL = os.environ.get('CONTACT_API_URL', '').strip()
 if not re.match(r'(/[^/]|https://)', CONTACT_API_URL):
     CONTACT_API_URL = ''  # only a path on this site or an https:// address
 TURNSTILE_SITE_KEY = os.environ.get('TURNSTILE_SITE_KEY', '').strip()
-# Each free tool's agent script, loaded on its own page (/free-tools/<slug>/).
-# Empty: that page shows an honest "Coming soon" state.
-FREE_TOOL_SCRIPTS = {
-    'wire': os.environ.get('FREE_TOOL_WIRE_SCRIPT_URL', ''),
-    'tiles': os.environ.get('FREE_TOOL_TILES_SCRIPT_URL', ''),
-    'bricks': os.environ.get('FREE_TOOL_BRICKS_SCRIPT_URL', ''),
-    'cement': os.environ.get('FREE_TOOL_CEMENT_SCRIPT_URL', ''),
-}
 
 # Keep search engines out (X-Robots-Tag header, robots meta, robots.txt).
 # On by default so previews are never indexed by accident; set

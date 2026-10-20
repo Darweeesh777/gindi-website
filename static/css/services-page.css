@@ -58,10 +58,6 @@
   color: var(--muted);
 }
 
-.tool-card__status {
-  color: var(--gindi-gold);
-}
-
 .tool-card__cta {
   margin-block-start: 0.25rem;
 }
@@ -100,7 +96,7 @@
   color: var(--muted);
 }
 
-/* ---------- 404 page (reuses the estimator page layout) ---------- */
+/* ---------- 404 page (reuses the tools overview layout) ---------- */
 .error-page .estimate__layout {
   min-height: 45vh;
   align-content: center;
@@ -111,32 +107,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-md);
-}
-
-.estimator {
-  width: 100%;
-  min-height: 16rem;
-  border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--gindi-ivory) 70%, #fff);
-}
-
-.estimator__soon {
-  display: grid;
-  justify-items: start;
-  gap: 0.875rem;
-  max-width: 36rem;
-  padding: clamp(1.5rem, 4vw, 3rem);
-}
-
-.estimator__status {
-  padding: 0.3125rem 0.75rem;
-  background: var(--gindi-navy);
-  color: var(--gindi-ivory);
-}
-
-.estimator__text {
-  color: var(--muted);
-  line-height: 1.65;
 }
 
 /* Back links: the arrow points back. */

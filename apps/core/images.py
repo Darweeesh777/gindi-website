@@ -40,6 +40,39 @@ IMAGES = {
     # 03_09_25 = waiting, 03_06_47 = front.
     **{f'kk-concept-{view}': {'name': f'kk-concept-{view}', 'size': (1536, 1024), 'widths': (480, 960, 1536), 'illustrative': False}
        for view in ('stations', 'styling', 'coffee', 'waiting', 'front')},
+    # Project 02, the villa: the studio's photographs, from "static/images/Villa ( pictures )/"
+    # (originals kept as they are). villa-<id> is the file whose name starts with <ID>;
+    # derivatives: tools/studio/web_images.py villa. Portrait 480/800/full, landscape 640/1200/full.
+    'villa-026ca8ba': {'name': 'villa-026ca8ba', 'size': (944, 1667), 'widths': (480, 800, 944), 'illustrative': False},
+    'villa-0449b0f4': {'name': 'villa-0449b0f4', 'size': (946, 1663), 'widths': (480, 800, 946), 'illustrative': False},
+    'villa-1504c80c': {'name': 'villa-1504c80c', 'size': (1676, 939), 'widths': (640, 1200, 1676), 'illustrative': False},
+    'villa-196fb278': {'name': 'villa-196fb278', 'size': (944, 1666), 'widths': (480, 800, 944), 'illustrative': False},
+    'villa-1b473d43': {'name': 'villa-1b473d43', 'size': (941, 1671), 'widths': (480, 800, 941), 'illustrative': False},
+    'villa-396ea57f': {'name': 'villa-396ea57f', 'size': (943, 1668), 'widths': (480, 800, 943), 'illustrative': False},
+    'villa-3e7ab2b8': {'name': 'villa-3e7ab2b8', 'size': (945, 1663), 'widths': (480, 800, 945), 'illustrative': False},
+    'villa-44769fca': {'name': 'villa-44769fca', 'size': (1674, 940), 'widths': (640, 1200, 1674), 'illustrative': False},
+    'villa-47624f42': {'name': 'villa-47624f42', 'size': (940, 1674), 'widths': (480, 800, 940), 'illustrative': False},
+    'villa-4e987bed': {'name': 'villa-4e987bed', 'size': (945, 1664), 'widths': (480, 800, 945), 'illustrative': False},
+    'villa-4fd6edc7': {'name': 'villa-4fd6edc7', 'size': (1665, 944), 'widths': (640, 1200, 1665), 'illustrative': False},
+    'villa-50cac651': {'name': 'villa-50cac651', 'size': (941, 1671), 'widths': (480, 800, 941), 'illustrative': False},
+    'villa-63aed22b': {'name': 'villa-63aed22b', 'size': (943, 1668), 'widths': (480, 800, 943), 'illustrative': False},
+    'villa-6cc5e965': {'name': 'villa-6cc5e965', 'size': (1668, 943), 'widths': (640, 1200, 1668), 'illustrative': False},
+    'villa-7750873b': {'name': 'villa-7750873b', 'size': (942, 1670), 'widths': (480, 800, 942), 'illustrative': False},
+    'villa-85018c79': {'name': 'villa-85018c79', 'size': (945, 1665), 'widths': (480, 800, 945), 'illustrative': False},
+    'villa-8a3b7f60': {'name': 'villa-8a3b7f60', 'size': (1667, 944), 'widths': (640, 1200, 1667), 'illustrative': False},
+    'villa-98b46f9a': {'name': 'villa-98b46f9a', 'size': (944, 1665), 'widths': (480, 800, 944), 'illustrative': False},
+    'villa-9b90c92c': {'name': 'villa-9b90c92c', 'size': (941, 1671), 'widths': (480, 800, 941), 'illustrative': False},
+    'villa-9d2616d8': {'name': 'villa-9d2616d8', 'size': (941, 1672), 'widths': (480, 800, 941), 'illustrative': False},
+    'villa-a32d2d56': {'name': 'villa-a32d2d56', 'size': (937, 1679), 'widths': (480, 800, 937), 'illustrative': False},
+    'villa-a530da02': {'name': 'villa-a530da02', 'size': (944, 1666), 'widths': (480, 800, 944), 'illustrative': False},
+    'villa-a752bb03': {'name': 'villa-a752bb03', 'size': (943, 1668), 'widths': (480, 800, 943), 'illustrative': False},
+    'villa-bbf489ef': {'name': 'villa-bbf489ef', 'size': (943, 1667), 'widths': (480, 800, 943), 'illustrative': False},
+    'villa-c9a23790': {'name': 'villa-c9a23790', 'size': (945, 1664), 'widths': (480, 800, 945), 'illustrative': False},
+    'villa-cf76fe9b': {'name': 'villa-cf76fe9b', 'size': (942, 1670), 'widths': (480, 800, 942), 'illustrative': False},
+    'villa-d5bc9550': {'name': 'villa-d5bc9550', 'size': (940, 1673), 'widths': (480, 800, 940), 'illustrative': False},
+    'villa-ddba2016': {'name': 'villa-ddba2016', 'size': (942, 1670), 'widths': (480, 800, 942), 'illustrative': False},
+    'villa-f7e821a2': {'name': 'villa-f7e821a2', 'size': (939, 1676), 'widths': (480, 800, 939), 'illustrative': False},
+    'villa-fe4b86ef': {'name': 'villa-fe4b86ef', 'size': (943, 1668), 'widths': (480, 800, 943), 'illustrative': False},
     # TEMPORARY second comparison (sample, not a project): the hero room empty
     # (master: room-background.png), paired with 'hero-desktop' (the same room
     # furnished, same viewpoint and size). Remove with its VISIONS entry.

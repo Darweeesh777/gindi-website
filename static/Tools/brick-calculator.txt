@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<title>حاسبة عدد وتكلفة الطوب | Eng/ Mostafa Elgindi</title>
+<meta name="description" content="احسب عدد الطوب اللي محتاجه للحوائط وتكلفته حسب نوع ومقاس الطوبة وسعر الألف طوبة. إعداد Eng/ Mostafa Elgindi - Gindi Innovations">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A; --orange:#F5A623; --cream:#F3D9A4;
+    --input-bg:#FFF8E1; --input-bd:#E8CF85; --input-fg:#0000FF;
+    --green-bg:#E2F0D9; --green-fg:#2E6B1F; --red:#C00000;
+    --bg:#F3F5F9; --card:#FFFFFF; --text:#1B2433; --muted:#6B7280; --line:#E3E7EE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--navy);border-radius:14px;overflow:hidden;color:#fff}
+  header .top{padding:22px 20px 16px}
+  header h1{margin:0;font-size:24px;font-weight:800}
+  header p{margin:4px 0 0;color:var(--cream);font-size:14px}
+  header .brand{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--orange);color:var(--navy);padding:6px 20px;font-size:13px;font-weight:700}
+  .card{background:var(--card);border-radius:14px;padding:18px;margin-top:14px;border-top:4px solid var(--orange);box-shadow:0 1px 3px rgba(11,31,58,.08)}
+  .card h2{margin:0 0 4px;font-size:17px;color:var(--navy);padding-bottom:6px;border-bottom:2px solid var(--navy)}
+  .hint{margin:8px 0 12px;color:var(--muted);font-size:13px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
+  input[type=number],select{width:100%;min-width:0;font:inherit;font-weight:700;color:var(--input-fg);background:var(--input-bg);border:1.5px solid var(--input-bd);border-radius:8px;padding:8px;text-align:center;-moz-appearance:textfield}
+  input:focus,select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,166,35,.25)}
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .size{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--green-bg);color:var(--green-fg);font-weight:700;font-size:13.5px}
+
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#F9FAFC}
+  .item .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+  .item .head b{color:var(--navy);font-size:15px}
+  .item .head small{color:var(--muted);font-size:12px;display:block;font-weight:400}
+  .item .head .tot{background:var(--green-bg);color:var(--green-fg);font-weight:800;border-radius:8px;padding:4px 10px;white-space:nowrap;font-size:14px}
+  .item .head .right{display:flex;align-items:center;gap:6px}
+  .add{display:block;width:100%;margin-top:8px;font:inherit;font-weight:700;font-size:14px;color:var(--navy);background:transparent;border:1.5px dashed var(--orange);border-radius:10px;padding:8px;cursor:pointer}
+  .add:hover,.add:focus-visible{background:var(--input-bg);outline:none}
+  .del{font:inherit;font-weight:800;font-size:18px;line-height:1;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--red);cursor:pointer}
+  .item .f{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .item .f label{font-size:11.5px;color:var(--navy);font-weight:600;display:block;margin-bottom:2px;white-space:nowrap}
+  .sumline{display:flex;justify-content:space-between;margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700}
+  .sumline span:last-child{color:var(--orange);font-size:18px}
+
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{border-radius:12px;padding:14px;background:var(--green-bg);color:var(--green-fg)}
+  .kpi.hero{grid-column:1/-1;background:var(--navy);color:#fff;text-align:center}
+  .kpi .v{font-size:26px;font-weight:800;line-height:1.2}
+  .kpi.hero .v{font-size:44px;color:var(--orange)}
+  .kpi .l{font-size:13px;font-weight:600}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px}
+  .cmp div{padding:8px 12px;border-radius:8px;background:#F3F5F9;font-size:14px}
+  .cmp div:nth-child(odd){font-weight:700;color:var(--navy)}
+  .cmp div:nth-child(even){background:var(--green-bg);color:var(--green-fg);font-weight:700;text-align:center}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .warn{color:var(--red);font-size:12.5px;margin-top:10px}
+  dl{margin:10px 0 0;display:grid;grid-template-columns:120px 1fr;gap:8px 12px;font-size:13.5px}
+  dt{font-weight:700;color:var(--navy);background:#F3F5F9;border-radius:6px;padding:4px 8px;align-self:start}
+  dd{margin:0;padding:4px 0}
+  footer{margin:16px 0 8px;text-align:center;font-size:12.5px;color:var(--muted)}
+  footer b{color:var(--navy)}
+  .pdf{display:block;width:100%;margin-top:14px;font:inherit;font-weight:800;font-size:16px;color:#fff;background:var(--navy);border:0;border-radius:10px;padding:12px;cursor:pointer;border-bottom:4px solid var(--orange)}
+  .pdf:hover,.pdf:focus-visible{filter:brightness(1.15);outline:none}
+  #report{display:none}
+  .back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:8px;color:var(--navy);font-weight:700;font-size:14px;text-decoration:none}
+  .back:hover,.back:focus-visible{text-decoration:underline;text-decoration-color:var(--orange);text-underline-offset:4px}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;color:#1B2433;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wrap > *:not(#report){display:none!important}
+    .wrap{max-width:none;padding:0}
+    #report{display:block;font-size:12px}
+    #report .r-head{display:flex;justify-content:space-between;align-items:center;background:#0B1F3A;color:#fff;padding:12px 16px;border-radius:8px;border-bottom:4px solid #F5A623}
+    #report h1{margin:0;font-size:20px}
+    #report .r-head p{margin:2px 0 0;color:#F3D9A4;font-size:12px}
+    #report .r-brand{background:#F5A623;color:#0B1F3A;font-weight:800;padding:6px 10px;border-radius:6px;text-align:center;direction:ltr;font-size:11px}
+    #report .r-kpis{display:flex;gap:8px;margin:12px 0}
+    #report .r-kpis div{flex:1;background:#E2F0D9;color:#2E6B1F;border-radius:8px;padding:8px;text-align:center}
+    #report .r-kpis div:first-child{background:#0B1F3A;color:#fff}
+    #report .r-kpis div:first-child b{color:#F5A623}
+    #report .r-kpis b{display:block;font-size:20px}
+    #report .r-kpis span{font-size:10.5px}
+    #report h2{font-size:14px;color:#0B1F3A;border-bottom:2px solid #0B1F3A;padding-bottom:3px;margin:14px 0 6px}
+    #report table{width:100%;border-collapse:collapse;font-size:11.5px;margin:0;page-break-inside:auto}
+    #report tr{page-break-inside:avoid}
+    #report th{background:#0B1F3A;color:#fff;padding:5px 4px}
+    #report td{padding:4px;text-align:center;border-bottom:1px solid #E3E7EE}
+    #report td.l{text-align:right}
+    #report td.hi{background:#E2F0D9;color:#2E6B1F;font-weight:800}
+    #report tfoot td{font-weight:800;border-top:2px solid #0B1F3A}
+    #report .r-note{color:#6B7280;font-size:10.5px;margin:4px 0 0}
+    #report .r-warn{color:#C00000;font-size:10.5px;margin-top:12px}
+    #report .r-foot{text-align:center;color:#6B7280;font-size:10.5px;border-top:1px solid #E3E7EE;padding-top:6px;margin-top:10px}
+  }
+  @media (max-width:560px){
+    .grid3{grid-template-columns:1fr 1fr}
+    .item .f{grid-template-columns:repeat(2,1fr)}
+    .kpi.hero .v{font-size:38px}
+    dl{grid-template-columns:1fr}
+    dt{justify-self:start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="../index.html#services">الرجوع لخدمات Gindi Innovations</a>
+
+  <header>
+    <div class="top">
+      <h1>حاسبة عدد وتكلفة الطوب</h1>
+      <p>اختار نوع الطوبة، واكتب أبعاد الحوائط وسعر الألف طوبة</p>
+    </div>
+    <div class="brand"><span>Eng/ Mostafa Elgindi</span><span>Gindi Innovations</span></div>
+  </header>
+
+  <section class="card">
+    <h2>١ — الطوبة والسعر</h2>
+    <p class="hint">الخانات الصفرا بخط أزرق مدخلات تقدر تغيّرها، والنتيجة بتتحسب لوحدها وانت بتكتب.</p>
+    <div class="field"><label for="brick">نوع ومقاس الطوبة</label><select id="brick"></select></div>
+    <div class="size" id="sizeInfo"></div>
+    <div class="grid3">
+      <div class="field"><label for="price">سعر الألف طوبة (ج)</label><input type="number" id="price" min="0" inputmode="decimal" placeholder="سعر المورد"></div>
+      <div class="field"><label for="waste">الهالك %</label><input type="number" id="waste" min="0" inputmode="decimal" value="5"></div>
+      <div class="field"><label for="joint">سُمك العرموس (سم)</label><input type="number" id="joint" min="0" inputmode="decimal" value="1"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>٢ — الحوائط</h2>
+    <p class="hint">لكل حائط اكتب الطول والارتفاع بالمتر، ومساحة الأبواب والشبابيك اللي فيه لو موجودة (مثلاً باب 0.9×2.1 + شباك 1.2×1.2 = 3.33 م²)، واختار سُمك الحائط. لو عندك حوائط أكتر دوس «+ إضافة حائط».</p>
+    <div id="walls"><button type="button" class="add" id="addWall">+ إضافة حائط</button></div>
+    <div class="sumline"><span>صافي مساحة الحوائط (م²)</span><span id="sumArea">0</span></div>
+  </section>
+
+  <section class="card">
+    <h2>٣ — النتيجة</h2>
+    <div class="kpis" style="margin-top:12px">
+      <div class="kpi hero"><div class="v" id="kBricks">0</div><div class="l" id="kBricksL">طوبة للشراء شامل الهالك</div></div>
+      <div class="kpi"><div class="v" id="kCost">—</div><div class="l" id="kCostL">التكلفة الإجمالية (جنيه)</div></div>
+      <div class="kpi"><div class="v" id="kRate">0</div><div class="l">طوبة في المتر (نص طوبة)</div></div>
+    </div>
+    <div class="cmp">
+      <div>عدد الطوب الصافي</div><div id="cNet">0</div>
+      <div>الهالك</div><div id="cWaste">0</div>
+      <div>طوب المتر (طوبة)</div><div id="cRate2">0</div>
+    </div>
+    <button type="button" class="pdf" id="pdfBtn">تصدير التقرير PDF</button>
+    <p class="note" style="text-align:center">هتفتحلك نافذة الطباعة، اختار منها «حفظ كـ PDF» (Save as PDF).</p>
+    <p class="warn">الحسبة تقديرية وبتتغير حسب مقاس الطوب الفعلي وسُمك العرموس وطريقة التنفيذ، ولازم يعتمدها مهندس مدني مختص.</p>
+  </section>
+
+  <section class="card">
+    <h2>منطق الحسبة</h2>
+    <dl>
+      <dt>المساحة الصافية</dt><dd>الطول × الارتفاع − مساحة الفتحات.</dd>
+      <dt>نص طوبة</dt><dd>حيطة سُمكها عرض الطوبة: طوب المتر = 10000 ÷ ((طول الطوبة + العرموس) × (ارتفاعها + العرموس)) بالسنتيمتر.</dd>
+      <dt>طوبة</dt><dd>حيطة سُمكها طول الطوبة: طوب المتر = 10000 ÷ ((عرض الطوبة + العرموس) × (ارتفاعها + العرموس))، يعني حوالي ضعف النص طوبة.</dd>
+      <dt>طوبة ونص</dt><dd>طوب النص طوبة + طوب الطوبة.</dd>
+      <dt>الهالك</dt><dd>مجموع الطوب × (1 + الهالك)، وبعدين بيتقرّب لأعلى لطوبة كاملة. عادة من 3% لـ 5%.</dd>
+      <dt>التكلفة</dt><dd>عدد الطوب للشراء ÷ 1000 × سعر الألف طوبة.</dd>
+      <dt>العرموس</dt><dd>1 سم للطوب العادي، وحوالي 0.3 سم للطوب الخفيف اللي بيتركب بلاصق.</dd>
+      <dt>المقاسات</dt><dd>الشائعة في السوق المصري وبتختلف شوية من مصنع للتاني، فراجع مقاس المورد. البلوك والطوب الخفيف عادة بيتبنوا نص طوبة.</dd>
+      <dt>مش محسوب</dt><dd>أسمنت ورمل المونة.</dd>
+    </dl>
+  </section>
+
+  <section id="report" aria-hidden="true"></section>
+  <footer>إعداد: <b>Eng/ Mostafa Elgindi</b> | Gindi Innovations | الحسبة تقديرية وتُعتمد من مهندس مدني مختص<br>© Gindi Innovations — ممنوع إعادة النشر أو النسخ بدون إذن كتابي</footer>
+</div>
+
+<script>
+(function(){
+  // Same logic as Eng_Mostafa_Elgindi_Brick_Calculator.xlsx (sheet «الحسبة»)
+  // [name, length, width, height] in cm — same list as sheet «أنواع الطوب»
+  var BRICKS = [
+    ["طوب أحمر طفلي مصمت", 25, 12, 6],
+    ["طوب أحمر طفلي مفرغ", 24, 11, 6],
+    ["طوب أحمر طفلي مفرغ", 25, 12, 13],
+    ["طوب أحمر طفلي مفرغ", 40, 20, 20],
+    ["طوب أسمنتي مصمت", 25, 12, 6],
+    ["طوب أسمنتي مفرغ", 25, 12, 12],
+    ["بلوك أسمنتي مفرغ", 40, 20, 20],
+    ["بلوك أسمنتي مفرغ", 40, 15, 20],
+    ["بلوك أسمنتي مفرغ", 40, 10, 20],
+    ["طوب رملي جيري", 25, 12, 6],
+    ["طوب خفيف (خرسانة خلوية)", 60, 20, 20],
+    ["طوب خفيف (خرسانة خلوية)", 60, 15, 20],
+    ["طوب خفيف (خرسانة خلوية)", 60, 10, 20],
+    ["طوب واجهات (فيس)", 24, 11, 6]
+  ];
+  var THICK = ["نص طوبة", "طوبة", "طوبة ونص"];
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n, d){ return n.toLocaleString("en-US", {maximumFractionDigits: d || 0}); };
+  var num = function(el){ var v = parseFloat(el.value); return isFinite(v) && v >= 0 ? v : null; };
+  var up = function(x){ return Math.ceil(x - 1e-9); }; // ROUNDUP(x,0) for x >= 0
+  // LRI…PDI keeps "25×12×6" reading left-to-right inside Arabic text
+  var dims = function(b){ return "⁦" + b[1] + "×" + b[2] + "×" + b[3] + "⁩ سم"; };
+  var label = function(b){ return b[0] + "  " + dims(b); };
+
+  $("brick").innerHTML = BRICKS.map(function(b, i){ return '<option value="' + i + '">' + label(b) + "</option>"; }).join("");
+
+  var box = $("walls"), addBtn = $("addWall"), nextId = 0;
+  function addWall(focus, L, H, O){
+    var i = nextId++, d = document.createElement("div");
+    d.className = "item"; d.dataset.row = i;
+    d.innerHTML =
+      '<div class="head"><div><b class="ttl"></b><small id="m' + i + '">0 م²</small></div>' +
+      '<div class="right"><div class="tot" id="g' + i + '">0 طوبة</div>' +
+      '<button type="button" class="del" aria-label="شيل الحائط ده">×</button></div></div>' +
+      '<div class="f">' +
+        '<div><label for="l' + i + '">الطول (م)</label><input type="number" min="0" inputmode="decimal" id="l' + i + '" value="' + (L || "") + '" placeholder="0"></div>' +
+        '<div><label for="h' + i + '">الارتفاع (م)</label><input type="number" min="0" inputmode="decimal" id="h' + i + '" value="' + (H || "") + '" placeholder="0"></div>' +
+        '<div><label for="o' + i + '">خصم الفتحات (م²)</label><input type="number" min="0" inputmode="decimal" id="o' + i + '" value="' + (O || "") + '" placeholder="0"></div>' +
+        '<div><label for="t' + i + '">سُمك الحائط</label><select id="t' + i + '">' + THICK.map(function(t){ return "<option>" + t + "</option>"; }).join("") + '</select></div>' +
+      '</div>';
+    d.querySelector(".del").addEventListener("click", function(){ d.remove(); renumber(); calc(); });
+    box.insertBefore(d, addBtn);
+    renumber();
+    if (focus) $("l" + i).focus();
+  }
+  function renumber(){
+    var rows = box.querySelectorAll(".item");
+    rows.forEach(function(r, k){
+      r.querySelector(".ttl").textContent = "حائط " + (k + 1);
+      r.querySelector(".del").hidden = rows.length === 1;
+    });
+  }
+  addBtn.addEventListener("click", function(){ addWall(true); calc(); });
+  addWall(false, 5, 3, 3.33);
+
+  function calc(){
+    var b = BRICKS[$("brick").value];
+    var j = num($("joint")) || 0, waste = (num($("waste")) || 0) / 100, price = num($("price"));
+    var half = 10000 / ((b[1] + j) * (b[3] + j)), full = 10000 / ((b[2] + j) * (b[3] + j));
+    $("sizeInfo").innerHTML = "الطول × العرض × الارتفاع: " + dims(b) + " · " + fmt(half, 1) + " طوبة/م² نص طوبة";
+
+    var area = 0, net = 0, W = [];
+    box.querySelectorAll(".item").forEach(function(r){
+      var i = r.dataset.row;
+      var L = num($("l" + i)) || 0, H = num($("h" + i)) || 0, O = num($("o" + i)) || 0, t = $("t" + i).value;
+      var a = Math.max(0, L * H - O);
+      var rate = t === THICK[1] ? full : t === THICK[2] ? half + full : half;
+      var n = a * rate;
+      area += a; net += n;
+      $("m" + i).textContent = fmt(a, 2) + " م² صافي";
+      $("g" + i).textContent = fmt(n) + " طوبة";
+      W.push({name: r.querySelector(".ttl").textContent, L: L, H: H, O: O, t: t, a: a, rate: rate, n: n});
+    });
+    var gross = net * (1 + waste), buy = up(gross);
+    var cost = price === null ? null : buy / 1000 * price;
+
+    $("sumArea").textContent = fmt(area, 2);
+    $("kBricks").textContent = fmt(buy);
+    $("kBricksL").textContent = "طوبة للشراء شامل " + fmt(waste * 100, 1) + "% هالك";
+    $("kCost").textContent = cost === null ? "—" : fmt(cost);
+    $("kCostL").textContent = cost === null ? "اكتب سعر الألف طوبة فوق" : "التكلفة الإجمالية (جنيه)";
+    $("kRate").textContent = fmt(half, 1);
+    $("cNet").textContent = fmt(net, 1) + " طوبة";
+    $("cWaste").textContent = fmt(gross - net, 1) + " طوبة";
+    $("cRate2").textContent = fmt(full, 1) + " طوبة/م²";
+
+    buildReport(b, W, area, net, buy, cost, price, waste, j);
+  }
+
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(ch){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]; }); }
+  function buildReport(b, W, area, net, buy, cost, price, waste, j){
+    var d = new Date(), date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+    var rows = W.map(function(w){
+      return "<tr><td class='l'>" + esc(w.name) + "</td><td>" + fmt(w.L, 2) + "</td><td>" + fmt(w.H, 2) + "</td><td>" + fmt(w.O, 2) + "</td><td>" + w.t +
+        "</td><td>" + fmt(w.a, 2) + "</td><td>" + fmt(w.rate, 1) + "</td><td class='hi'>" + fmt(w.n) + "</td></tr>";
+    }).join("");
+    $("report").innerHTML =
+      "<div class='r-head'><div><h1>تقرير كمية وتكلفة الطوب</h1><p>حاسبة عدد وتكلفة الطوب · " + date + "</p></div>" +
+      "<div class='r-brand'>Eng/ Mostafa Elgindi<br>Gindi Innovations</div></div>" +
+      "<div class='r-kpis'><div><b>" + fmt(buy) + "</b><span>طوبة للشراء شامل الهالك</span></div>" +
+      "<div><b>" + (cost === null ? "—" : fmt(cost)) + "</b><span>التكلفة الإجمالية (جنيه)</span></div>" +
+      "<div><b>" + fmt(area, 2) + "</b><span>صافي مساحة الحوائط (م²)</span></div></div>" +
+      "<p class='r-note'>الطوبة: " + esc(label(b)) + " · العرموس " + fmt(j, 2) + " سم · الهالك " + fmt(waste * 100, 1) + "%" +
+      (price === null ? "" : " · سعر الألف طوبة " + fmt(price, 2) + " ج") + "</p>" +
+      "<h2>تفصيل الحوائط</h2><table><thead><tr><th>الحائط</th><th>الطول (م)</th><th>الارتفاع (م)</th><th>الفتحات (م²)</th><th>السُمك</th><th>الصافي (م²)</th><th>طوب/م²</th><th>عدد الطوب</th></tr></thead><tbody>" + rows +
+      "</tbody><tfoot><tr><td>الإجمالي</td><td></td><td></td><td></td><td></td><td>" + fmt(area, 2) + "</td><td></td><td class='hi'>" + fmt(net) + "</td></tr></tfoot></table>" +
+      "<p class='r-note'>عدد الطوب الصافي " + fmt(net, 1) + " × (1 + " + fmt(waste * 100, 1) + "% هالك) = " + fmt(net * (1 + waste), 1) + "، متقرّب لأعلى = " + fmt(buy) + " طوبة.</p>" +
+      "<p class='r-warn'>الحسبة تقديرية وبتتغير حسب مقاس الطوب الفعلي وسُمك العرموس وطريقة التنفيذ، ولازم يعتمدها مهندس مدني مختص.</p>" +
+      "<p class='r-foot'>إعداد: Eng/ Mostafa Elgindi | Gindi Innovations</p>";
+  }
+
+  $("pdfBtn").addEventListener("click", function(){ calc(); window.print(); });
+  document.addEventListener("input", calc);
+  document.addEventListener("change", calc);
+  calc();
+})();
+</script>
+</body>
+</html>

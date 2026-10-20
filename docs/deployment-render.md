@@ -64,7 +64,6 @@ never paste them into a chat:
 |---|---|
 | `ENQUIRY_FORM_ACTION` | Enquiry form posts there (e.g. a form service). Empty: the form says it is not connected and cannot be sent |
 | `WHATSAPP_NUMBER` | Shows "Chat with Us on WhatsApp" (digits, international format). Empty: no button |
-| `FREE_TOOL_WIRE_SCRIPT_URL`, `…_TILES_…`, `…_BRICKS_…`, `…_CEMENT_…` | Loads that tool's agent. Empty: "Coming soon" |
 | `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_PASSWORD`, `DJANGO_SUPERUSER_EMAIL` | `build.sh` creates an `/admin/` account on the next deploy |
 | `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` | Extra hostnames (only for a custom domain later) |
 | `DJANGO_LOG_LEVEL` | Django log level (default `INFO`) |

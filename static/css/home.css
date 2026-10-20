@@ -334,26 +334,6 @@
   transition: transform var(--dur-fast) var(--ease-out);
 }
 
-/* Not connected yet (the tool's page says so too). */
-.home .svc-cell__status {
-  padding: 0.125rem 0.4rem;
-  border: 1px solid var(--svc-gold-line);
-  color: var(--gindi-gold);
-  font-family: var(--font-sans);
-  font-size: 0.625rem;
-  font-weight: var(--fw-medium);
-  letter-spacing: 0.14em;
-  line-height: 1.4;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-:lang(ar) .home .svc-cell__status {
-  font-size: 0.75rem;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
 /* The whole cell opens its service or tool. */
 .home .svc-cell__link {
   color: inherit;
@@ -487,5 +467,124 @@
 @media (max-width: 40rem) {
   .home .about__media .media--arch {
     max-width: min(100%, 60vw + 1rem, 18rem);
+  }
+}
+
+/* ---------- GINDI Design Studio invitation ----------
+   A navy band between "From Vision to Reality" and Services: the question
+   and its two links beside the three studio rooms (stills of the 3D scenes);
+   stacked on tablets and phones. Its own padding, as a band needs more room
+   than the shared section spacing. */
+.home > .studio-invite {
+  padding-block: clamp(2.5rem, 1.5rem + 3.6vw, 4.5rem);
+}
+
+.studio-invite__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: clamp(1.75rem, 1rem + 3vw, 4rem);
+}
+
+.studio-invite__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--gindi-gold);
+}
+
+.studio-invite__title {
+  margin-block-start: 0.75rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.875rem, 1.3rem + 2vw, 3rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.1;
+}
+
+.studio-invite__text {
+  max-width: 32rem;
+  margin-block-start: 1rem;
+  color: var(--muted);
+}
+
+.studio-invite__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+  margin-block-start: 1.75rem;
+}
+
+.studio-invite__media {
+  margin: 0;
+}
+
+.studio-invite__rooms {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studio-invite__room {
+  position: relative;
+  overflow: hidden;
+}
+
+.studio-invite__room:first-child {
+  grid-row: 1 / span 2;
+}
+
+.studio-invite__room img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 16 / 10;
+}
+
+.studio-invite__room:first-child img {
+  aspect-ratio: auto;
+}
+
+.studio-invite__name {
+  position: absolute;
+  inset-block-end: 0.625rem;
+  inset-inline-start: 0.625rem;
+  padding: 0.25rem 0.625rem;
+  background: rgb(28 44 74 / 0.82);
+  color: var(--gindi-ivory);
+  font-size: 0.8125rem;
+  font-weight: var(--fw-medium);
+}
+
+.studio-invite__caption {
+  margin-block-start: 0.75rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 64rem) {
+  .studio-invite__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 40rem) {
+  .studio-invite__rooms {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .studio-invite__room:first-child {
+    grid-row: auto;
+    grid-column: 1 / -1;
+  }
+
+  .studio-invite__room:first-child img {
+    aspect-ratio: 16 / 10;
   }
 }

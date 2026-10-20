@@ -566,3 +566,51 @@
     transform: none !important;
   }
 }
+
+/* ---------- From Vision to Reality on a project page ----------
+   partials/project_compare.html: the homepage comparison's markup and
+   styles (.compare*, sections.css), sized here for this page only. The
+   frame keeps the images' own 3:2 shape (nothing cropped or stretched); the
+   block is as wide as the screen height allows, so heading, image and
+   labels fit one screen, but never wider than the gallery's content width
+   nor narrower than 30rem (phones simply scroll). */
+.pv {
+  padding-block: 0 clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+}
+
+.pv > .container {
+  max-width: 120rem;
+  padding-inline: clamp(1rem, 0.4rem + 2.4vw, 3rem); /* the gallery's edges */
+}
+
+.pv__inner {
+  width: clamp(min(100%, 30rem), calc((100vh - var(--header-h) - 9rem) * 1.5), 100%);
+  width: clamp(min(100%, 30rem), calc((100svh - var(--header-h) - 9rem) * 1.5), 100%);
+  margin-inline: auto;
+}
+
+.pv__title {
+  margin-block-end: clamp(0.875rem, 0.5rem + 1vw, 1.5rem);
+  font-size: min(var(--fs-h2), 9vh);
+}
+
+.pv .compare {
+  display: block;
+  max-height: none;
+}
+
+.pv .compare__frame {
+  aspect-ratio: 3 / 2;
+  min-height: 0;
+  max-height: none;
+}
+
+/* The render stays on the left in Arabic too: the comparison is dir="ltr",
+   so undo the page-level right-to-left placement of the design layer. */
+.pv .compare[dir="ltr"] .compare__layer--design {
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+
+.pv .compare[dir="ltr"] .compare__divider {
+  left: var(--pos);
+}

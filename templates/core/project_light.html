@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% comment %}
+A project with layout 'light' (apps/core/projects.py): Project 02, the villa.
+"Follow the Light": five photographs, alternately left and right, joined by
+one continuous line of light that scroll draws down the page and that brings
+each photograph from dim to its natural brightness as it arrives
+(static/js/project-light.js draws the line from the photographs' actual
+positions). Then "Explore the Villa": every photograph in a carousel, grouped
+by space. Photos open in the full-screen gallery (static/js/projects-page.js).
+Without JavaScript or with reduced motion, every photograph is shown at its
+natural brightness. Styles: css/project-light.css.
+{% endcomment %}
+{% load static %}
+
+{% block title %}{{ project.name }} — {{ c.projects_page.meta_title }}{% endblock %}
+{% block description %}{{ project.work }}{% endblock %}
+
+{% block alternates %}
+  <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+  <link rel="alternate" hreflang="ar" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.ar }}">
+  <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ alternate.en }}">
+{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'css/projects-page.css' %}">
+  <link rel="stylesheet" href="{% static 'css/project-light.css' %}">
+  <script src="{% static 'js/projects-page.js' %}" defer></script>
+  <script src="{% static 'js/project-light.js' %}" defer></script>
+{% endblock %}
+
+{% block body %}
+  {% include "partials/header.html" %}
+
+  {% with t=c.project_light light=project.light %}
+  <main id="main" class="villa theme-dark" tabindex="-1">
+    {% comment %}Follow the light: the hero, then two sections of two photographs.
+    One line of light runs through all three (the SVG spans the story).{% endcomment %}
+    <div class="villa-story" data-light>
+      <svg class="villa-line" aria-hidden="true" focusable="false" data-light-svg></svg>
+
+      {% with m=light.hero %}
+      <section class="villa-hero" id="top" aria-labelledby="villa-title">
+        <div class="container villa-container villa-hero__grid">
+          <div class="villa-hero__text">
+            <div class="villa-hero__intro">
+              <a class="link-arrow villa-hero__back" href="{{ project.index_url }}">
+                {% include "partials/arrow.html" %}<span>{{ c.projects_page.back }}</span>
+              </a>
+              <p class="villa-hero__eyebrow label">
+                <span>{{ t.eyebrow }}</span> <span class="num">{{ project.number }}</span><span class="keystone" aria-hidden="true"></span>
+              </p>
+              <p class="villa-hero__name">{{ project.name }}</p>
+              <h1 class="villa-hero__title" id="villa-title">{{ t.title }}</h1>
+              <p class="villa-hero__desc">{{ m.text }}</p>
+              <a class="villa-hero__explore" href="#villa-moments-2">{{ t.explore }}
+                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+              </a>
+            </div>
+            <p class="villa-hero__count label"><span class="num">{{ m.number }} / {{ m.total }}</span><span class="villa-hero__dash" aria-hidden="true"></span><span>{{ m.label }}</span></p>
+          </div>
+          <div class="moment moment--hero" data-moment>
+            <div class="moment__frame" data-moment-frame data-role="hero">
+              <button class="moment__photo" type="button" data-lightbox-open="{{ m.photo.index }}"
+                      aria-label="{{ t.open }}: {{ m.label }}. {{ m.photo.image.alt }}">
+                <img src="{{ m.photo.image.src }}" srcset="{{ m.photo.image.srcset }}" sizes="(min-width: 64rem) 30rem, 92vw"
+                     width="{{ m.photo.image.width }}" height="{{ m.photo.image.height }}" alt="" fetchpriority="high" decoding="async">
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      {% endwith %}
+
+      {% for pair in light.pairs %}
+        <section class="villa-pair" id="villa-moments-{{ forloop.counter|add:1 }}" aria-label="{{ t.moments }}: {% for m in pair %}{{ m.number }} {{ m.label }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+          <div class="container villa-container">
+            <div class="villa-pair__grid">
+              {% for m in pair %}
+                <div class="moment moment--{{ m.role }}{% if m.landscape %} moment--wide{% endif %}" data-moment>
+                  <div class="moment__frame" data-moment-frame data-role="{{ m.role }}">
+                    <button class="moment__photo" type="button" data-lightbox-open="{{ m.photo.index }}"
+                            aria-label="{{ t.open }}: {{ m.label }}. {{ m.photo.image.alt }}">
+                      <img src="{{ m.photo.image.src }}" srcset="{{ m.photo.image.srcset }}"
+                           sizes="{% if m.landscape %}(min-width: 64rem) 44rem, 92vw{% else %}(min-width: 64rem) 22rem, 92vw{% endif %}"
+                           width="{{ m.photo.image.width }}" height="{{ m.photo.image.height }}" alt="" loading="lazy" decoding="async">
+                    </button>
+                  </div>
+                </div>
+                <div class="moment-text moment-text--{{ m.role }}">
+                  <p class="moment-text__num num">{{ m.number }}<span aria-hidden="true"> / {{ m.total }}</span></p>
+                  <span class="moment-text__rule" aria-hidden="true"></span>
+                  <h2 class="moment-text__title">{{ m.label }}</h2>
+                  <p class="moment-text__desc">{{ m.text }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+      {% endfor %}
+    </div>
+
+    {# ---------- Explore the Villa: every photograph, by space ---------- #}
+    <section class="explore" aria-labelledby="explore-title" data-carousel>
+      <div class="container villa-container explore__head">
+        <p class="explore__eyebrow label">
+          <span class="keystone" aria-hidden="true"></span><span class="num">{{ project.photos|length }}</span> <span>{{ t.photos }}</span>
+        </p>
+        <h2 class="explore__title" id="explore-title">{{ t.explore_title }}</h2>
+        <p class="explore__lead">{{ t.explore_lead }}</p>
+        <nav class="explore__groups" aria-label="{{ t.groups }}">
+          <ul role="list">
+            {% for g in light.groups %}
+              <li><button class="explore__group" type="button" data-carousel-goto="{{ g.first }}" data-group="{{ g.id }}">
+                <span class="keystone" aria-hidden="true"></span>{{ g.label }} <span class="num explore__group-count">{{ g.count }}</span>
+              </button></li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </div>
+
+      <ul class="explore__track" role="list" tabindex="0" aria-label="{{ t.carousel }}" data-carousel-track>
+        {% for g in light.groups %}
+          {# The logo's keystone and divider open each space. #}
+          <li class="explore__sep" aria-hidden="true"><span class="keystone"></span><span class="explore__sep-rule"></span></li>
+          {% for p in g.photos %}
+            <li class="explore__slide{% if p.image.width > p.image.height %} explore__slide--wide{% endif %}" data-slide="{{ p.index }}" data-group="{{ g.id }}" data-group-label="{{ g.label }}">
+              <figure class="explore__figure">
+                <button class="explore__photo" type="button" data-lightbox-item="{{ p.index }}" data-lightbox-open="{{ p.index }}"
+                        data-src="{{ p.image.src }}" data-srcset="{{ p.image.srcset }}" data-alt="{{ p.image.alt }}"
+                        data-width="{{ p.image.width }}" data-height="{{ p.image.height }}"
+                        data-caption="{{ g.label }} — {{ p.caption }}">
+                  <img src="{{ p.image.src }}" srcset="{{ p.image.srcset }}"
+                       sizes="{% if p.image.width > p.image.height %}(min-width: 64rem) 56rem, 92vw{% else %}(min-width: 64rem) 20rem, 62vw{% endif %}"
+                       width="{{ p.image.width }}" height="{{ p.image.height }}" alt="{{ p.image.alt }}"
+                       loading="lazy" decoding="async" draggable="false">
+                </button>
+                <figcaption class="explore__caption">
+                  <span class="explore__caption-group label">{{ g.label }}</span>
+                  <span class="explore__caption-text">{{ p.caption }}</span>
+                  <span class="explore__caption-num num">{{ p.number }}</span>
+                </figcaption>
+              </figure>
+            </li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+
+      <div class="container villa-container explore__bar">
+        <p class="explore__status">
+          <span class="explore__status-group" data-carousel-group>{{ light.groups.0.label }}</span>
+          <span class="num explore__status-count"><span data-carousel-count>01</span> / {{ project.photos|length }}</span>
+        </p>
+        {# The logo's divider, with its keystone marking the place in the villa. #}
+        <div class="explore__progress" aria-hidden="true">
+          <span class="explore__progress-rule"></span>
+          {% for g in light.groups %}<span class="explore__progress-tick" style="--at: {{ g.first }}"></span>{% endfor %}
+          <span class="keystone explore__progress-mark" data-carousel-mark></span>
+        </div>
+        <div class="explore__nav" data-carousel-nav hidden>
+          {# Arch-and-keystone buttons, after the logo's emblem. #}
+          <button class="explore__btn explore__btn--prev" type="button" aria-label="{{ t.previous }}" data-carousel-prev>
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          </button>
+          <button class="explore__btn explore__btn--next" type="button" aria-label="{{ t.next }}" data-carousel-next>
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          </button>
+        </div>
+        <p class="visually-hidden" aria-live="polite" data-carousel-live></p>
+      </div>
+    </section>
+  </main>
+  {% endwith %}
+
+  {# Full-screen photo gallery (static/js/projects-page.js): every photo, in carousel order. #}
+  <dialog class="lightbox" aria-label="{{ c.projects_page.lightbox }}: {{ project.name }}" data-lightbox>
+    <figure class="lightbox__figure">
+      <img class="lightbox__image" alt="" data-lightbox-image>
+      <figcaption class="lightbox__caption" data-lightbox-caption></figcaption>
+    </figure>
+    <p class="lightbox__count num" aria-live="polite" data-lightbox-count></p>
+    <button class="lightbox__close" type="button" aria-label="{{ c.projects_page.close }}" data-lightbox-close>
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5 5 19" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    </button>
+    <button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="{{ c.projects_page.previous }}" data-lightbox-prev>
+      <svg viewBox="0 0 12 20" aria-hidden="true" focusable="false"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+    </button>
+    <button class="lightbox__nav lightbox__nav--next" type="button" aria-label="{{ c.projects_page.next }}" data-lightbox-next>
+      <svg viewBox="0 0 12 20" aria-hidden="true" focusable="false"><path d="m2 2 8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+    </button>
+  </dialog>
+
+  {% include "partials/footer.html" %}
+{% endblock %}

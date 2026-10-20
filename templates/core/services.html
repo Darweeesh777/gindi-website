@@ -97,8 +97,8 @@ enquiry drawer with the service selected.
       </div>
     </section>
 
-    {# Free planning tools: each opens its own page, which states whether it is available. #}
-    <section class="sp-tools theme-dark" aria-labelledby="sp-tools-title">
+    {# Free planning tools: each opens its calculator. id="free-tools": the calculators' "back" links. #}
+    <section class="sp-tools theme-dark" id="free-tools" aria-labelledby="sp-tools-title">
       <svg class="sp-tools__mark" viewBox="0 0 279 357" aria-hidden="true" focusable="false">
         <path d="{{ emblem.paths.main }} {{ emblem.paths.arm }} {{ emblem.paths.keystone }}"/>
       </svg>
@@ -115,7 +115,6 @@ enquiry drawer with the service selected.
               <p class="sp-tool__foot">
                 <a class="sp-tool__link" href="{{ tool.url }}">{{ c.services_page.view_tool }}<span class="visually-hidden">: {{ tool.name }}</span>
                   <svg class="sp-arrow" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
-                {% if not tool.script %}<span class="sp-tool__status">{{ c.tools_page.status }}</span>{% endif %}
               </p>
             </li>
           {% endfor %}

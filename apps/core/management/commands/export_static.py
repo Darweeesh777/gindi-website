@@ -46,6 +46,11 @@ SLUGS = {
     'free_tool': lambda: [tool['slug'] for tool in tools.TOOLS],
 }
 
+# Static folders that are never published: Django admin's files (there is no
+# admin on a static host) and the calculators' reference originals in
+# static/Tools/ (kept unchanged for comparison; the site runs static/js/tools/).
+PRIVATE_STATIC = ('admin/', 'Tools/')
+
 SECURITY_HEADERS = {
     'X-Frame-Options': 'DENY',
     'X-Content-Type-Options': 'nosniff',
@@ -153,7 +158,7 @@ class Command(BaseCommand):
             names = json.loads(manifest.read_text(encoding='utf-8'))['paths'].values()
         else:
             names = [p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()]
-        names = sorted(n for n in set(names) if not n.startswith('admin/') and n != 'staticfiles.json')
+        names = sorted(n for n in set(names) if not n.startswith(PRIVATE_STATIC) and n != 'staticfiles.json')
         prefix = urlparse(settings.STATIC_URL).path.strip('/')
         for name in names:
             target = out / prefix / name

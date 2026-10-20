@@ -18,20 +18,93 @@ so /projects/#<slug> lands on it (the fixed header is allowed for in CSS).
 {% block head_extra %}
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/projects-page.css' %}">
+  <link rel="stylesheet" href="{% static 'css/projects-gate.css' %}">
   <script src="{% static 'js/projects-page.js' %}" defer></script>
+  <script src="{% static 'js/projects-gate.js' %}" defer></script>
 {% endblock %}
 
 {% block body %}
   {% include "partials/header.html" %}
 
   <main id="main" tabindex="-1">
-    <section class="section projects-page theme-light" id="top" aria-labelledby="projects-page-title">
+    {% comment %}
+    The Gindi Gate: the page's entrance (css/projects-gate.css, js/projects-gate.js). The gate
+    is drawn from the logo's G — its arch with the keystone, the uprights and the inward stroke
+    (logo/Gindi-Logo-Elements.png; coordinates are the logo's). Two layers of text: the closed
+    gate's headline, inside the opening, and the open gate's introduction to the work, framed by
+    the parted halves. A downward gesture opens the gate in place; a new one scrolls on to the
+    projects; an upward gesture at the top closes it again. Only the active layer is visible,
+    focusable and announced. Without JavaScript, or with reduced motion, the gate is shown open
+    and still, and the page scrolls normally.
+    {% endcomment %}
+    <section class="pgate theme-dark" id="top" aria-labelledby="pgate-title" data-gate data-gate-state="closed">
+      <div class="pgate__stage">
+        <div class="pgate__body">
+          <div class="pgate__frame">
+            <svg class="pgate__svg" viewBox="182 217 513 645" aria-hidden="true" focusable="false" data-gate-svg>
+              <defs>
+                <radialGradient id="pgate-glow" cx="50%" cy="42%" r="50%">
+                  <stop offset="0" stop-color="#c8892b" stop-opacity="0.16"/>
+                  <stop offset="0.6" stop-color="#c8892b" stop-opacity="0.04"/>
+                  <stop offset="1" stop-color="#c8892b" stop-opacity="0"/>
+                </radialGradient>
+                <mask id="pgate-keystone-cut" maskUnits="userSpaceOnUse" x="-2000" y="-2000" width="5000" height="5000">
+                  <rect x="-2000" y="-2000" width="5000" height="5000" fill="#fff"/>
+                  <polygon points="393,240 483,240 469,352 407,352" fill="#000"/>
+                </mask>
+              </defs>
+              <ellipse class="pgate__glow" cx="438.5" cy="520" rx="240" ry="300" fill="url(#pgate-glow)"/>
+              <g mask="url(#pgate-keystone-cut)">
+                {# Each half: its arches, then its lower strokes (uprights and base), which phones hide when open. #}
+                <g class="pgate__half pgate__half--left">
+                  <path d="M438.5 243.5A226.5 226.5 0 0 0 212 470"/>
+                  <path d="M438.5 303.5A166.5 166.5 0 0 0 272 470"/>
+                  <path class="pgate__low" d="M212 470V830H438.5"/>
+                  <path class="pgate__low" d="M272 470V770H438.5"/>
+                </g>
+                <g class="pgate__half pgate__half--right">
+                  <path d="M438.5 243.5A226.5 226.5 0 0 1 665 470"/>
+                  <path d="M605 470A166.5 166.5 0 0 0 438.5 303.5"/>
+                  <path class="pgate__low" d="M665 470V535H605V470"/>
+                  <path class="pgate__low" d="M438.5 830H665V593"/>
+                  <path class="pgate__low" d="M605 652V770H438.5"/>
+                </g>
+              </g>
+              <g class="pgate__bar"><path d="M665 593H438V652H605"/></g>
+              <polygon class="pgate__key" points="400,247 476,247 463,345 413,345"/>
+            </svg>
+            {# The closed gate: the headline in the opening. #}
+            <div class="pgate__content" data-gate-layer="closed">
+              <p class="pgate__eyebrow label">{{ c.projects_page.gate_eyebrow }}</p>
+              <h1 class="pgate__title" id="pgate-title">{{ c.projects_page.gate_title }}</h1>
+              <a class="pgate__cta" href="#projects-list" data-gate-go>{{ c.projects_page.gate_cta }}
+                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+              </a>
+            </div>
+          </div>
+          {# The open gate: an introduction to the work. #}
+          <div class="pgate__intro" data-gate-layer="open">
+            <p class="pgate__intro-eyebrow label">{{ c.projects_page.gate_open_eyebrow }}</p>
+            <h1 class="pgate__intro-title" id="pgate-intro-title">{{ c.projects_page.gate_open_title }}</h1>
+            <span class="pgate__rule" aria-hidden="true"></span>
+            <p class="pgate__intro-text">{{ c.projects_page.gate_open_text }}</p>
+            <p class="pgate__by">{{ c.projects_page.gate_open_by }}</p>
+            <a class="btn btn--primary pgate__intro-cta" href="#projects-list" data-gate-go>{{ c.projects_page.gate_open_cta }}
+              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            </a>
+          </div>
+        </div>
+        <a class="pgate__cue" href="#projects-list" data-gate-go>
+          <span class="pgate__cue-line" aria-hidden="true"></span>
+          <span class="pgate__cue-text pgate__cue-text--closed">{{ c.projects_page.gate_cue }}</span>
+          <span class="pgate__cue-text pgate__cue-text--open">{{ c.projects_page.gate_open_cue }}</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section projects-page projects-page--after-gate theme-light" id="projects-list" aria-labelledby="projects-page-title">
       <div class="container">
-        <header class="projects-page__head">
-          <p class="projects-page__eyebrow label" data-reveal>{{ c.projects_page.eyebrow }}</p>
-          <h1 class="projects-page__title" id="projects-page-title" data-reveal>{{ c.projects_page.title }}</h1>
-          <p class="projects-page__lead" data-reveal>{{ c.projects_page.lead }}</p>
-        </header>
+        <h2 class="visually-hidden" id="projects-page-title">{{ c.projects_page.eyebrow }}</h2>
 
         <ol class="project-list" role="list">
           {% for project in projects %}

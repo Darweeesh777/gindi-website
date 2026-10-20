@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<title>حاسبة السيراميك والبلاط | Eng/ Mostafa Elgindi</title>
+<meta name="description" content="احسب مساحات السيراميك والبلاط وعدد الكراتين والوزرة واللاصق والتكلفة، وقارنها بطلب المورّد. إعداد Eng/ Mostafa Elgindi - Gindi Innovations">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A; --orange:#F5A623; --cream:#F3D9A4;
+    --input-bg:#FFF8E1; --input-bd:#E8CF85; --input-fg:#0000FF;
+    --green-bg:#E2F0D9; --green-fg:#2E6B1F; --red:#C00000;
+    --bg:#F3F5F9; --card:#FFFFFF; --text:#1B2433; --muted:#6B7280; --line:#E3E7EE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--navy);border-radius:14px;overflow:hidden;color:#fff}
+  header .top{padding:22px 20px 16px}
+  header h1{margin:0;font-size:24px;font-weight:800}
+  header p{margin:4px 0 0;color:var(--cream);font-size:14px}
+  header .brand{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--orange);color:var(--navy);padding:6px 20px;font-size:13px;font-weight:700}
+  .card{background:var(--card);border-radius:14px;padding:18px;margin-top:14px;border-top:4px solid var(--orange);box-shadow:0 1px 3px rgba(11,31,58,.08)}
+  .card h2{margin:0 0 4px;font-size:17px;color:var(--navy);padding-bottom:6px;border-bottom:2px solid var(--navy)}
+  .hint{margin:8px 0 12px;color:var(--muted);font-size:13px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
+  input[type=number],select{width:100%;min-width:0;font:inherit;font-weight:700;color:var(--input-fg);background:var(--input-bg);border:1.5px solid var(--input-bd);border-radius:8px;padding:8px;text-align:center;-moz-appearance:textfield}
+  input:focus,select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,166,35,.25)}
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .size{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--green-bg);color:var(--green-fg);font-weight:700;font-size:13.5px}
+
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#F9FAFC}
+  .item .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+  .item .head b{color:var(--navy);font-size:15px}
+  .item .head small{color:var(--muted);font-size:12px;display:block;font-weight:400}
+  .item .head .tot{background:var(--green-bg);color:var(--green-fg);font-weight:800;border-radius:8px;padding:4px 10px;white-space:nowrap;font-size:14px}
+  .item .head .right{display:flex;align-items:center;gap:6px}
+  .add{display:block;width:100%;margin-top:8px;font:inherit;font-weight:700;font-size:14px;color:var(--navy);background:transparent;border:1.5px dashed var(--orange);border-radius:10px;padding:8px;cursor:pointer}
+  .add:hover,.add:focus-visible{background:var(--input-bg);outline:none}
+  .del{font:inherit;font-weight:800;font-size:18px;line-height:1;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--red);cursor:pointer}
+  .item .f{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .item .f label{font-size:11.5px;color:var(--navy);font-weight:600;display:block;margin-bottom:2px;white-space:nowrap}
+  .sumline{display:flex;justify-content:space-between;margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700}
+  .sumline span:last-child{color:var(--orange);font-size:18px}
+
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{border-radius:12px;padding:14px;background:var(--green-bg);color:var(--green-fg)}
+  .kpi.hero{grid-column:1/-1;background:var(--navy);color:#fff;text-align:center}
+  .kpi .v{font-size:26px;font-weight:800;line-height:1.2}
+  .kpi.hero .v{font-size:44px;color:var(--orange)}
+  .kpi .l{font-size:13px;font-weight:600}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px}
+  .cmp div{padding:8px 12px;border-radius:8px;background:#F3F5F9;font-size:14px}
+  .cmp div:nth-child(odd){font-weight:700;color:var(--navy)}
+  .cmp div:nth-child(even){background:var(--green-bg);color:var(--green-fg);font-weight:700;text-align:center}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .warn{color:var(--red);font-size:12.5px;margin-top:10px}
+  dl{margin:10px 0 0;display:grid;grid-template-columns:120px 1fr;gap:8px 12px;font-size:13.5px}
+  dt{font-weight:700;color:var(--navy);background:#F3F5F9;border-radius:6px;padding:4px 8px;align-self:start}
+  dd{margin:0;padding:4px 0}
+  footer{margin:16px 0 8px;text-align:center;font-size:12.5px;color:var(--muted)}
+  footer b{color:var(--navy)}
+  .pdf{display:block;width:100%;margin-top:14px;font:inherit;font-weight:800;font-size:16px;color:#fff;background:var(--navy);border:0;border-radius:10px;padding:12px;cursor:pointer;border-bottom:4px solid var(--orange)}
+  .pdf:hover,.pdf:focus-visible{filter:brightness(1.15);outline:none}
+  #report{display:none}
+  .back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:8px;color:var(--navy);font-weight:700;font-size:14px;text-decoration:none}
+  .back:hover,.back:focus-visible{text-decoration:underline;text-decoration-color:var(--orange);text-underline-offset:4px}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;color:#1B2433;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wrap > *:not(#report){display:none!important}
+    .wrap{max-width:none;padding:0}
+    #report{display:block;font-size:12px}
+    #report .r-head{display:flex;justify-content:space-between;align-items:center;background:#0B1F3A;color:#fff;padding:12px 16px;border-radius:8px;border-bottom:4px solid #F5A623}
+    #report h1{margin:0;font-size:20px}
+    #report .r-head p{margin:2px 0 0;color:#F3D9A4;font-size:12px}
+    #report .r-brand{background:#F5A623;color:#0B1F3A;font-weight:800;padding:6px 10px;border-radius:6px;text-align:center;direction:ltr;font-size:11px}
+    #report .r-kpis{display:flex;gap:8px;margin:12px 0}
+    #report .r-kpis div{flex:1;background:#E2F0D9;color:#2E6B1F;border-radius:8px;padding:8px;text-align:center}
+    #report .r-kpis div:first-child{background:#0B1F3A;color:#fff}
+    #report .r-kpis div:first-child b{color:#F5A623}
+    #report .r-kpis b{display:block;font-size:20px}
+    #report .r-kpis span{font-size:10.5px}
+    #report h2{font-size:14px;color:#0B1F3A;border-bottom:2px solid #0B1F3A;padding-bottom:3px;margin:14px 0 6px}
+    #report table{width:100%;border-collapse:collapse;font-size:11.5px;margin:0;page-break-inside:auto}
+    #report tr{page-break-inside:avoid}
+    #report th{background:#0B1F3A;color:#fff;padding:5px 4px}
+    #report td{padding:4px;text-align:center;border-bottom:1px solid #E3E7EE}
+    #report td.l{text-align:right}
+    #report td.hi{background:#E2F0D9;color:#2E6B1F;font-weight:800}
+    #report tfoot td{font-weight:800;border-top:2px solid #0B1F3A}
+    #report .r-note{color:#6B7280;font-size:10.5px;margin:4px 0 0}
+    #report .r-warn{color:#C00000;font-size:10.5px;margin-top:12px}
+    #report .r-foot{text-align:center;color:#6B7280;font-size:10.5px;border-top:1px solid #E3E7EE;padding-top:6px;margin-top:10px}
+  }
+  @media (max-width:560px){
+    .grid3{grid-template-columns:1fr 1fr}
+    .item .f{grid-template-columns:repeat(2,1fr)}
+    .kpi.hero .v{font-size:38px}
+    dl{grid-template-columns:1fr}
+    dt{justify-self:start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="../index.html#services">الرجوع لخدمات Gindi Innovations</a>
+
+  <header>
+    <div class="top">
+      <h1>حاسبة السيراميك والبلاط</h1>
+      <p>تقدير المساحات والكراتين والتكلفة</p>
+    </div>
+    <div class="brand"><span>Eng/ Mostafa Elgindi</span><span>Gindi Innovations</span></div>
+  </header>
+
+  <section class="card">
+    <h2>١ — المدخلات العامة</h2>
+    <p class="hint">الخانات الصفرا بخط أزرق مدخلات تقدر تغيّرها، والنتيجة بتتحسب لوحدها وانت بتكتب.</p>
+    <div class="grid3">
+      <div class="field"><label for="wMin">الهالك — أدنى %</label><input type="number" id="wMin" min="0" inputmode="decimal" value="5"></div>
+      <div class="field"><label for="wAvg">الهالك — متوسط %</label><input type="number" id="wAvg" min="0" inputmode="decimal" value="10"></div>
+      <div class="field"><label for="wMax">الهالك — أعلى %</label><input type="number" id="wMax" min="0" inputmode="decimal" value="15"></div>
+      <div class="field"><label for="wExtra">هالك إضافي مباشر %</label><input type="number" id="wExtra" min="0" inputmode="decimal" value="10"></div>
+      <div class="field"><label for="joint">الفاصل بين البلاط (مم)</label><input type="number" id="joint" min="0" inputmode="decimal" value="3"></div>
+    </div>
+    <p class="note">الهالك الإضافي المباشر بيتضاف فوق نسب الهالك (أدنى ومتوسط وأعلى) على كل الأرضيات والحوائط.</p>
+  </section>
+
+  <section class="card">
+    <h2>٢ — أنواع البلاط</h2>
+    <p class="hint">اكتب مقاس البلاطة بالسنتيمتر ومساحة الكرتونة (م²) من الكرتونة نفسها، وسعر المتر. سيب النوع اللي مش مستخدم فاضي.</p>
+    <div id="types"></div>
+  </section>
+
+  <section class="card">
+    <h2>٣ — المساحات (أرضيات وحوائط)</h2>
+    <p class="hint">المساحة = الطول × العرض × العدد − الفتحات. للحوائط: اكتب المحيط في «الطول» والارتفاع في «العرض»، وخصم الأبواب والشبابيك في «خصم فتحات». لو عندك أماكن أكتر دوس «+ إضافة مكان».</p>
+    <div id="areas"><button type="button" class="add" id="addArea">+ إضافة مكان</button></div>
+    <div class="sumline"><span>إجمالي المساحة الصافية (م²)</span><span id="sumArea">0</span></div>
+  </section>
+
+  <section class="card">
+    <h2>٤ — الوزرة</h2>
+    <div class="grid3">
+      <div class="field"><label for="skH">ارتفاع الوزرة (سم)</label><input type="number" id="skH" min="0" inputmode="decimal" value="10"></div>
+      <div class="field"><label for="skX">زيادة الوزرة % (فوق الهالك)</label><input type="number" id="skX" min="0" inputmode="decimal" value="10"></div>
+    </div>
+    <p class="note">الوزرة بتتحسب لكل أرضية اختارت لها «وزرة: أيوه»: المحيط = 2 × (الطول + العرض) × العدد ناقص عرض الأبواب، وبنفس نوع بلاط الأرضية. زيادة الوزرة بتتضاف فوق الهالك لأن القص بيضيّع أكتر.</p>
+    <div class="sumline"><span>إجمالي الوزرة (م²)</span><span id="sumSk">0</span></div>
+  </section>
+
+  <section class="card">
+    <h2>٥ — اللاصق وطلب المورّد (اختياري)</h2>
+    <div class="grid3">
+      <div class="field"><label for="glueCov">تغطية كيس اللاصق (م²)</label><input type="number" id="glueCov" min="0" inputmode="decimal" placeholder="من الكيس"></div>
+      <div class="field"><label for="gluePrice">سعر كيس اللاصق (ج)</label><input type="number" id="gluePrice" min="0" inputmode="decimal" placeholder="سعر المورد"></div>
+      <div class="field"><label for="supplier">كراتين المورّد</label><input type="number" id="supplier" min="0" inputmode="decimal" placeholder="اللي طلبها"></div>
+    </div>
+    <p class="note">التغطية بتختلف حسب مقاس البلاطة ونوع المسطرة، فاكتبها من الكيس نفسه. اللاصق محسوب على مساحة الأرضيات والحوائط.</p>
+  </section>
+
+  <section class="card">
+    <h2>٦ — النتيجة</h2>
+    <div class="kpis" style="margin-top:12px">
+      <div class="kpi hero"><div class="v" id="kCartons">0</div><div class="l">إجمالي الكراتين (متوسط) بعد الهالك</div></div>
+      <div class="kpi"><div class="v" id="kRange">—</div><div class="l">النطاق المتوقع (كرتونة)</div></div>
+      <div class="kpi"><div class="v" id="kArea">0</div><div class="l">م² صافي (شامل الوزرة)</div></div>
+      <div class="kpi"><div class="v" id="kCost">—</div><div class="l" id="kCostL">التكلفة شامل اللاصق (جنيه)</div></div>
+      <div class="kpi"><div class="v" id="kSup" style="font-size:20px">—</div><div class="l" id="kSupL">طلب المورّد مقابل الحسبة</div></div>
+    </div>
+    <div class="cmp" id="cmp"></div>
+    <p class="warn" id="check"></p>
+    <button type="button" class="pdf" id="pdfBtn">تصدير التقرير PDF</button>
+    <p class="note" style="text-align:center">هتفتحلك نافذة الطباعة، اختار منها «حفظ كـ PDF» (Save as PDF).</p>
+    <p class="warn">الحسبة تقريبية. اشتري كل الكمية من نفس الدفعة (Batch) عشان متختلفش الدرجة واللون، وراجعها مع المورّد ومهندس الموقع.</p>
+  </section>
+
+  <section class="card">
+    <h2>منطق الحسبة</h2>
+    <dl>
+      <dt>المساحة</dt><dd>الطول × العرض × العدد − الفتحات، ولو طلعت بالسالب بتبقى صفر.</dd>
+      <dt>الوزرة</dt><dd>طول الوزرة الصافي × ارتفاعها ÷ 100.</dd>
+      <dt>الهالك</dt><dd>المساحة × (1 + نسبة الهالك + الهالك الإضافي)، والوزرة بتاخد كمان زيادة الوزرة.</dd>
+      <dt>الكراتين</dt><dd>المساحة بعد الهالك ÷ مساحة الكرتونة، متقرّبة لأعلى لكل نوع. بتتحسب 3 مرات بالهالك الأدنى والمتوسط والأعلى عشان تطلع النطاق.</dd>
+      <dt>القطع</dt><dd>المساحة بعد الهالك (متوسط) ÷ مساحة البلاطة مع الفاصل، متقرّبة لأعلى.</dd>
+      <dt>التكلفة</dt><dd>الكراتين المتوسطة × مساحة الكرتونة × سعر المتر، + أكياس اللاصق × سعر الكيس.</dd>
+      <dt>اللاصق</dt><dd>مساحة الأرضيات والحوائط ÷ تغطية الكيس، متقرّب لأعلى.</dd>
+      <dt>المورّد</dt><dd>لو طلبه أعلى من الحد الأعلى اسأله الرقم جاي منين وبالتفصيل، ولو أقل من الأدنى اتأكد إن مفيش مكان ناقص.</dd>
+    </dl>
+  </section>
+
+  <section id="report" aria-hidden="true"></section>
+  <footer>إعداد: <b>Eng/ Mostafa Elgindi</b> | Gindi Innovations | الحسبة تقديرية وتُراجع مع المورّد ومهندس الموقع<br>© Gindi Innovations — ممنوع إعادة النشر أو النسخ بدون إذن كتابي</footer>
+</div>
+
+<script>
+(function(){
+  // Same logic as Eng_Mostafa_Elgindi_Ceramic_Calculator.xlsx (sheet «الحسبة»)
+  var TYPES = [["نوع 1", "أرضيات"], ["نوع 2", "حوائط"], ["نوع 3", "أرضيات الحمامات"]];
+  var SURF = ["أرضية", "حوائط", "أخرى"];
+  // [place, type index, surface index, skirting?] — same rows as the sheet
+  var AREAS = [
+    ["الريسبشن", 0, 0, 1], ["غرفة 1", 0, 0, 1], ["غرفة 2", 0, 0, 1], ["غرفة 3", 0, 0, 1], ["الطرقة", 0, 0, 1],
+    ["المطبخ — أرضية", 0, 0, 1], ["المطبخ — حوائط", 1, 1, 0], ["حمام 1 — أرضية", 2, 0, 0], ["حمام 1 — حوائط", 1, 1, 0],
+    ["حمام 2 — أرضية", 2, 0, 0], ["حمام 2 — حوائط", 1, 1, 0], ["البلكونة — أرضية", 0, 0, 1]
+  ];
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n, d){ return n.toLocaleString("en-US", {maximumFractionDigits: d || 0}); };
+  var num = function(el){ var v = parseFloat(el.value); return isFinite(v) && v >= 0 ? v : null; };
+  var up = function(x){ return Math.ceil(x - 1e-9); }; // ROUNDUP(x,0) for x >= 0
+  var esc = function(t){ return String(t).replace(/[&<>"]/g, function(ch){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]; }); };
+  var inp = function(id, label, ph){ return '<div><label for="' + id + '">' + label + '</label><input type="number" min="0" inputmode="decimal" id="' + id + '" placeholder="' + (ph || "0") + '"></div>'; };
+  var sel = function(id, label, opts, v){ return '<div><label for="' + id + '">' + label + '</label><select id="' + id + '">' + opts.map(function(o, k){ return "<option" + (k === v ? " selected" : "") + ">" + o + "</option>"; }).join("") + "</select></div>"; };
+
+  $("types").innerHTML = TYPES.map(function(t, k){
+    return '<div class="item"><div class="head"><div><b>' + t[0] + '</b><small>' + t[1] + '</small></div><div class="tot" id="tp' + k + '">—</div></div><div class="f">' +
+      inp("tl" + k, "الطول (سم)") + inp("tw" + k, "العرض (سم)") + inp("tc" + k, "مساحة الكرتونة (م²)") + inp("tr" + k, "سعر المتر (ج)", "سعر المورد") + "</div></div>";
+  }).join("");
+
+  var box = $("areas"), addBtn = $("addArea"), nextId = 0;
+  function addArea(focus, a){
+    a = a || ["مكان إضافي", 0, 0, 0];
+    var i = nextId++, d = document.createElement("div");
+    d.className = "item"; d.dataset.row = i;
+    d.innerHTML =
+      '<div class="head"><div><b class="ttl">' + esc(a[0]) + '</b><small id="m' + i + '">0 م²</small></div>' +
+      '<div class="right"><div class="tot" id="g' + i + '">0 م²</div>' +
+      '<button type="button" class="del" aria-label="شيل المكان ده">×</button></div></div>' +
+      '<div class="f">' +
+        inp("l" + i, "الطول / المحيط (م)") + inp("w" + i, "العرض / الارتفاع (م)") + inp("n" + i, "العدد", "1") + inp("o" + i, "خصم فتحات (م²)") +
+        sel("t" + i, "النوع", TYPES.map(function(t){ return t[0]; }), a[1]) + sel("s" + i, "السطح", SURF, a[2]) +
+        sel("k" + i, "وزرة", ["لأ", "أيوه"], a[3]) + inp("dr" + i, "خصم أبواب للوزرة (م)") +
+      '</div>';
+    d.querySelector(".del").addEventListener("click", function(){ d.remove(); calc(); });
+    box.insertBefore(d, addBtn);
+    if (focus) $("l" + i).focus();
+  }
+  addBtn.addEventListener("click", function(){ addArea(true); calc(); });
+  AREAS.forEach(function(a){ addArea(false, a); });
+
+  function calc(){
+    var g = function(id){ return num($(id)) || 0; };
+    var wMin = g("wMin") / 100, wAvg = g("wAvg") / 100, wMax = g("wMax") / 100, wX = g("wExtra") / 100, j = g("joint");
+    var skH = g("skH"), skX = g("skX") / 100;
+    var T = TYPES.map(function(t, k){ return {name: t[0], use: t[1], L: num($("tl" + k)), W: num($("tw" + k)), C: num($("tc" + k)) || null, P: num($("tr" + k)), area: 0, sk: 0}; });
+
+    var net = 0, skAll = 0, A = [];
+    box.querySelectorAll(".item").forEach(function(r){
+      var i = r.dataset.row;
+      var L = $("l" + i).value === "" ? null : g("l" + i), W = $("w" + i).value === "" ? null : g("w" + i);
+      var n = $("n" + i).value === "" ? 1 : g("n" + i), o = g("o" + i);
+      var ti = TYPES.map(function(t){ return t[0]; }).indexOf($("t" + i).value), s = $("s" + i).value, skOn = $("k" + i).value === "أيوه";
+      var a = L === null || W === null ? 0 : Math.max(0, L * W * n - o);
+      var per = L === null || W === null ? 0 : 2 * (L + W) * n, skLen = skOn ? Math.max(0, per - g("dr" + i)) : 0, sk = skLen * skH / 100;
+      T[ti].area += a; T[ti].sk += sk; net += a; skAll += sk;
+      $("m" + i).textContent = esc($("t" + i).value) + " · " + s + (sk ? " · وزرة " + fmt(sk, 2) + " م²" : "");
+      $("g" + i).textContent = fmt(a, 2) + " م²";
+      if (a || sk) A.push({name: r.querySelector(".ttl").textContent, type: T[ti].name, s: s, L: L, W: W, n: n, o: o, a: a, skLen: skLen, sk: sk});
+    });
+
+    var tot = {area: 0, sk: 0, after: 0, min: 0, avg: 0, max: 0, cost: null}, missing = false;
+    T.forEach(function(t, k){
+      var ctn = function(w){ return t.area + t.sk === 0 || !t.C ? 0 : up((t.area * (1 + w + wX) + t.sk * (1 + w + wX + skX)) / t.C); };
+      t.after = t.area * (1 + wAvg + wX) + t.sk * (1 + wAvg + wX + skX);
+      t.min = ctn(wMin); t.avg = ctn(wAvg); t.max = ctn(wMax);
+      t.cost = t.avg && t.P !== null ? t.avg * t.C * t.P : null;
+      t.perCtn = t.L && t.W && t.C ? Math.round(t.C / (t.L * t.W / 10000)) : null;
+      t.pieces = t.L && t.W ? up(t.after / (((t.L + j / 10) * (t.W + j / 10)) / 10000)) : 0;
+      if (t.area + t.sk > 0 && !t.C) missing = true;
+      $("tp" + k).textContent = t.perCtn === null ? "—" : t.perCtn + " قطعة/كرتونة";
+      tot.area += t.area; tot.sk += t.sk; tot.after += t.after; tot.min += t.min; tot.avg += t.avg; tot.max += t.max;
+      if (t.cost !== null) tot.cost = (tot.cost || 0) + t.cost;
+    });
+
+    var cov = num($("glueCov")), gp = num($("gluePrice")), sup = num($("supplier"));
+    var bags = cov && net ? up(net / cov) : null, glueCost = bags !== null && gp !== null ? bags * gp : null;
+    var all = tot.cost === null ? null : tot.cost + (glueCost || 0);
+    var verdict = sup === null || tot.max === 0 ? null : sup > tot.max ? "أعلى من النطاق" : sup < tot.min ? "أقل من النطاق" : "داخل النطاق";
+    var verdictLong = verdict === null ? "اكتب عدد كراتين المورّد فوق" : sup > tot.max ? "أعلى من النطاق — اسأله الرقم جاي منين وبالتفصيل" : sup < tot.min ? "أقل من النطاق — اتأكد إن مفيش مكان ناقص" : "داخل النطاق المعقول";
+
+    $("sumArea").textContent = fmt(net, 2);
+    $("sumSk").textContent = fmt(skAll, 2);
+    $("kCartons").textContent = fmt(tot.avg);
+    $("kRange").textContent = tot.max ? "من " + tot.min + " لـ " + tot.max : "—";
+    $("kArea").textContent = fmt(net + skAll, 2);
+    $("kCost").textContent = all === null ? "—" : fmt(all);
+    $("kCostL").textContent = all === null ? "اكتب سعر المتر لأنواع البلاط" : "التكلفة شامل اللاصق (جنيه)";
+    $("kSup").textContent = verdict || "—";
+    $("kSupL").textContent = verdict === null ? "اكتب كراتين المورّد فوق" : "طلب " + fmt(sup) + " كرتونة | الحسبة " + fmt(tot.avg) + " كرتونة";
+    $("cmp").innerHTML = T.filter(function(t){ return t.area + t.sk > 0; }).map(function(t){
+      return "<div>" + t.name + " (" + t.use + ")</div><div>" + fmt(t.avg) + " كرتونة · " + fmt(t.pieces) + " قطعة</div>";
+    }).join("") +
+      "<div>المساحة بعد الهالك</div><div>" + fmt(tot.after, 2) + " م²</div>" +
+      "<div>تكلفة البلاط</div><div>" + (tot.cost === null ? "—" : fmt(tot.cost) + " ج") + "</div>" +
+      "<div>أكياس اللاصق</div><div>" + (bags === null ? "—" : fmt(bags) + " كيس" + (glueCost === null ? "" : " · " + fmt(glueCost) + " ج")) + "</div>" +
+      "<div>المقارنة مع المورّد</div><div>" + verdictLong + (verdict === null ? "" : " (الفرق عن المتوسط " + fmt(sup - tot.avg) + ")") + "</div>";
+    $("check").textContent = missing ? "تنبيه: في نوع عليه مساحة ومفيش له مساحة كرتونة، اكتبها في «أنواع البلاط»." : "";
+
+    buildReport(T, A, tot, net, skAll, bags, glueCost, all, sup, verdictLong, {wMin: wMin, wAvg: wAvg, wMax: wMax, wX: wX, j: j, skH: skH, skX: skX});
+  }
+
+  function buildReport(T, A, tot, net, skAll, bags, glueCost, all, sup, verdictLong, p){
+    var d = new Date(), date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+    var opt = function(v, dg){ return v === null || v === undefined ? "—" : fmt(v, dg); };
+    var aRows = A.map(function(a){
+      return "<tr><td class='l'>" + esc(a.name) + "</td><td>" + a.type + "</td><td>" + a.s + "</td><td>" + opt(a.L, 2) + "</td><td>" + opt(a.W, 2) + "</td><td>" + fmt(a.n, 2) +
+        "</td><td>" + fmt(a.o, 2) + "</td><td class='hi'>" + fmt(a.a, 2) + "</td><td>" + (a.sk ? fmt(a.sk, 2) : "—") + "</td></tr>";
+    }).join("");
+    var tRows = T.filter(function(t){ return t.area + t.sk > 0; }).map(function(t){
+      return "<tr><td class='l'>" + t.name + " (" + t.use + ")</td><td>" + (t.L && t.W ? "⁦" + fmt(t.L, 1) + "×" + fmt(t.W, 1) + "⁩" : "—") + "</td><td>" + opt(t.C, 2) +
+        "</td><td>" + fmt(t.area, 2) + "</td><td>" + fmt(t.sk, 2) + "</td><td>" + fmt(t.after, 2) + "</td><td>" + t.min + "</td><td class='hi'>" + t.avg + "</td><td>" + t.max +
+        "</td><td>" + fmt(t.pieces) + "</td><td>" + opt(t.cost) + "</td></tr>";
+    }).join("");
+    $("report").innerHTML =
+      "<div class='r-head'><div><h1>تقرير السيراميك والبلاط</h1><p>حاسبة السيراميك والبلاط · " + date + "</p></div>" +
+      "<div class='r-brand'>Eng/ Mostafa Elgindi<br>Gindi Innovations</div></div>" +
+      "<div class='r-kpis'><div><b>" + fmt(tot.avg) + "</b><span>إجمالي الكراتين (متوسط)</span></div>" +
+      "<div><b>" + (tot.max ? "من " + tot.min + " لـ " + tot.max : "—") + "</b><span>النطاق المتوقع (كرتونة)</span></div>" +
+      "<div><b>" + fmt(net + skAll, 2) + "</b><span>م² صافي شامل الوزرة</span></div>" +
+      "<div><b>" + opt(all) + "</b><span>التكلفة شامل اللاصق (جنيه)</span></div></div>" +
+      "<p class='r-note'>الهالك " + fmt(p.wMin * 100, 1) + "% / " + fmt(p.wAvg * 100, 1) + "% / " + fmt(p.wMax * 100, 1) + "% + إضافي " + fmt(p.wX * 100, 1) + "% · الفاصل " + fmt(p.j, 1) +
+      " مم · الوزرة " + fmt(p.skH, 1) + " سم + زيادة " + fmt(p.skX * 100, 1) + "%</p>" +
+      "<h2>تفصيل المساحات</h2><table><thead><tr><th>المكان</th><th>النوع</th><th>السطح</th><th>الطول/المحيط</th><th>العرض/الارتفاع</th><th>العدد</th><th>الفتحات</th><th>الصافي (م²)</th><th>الوزرة (م²)</th></tr></thead><tbody>" + aRows +
+      "</tbody><tfoot><tr><td>الإجمالي</td><td></td><td></td><td></td><td></td><td></td><td></td><td class='hi'>" + fmt(net, 2) + "</td><td>" + fmt(skAll, 2) + "</td></tr></tfoot></table>" +
+      "<h2>ملخص الكراتين والتكلفة</h2><table><thead><tr><th>النوع</th><th>المقاس (سم)</th><th>الكرتونة (م²)</th><th>المساحة</th><th>الوزرة</th><th>بعد الهالك</th><th>أدنى</th><th>متوسط</th><th>أعلى</th><th>القطع</th><th>التكلفة (ج)</th></tr></thead><tbody>" + tRows +
+      "</tbody><tfoot><tr><td>الإجمالي</td><td></td><td></td><td>" + fmt(tot.area, 2) + "</td><td>" + fmt(tot.sk, 2) + "</td><td>" + fmt(tot.after, 2) + "</td><td>" + tot.min + "</td><td class='hi'>" + tot.avg + "</td><td>" + tot.max + "</td><td></td><td>" + opt(tot.cost) + "</td></tr></tfoot></table>" +
+      "<p class='r-note'>اللاصق: " + (bags === null ? "—" : fmt(bags) + " كيس" + (glueCost === null ? "" : " = " + fmt(glueCost) + " ج")) +
+      " · طلب المورّد: " + (sup === null ? "—" : fmt(sup) + " كرتونة، " + verdictLong) + "</p>" +
+      "<p class='r-warn'>الحسبة تقريبية. اشتري كل الكمية من نفس الدفعة (Batch) عشان متختلفش الدرجة واللون، وراجعها مع المورّد ومهندس الموقع.</p>" +
+      "<p class='r-foot'>إعداد: Eng/ Mostafa Elgindi | Gindi Innovations</p>";
+  }
+
+  $("pdfBtn").addEventListener("click", function(){ calc(); window.print(); });
+  document.addEventListener("input", calc);
+  document.addEventListener("change", calc);
+  calc();
+})();
+</script>
+</body>
+</html>

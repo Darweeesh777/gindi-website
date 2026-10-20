@@ -1,0 +1,110 @@
+{
+  "purpose": "Generated concept images, not completed studio project photos.",
+  "usage": {
+    "mood": [
+      "warm-beige",
+      "minimal-ivory",
+      "bold-charcoal"
+    ],
+    "palette": "Three results per style. Generated variants have small geometry differences: use crossfade, not pixel-aligned comparison.",
+    "questions": "Three furniture, three material and three detail-density choices."
+  },
+  "assets": [
+    {
+      "id": "warm-beige",
+      "file": "exec-c81b4889-ee83-4a2a-9adb-f5d41856f244.png",
+      "path": "results/warm-beige.png"
+    },
+    {
+      "id": "warm-olive",
+      "file": "exec-3ee93bfd-bb3b-434c-a7b3-e5d27b8d08bf.png",
+      "path": "results/warm-olive.png"
+    },
+    {
+      "id": "warm-clay",
+      "file": "exec-248c2564-35e8-4063-8bc7-d9795851ebc8.png",
+      "path": "results/warm-clay.png"
+    },
+    {
+      "id": "minimal-ivory",
+      "file": "exec-db84193f-9b61-4f21-876f-5a1ec10431b0.png",
+      "path": "results/minimal-ivory.png"
+    },
+    {
+      "id": "minimal-greige",
+      "file": "exec-b3354a6d-2a94-4f79-b28a-ba18a60f824c.png",
+      "path": "results/minimal-greige.png"
+    },
+    {
+      "id": "minimal-sage",
+      "file": "exec-520ae163-6135-4fe1-b8ec-ba3199ac7f72.png",
+      "path": "results/minimal-sage.png"
+    },
+    {
+      "id": "bold-charcoal",
+      "file": "exec-7d9981cb-75b2-4290-8e77-e7ee4fdb1ef1.png",
+      "path": "results/bold-charcoal.png"
+    },
+    {
+      "id": "bold-navy",
+      "file": "exec-889d9ecc-f907-4f4b-bb19-b96e7181558a.png",
+      "path": "results/bold-navy.png"
+    },
+    {
+      "id": "bold-olive",
+      "file": "exec-bf02fa9c-88c0-4d19-8ee6-f9672e1c0f7c.png",
+      "path": "results/bold-olive.png"
+    },
+    {
+      "id": "furniture-mixed",
+      "prompt": "Edit this reference into ONE standalone landscape 3:2 photograph for a furniture-shape choice in an interior style quiz. Keep a straight rectangular sofa but use a rounded armchair and oval oak coffee table, a balanced mix of straight and curved silhouettes. Keep the exact camera, room architecture, window, natural daylight, beige and ivory palette, furniture positions and restrained styling consistent. Neutral beige cushions throughout to focus attention on shape. Authentic interior photography with fabric weave, slight creases, real wood grain, natural shadows. No CGI gloss, no text, no logos, no collage.",
+      "file": "exec-0f759496-dff2-47db-9b99-00b3010869b4.png",
+      "path": "questions/furniture-mixed.png"
+    },
+    {
+      "id": "furniture-curved",
+      "prompt": "Edit this reference into ONE standalone landscape 3:2 photograph for a furniture-shape choice in an interior style quiz. Make sofa gently curved with rounded arms, armchair softly rounded, coffee table oval with rounded pedestal. Believable furniture, no extreme sculptural shapes. Keep the exact camera, room architecture, window, natural daylight, beige and ivory palette, furniture positions and restrained styling consistent. Neutral beige cushions throughout to focus attention on shape. Authentic interior photography with fabric weave, slight creases, real wood grain, natural shadows. No CGI gloss, no text, no logos, no collage.",
+      "file": "exec-e2afac79-e8b1-414e-a0d4-f3680abfaeba.png",
+      "path": "questions/furniture-curved.png"
+    },
+    {
+      "id": "furniture-straight",
+      "prompt": "Edit this reference into ONE standalone landscape 3:2 photograph for a furniture-shape choice in an interior style quiz. Make the sofa and armchair distinctly clean straight-edged rectangular with square arms; coffee table rectangular, square legs. Keep the exact camera, room architecture, window, natural daylight, beige and ivory palette, furniture positions and restrained styling consistent. Neutral beige cushions throughout to focus attention on shape. Authentic interior photography with fabric weave, slight creases, real wood grain, natural shadows. No CGI gloss, no text, no logos, no collage.",
+      "file": "exec-c7978642-5820-4cb4-a1f2-31ef271d829a.png",
+      "path": "questions/furniture-straight.png"
+    },
+    {
+      "id": "details-minimal",
+      "prompt": "Edit this reference into ONE standalone landscape 3:2 interior photograph for the decorative-detail-density question of a style quiz. Sparse styling: two plain neutral cushions on sofa, no throw, only one simple ceramic bowl on coffee table, one vase on cabinet, single existing wall artwork. Remove extra tabletop objects, books and branches. Keep window-side plant. Keep exactly the same room, camera, sofa, armchair, rectangular oak table, cabinet, window, sunlight and furniture arrangement. All decorations beige, ivory, taupe, natural wood; no new strong accent colors. Authentic attainable apartment editorial photography, real fabric textures, little creases, natural shadows. No showroom CGI sheen, no text, no logos, no collage.",
+      "file": "exec-503cd226-6069-4036-b68b-3b1395daff32.png",
+      "path": "questions/details-minimal.png"
+    },
+    {
+      "id": "details-balanced",
+      "prompt": "Edit this reference into ONE standalone landscape 3:2 interior photograph for the decorative-detail-density question of a style quiz. Balanced styling: four neutral cushions, one casually folded throw, a vase with a few branches and two books on coffee table, one bowl and one vase on cabinet, single existing wall artwork. Keep exactly the same room, camera, sofa, armchair, rectangular oak table, cabinet, window, sunlight and furniture arrangement. All decorations beige, ivory, taupe, natural wood; no new strong accent colors. Authentic attainable apartment editorial photography, real fabric textures, little creases, natural shadows. No showroom CGI sheen, no text, no logos, no collage.",
+      "file": "exec-6adb3367-7c0a-441d-9bdb-9d1b0bec46e0.png",
+      "path": "questions/details-balanced.png"
+    },
+    {
+      "id": "details-layered",
+      "prompt": "Edit this reference into ONE standalone landscape 3:2 interior photograph for the decorative-detail-density question of a style quiz. Rich but tasteful layered styling: six neutral cushions with varied textures, a soft throw casually draped, a tray, a few books, small ceramic bowl and vase on coffee table, grouped ceramics and books on cabinet, a composed three-piece neutral art arrangement above sofa. Keep realistic usable surfaces, do not clutter floor. Keep exactly the same room, camera, sofa, armchair, rectangular oak table, cabinet, window, sunlight and furniture arrangement. All decorations beige, ivory, taupe, natural wood; no new strong accent colors. Authentic attainable apartment editorial photography, real fabric textures, little creases, natural shadows. No showroom CGI sheen, no text, no logos, no collage.",
+      "file": "exec-dc46cb8b-dc1f-4569-8517-4d5338bf24d3.png",
+      "path": "questions/details-layered.png"
+    },
+    {
+      "id": "material-wood",
+      "file": "exec-83d0ac1c-04db-4eb0-b4d3-d61c46233307.png",
+      "path": "questions/material-wood.png"
+    },
+    {
+      "id": "material-stone",
+      "file": "exec-c1bc58b5-ad52-42f6-ac26-50587af9d1e3.png",
+      "path": "questions/material-stone.png"
+    },
+    {
+      "id": "material-fabric",
+      "file": "exec-8d66801f-1d0c-4e7b-b68c-b26b2ec2941a.png",
+      "path": "questions/material-fabric.png"
+    }
+  ]
+}

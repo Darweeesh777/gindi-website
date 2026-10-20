@@ -25,6 +25,7 @@ never start by themselves.
     <link rel="stylesheet" href="{% static 'css/project-gallery.css' %}">
     <script src="{% static 'js/project-gallery.js' %}" defer></script>
   {% endif %}
+  {% if comparison %}<script src="{% static 'js/compare-slider.js' %}" defer></script>{% endif %}
 {% endblock %}
 
 {% block body %}
@@ -33,6 +34,7 @@ never start by themselves.
   <main id="main" tabindex="-1">
     {% if project.interactive %}
       {% include "partials/project_gallery.html" %}
+      {% if comparison %}{% include "partials/project_compare.html" %}{% endif %}
     {% else %}
     <section class="section project-page theme-light" id="top" aria-labelledby="project-title">
       <div class="container">

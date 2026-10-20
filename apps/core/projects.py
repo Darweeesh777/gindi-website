@@ -27,10 +27,19 @@ Each project:
                   point on this photo, in % of the photo's width and height).
     'tiles'       optional: which media (indexes) form the Projects page group,
                   in order; otherwise the first three
+    'comparison'  optional: the id of the project's design/reality comparison
+                  in apps/core/vision.py, shown below the interactive gallery
     'concept'     optional {'note', 'images': [{'image', 'caption', 'alt'}, ...]}:
                   concept visualizations, a gallery on its own tab of the
                   interactive project page, with one note under it
     'thumbnail'   optional images.py key for the homepage thumbnail
+    'cover'       optional images.py key for the homepage image (else the first photo)
+    'layout'      optional: 'light' gives the project the "Follow the Light" page
+                  (templates/core/project_light.html), with:
+                    'moments'  five {'image': <a media image key>, 'label', 'text'}:
+                               the photos joined by the scroll-lit line, in order
+                    'groups'   [(id, label), ...]: the carousel's groups, in order;
+                               every photo in 'media' has a 'group' and a 'caption'
     'focus'       optional crop focal point (CSS object-position) for the
                   homepage image
 
@@ -40,7 +49,8 @@ Films: MP4 (H.264) files in static/videos/, with a poster photo.
 Text fields take one string (both languages) or {'en': ..., 'ar': ...}; a
 missing 'ar' falls back to English.
 
-Project 01 is the studio's real KK Barbershop. Projects 02-04 are TEMPORARY:
+Project 01 is the studio's real KK Barbershop; Project 02, the villa, is the
+studio's own photographs too. Projects 03-04 are TEMPORARY:
 their photos are illustrative, AI-generated interiors (labelled as such on
 the page), not studio projects, and the detail photos are placeholders.
 
@@ -179,25 +189,203 @@ PROJECTS = [
                     'ar': 'تصوّر لمحطات الحلاقة من الأمام، بين أريكتين زيتونيتين وطاولة قهوة بسطح حجري.'}},
             ],
         },
+        # The homepage's "From Vision to Reality" comparison for this project
+        # (its id in apps/core/vision.py), shown again below the gallery.
+        'comparison': 'kk-barbershop',
         'thumbnail': None,
         'focus': '50% 62%',
     },
     {
+        # Project 02, the villa: the studio's photographs (static/images/Villa ( pictures )/).
+        # Its own page: "Follow the Light" (templates/core/project_light.html) — five moments
+        # joined by a scroll-lit line, then every photo in the "Explore the Villa" carousel.
+        # Dimensions and materials are not stated: only what the photos show.
         'slug': 'project-2',
-        'name': {'en': 'Project 02', 'ar': 'المشروع 02'},
-        'work': PLACEHOLDER_SCOPE,
-        'description': PLACEHOLDER_DESCRIPTION,
-        'media': [
-            {'image': 'project-2', 'alt': {
-                'en': 'Illustrative image: a curved plaster staircase with a brass handrail and a wooden bench '
-                      'at its base.',
-                'ar': 'صورة توضيحية: درج منحنٍ من الجص بدرابزين نحاسي ومقعد خشبي عند قاعدته.'}},
-            {'image': None},
-            {'image': None},
+        'layout': 'light',
+        # The name as the studio gives it (the same in both languages).
+        'name': 'villa-New El Sheikh Zayed City',
+        'work': {'en': 'Follow the light through the villa: from the chandelier in the stairwell to the terrace at dusk.',
+                 'ar': 'اتبع الضوء عبر الفيلا: من النجفة في فراغ السلم حتى التراس عند الغروب.'},
+        # Homepage image and thumbnail, and the Projects page group (media indexes):
+        # the chandelier and staircase large, then the kitchen and the terrace.
+        'cover': 'villa-4e987bed',
+        'tiles': [11, 3, 29],
+        # Carousel groups, in order (each photo's 'group').
+        'groups': [
+            ('entrance', {'en': 'Entrance & Reception', 'ar': 'المدخل والاستقبال'}),
+            ('kitchen', {'en': 'Kitchen', 'ar': 'المطبخ'}),
+            ('stairs', {'en': 'Staircase & Chandelier', 'ar': 'الدرج والنجفة'}),
+            ('doors', {'en': 'Doors & Corridors', 'ar': 'الأبواب والممرات'}),
+            ('bathrooms', {'en': 'Bathrooms', 'ar': 'الحمّامات'}),
+            ('terrace', {'en': 'Terrace', 'ar': 'التراس'}),
         ],
-        'thumbnail': None,
-        # Portrait original: keep the curve of the stair in the landscape crop.
-        'focus': '50% 62%',
+        # "Follow the light.": the five moments, in order (photos from 'media'): the hero, then two
+        # sections of two. The descriptions are the studio's approved copy.
+        'moments': [
+            {'image': 'villa-4e987bed', 'label': {'en': 'The Chandelier', 'ar': 'النجفة'},
+             'text': {'en': 'A cascade of illuminated pendants draws the eye through the stairwell. Dark glass balustrades '
+                            'and pale steps frame the light, turning the connection between floors into a defining feature '
+                            'of the villa.',
+                      'ar': 'تمتد وحدات الإضاءة المعلّقة عبر فراغ السلم، فتقود العين بين مستويات الفيلا. ويحيط بها الزجاج '
+                            'الداكن والدرج الفاتح، ليصبح الانتقال بين الطوابق أحد أبرز ملامح المكان.'}},
+            {'image': 'villa-63aed22b', 'label': {'en': 'The Kitchen', 'ar': 'المطبخ'},
+             'text': {'en': 'Warm wood tones and illuminated glass cabinets bring depth to the kitchen, balanced by '
+                            'understated grey cabinetry and dark worktops. Clean lines connect storage, display, and '
+                            'preparation areas in one cohesive composition.',
+                      'ar': 'تمنح درجات الخشب الدافئة ووحدات العرض الزجاجية المضيئة عمقًا للمطبخ، في توازن مع الخزائن '
+                            'الرمادية وأسطح العمل الداكنة. وتربط الخطوط الواضحة بين التخزين والعرض والتحضير في تكوين '
+                            'متناسق.'}},
+            {'image': 'villa-a32d2d56', 'label': {'en': 'Stone & Light', 'ar': 'الخامة والضوء'},
+             'text': {'en': 'Concealed lighting traces the recessed shelves, revealing the golden veining against a dark '
+                            'surface. This close-up captures the meeting of texture, proportion, and light within a '
+                            'carefully framed detail.',
+                      'ar': 'تحدد الإضاءة المخفية الرفوف الغائرة، وتُبرز العروق الذهبية على السطح الداكن. وتكشف هذه '
+                            'اللقطة القريبة عن التقاء الملمس والنِّسب والضوء داخل تفصيلة محددة الإطار.'}},
+            {'image': 'villa-6cc5e965', 'label': {'en': 'The Bathroom', 'ar': 'الحمّام'},
+             'text': {'en': 'Clear glass keeps the bathing area visually open, while contrasting stone tones define its '
+                            'surfaces. Warm perimeter lighting and an illuminated niche bring a softer atmosphere to the '
+                            'crisp geometry of the shower and bathtub.',
+                      'ar': 'يحافظ الزجاج الشفاف على الانفتاح البصري لمنطقة الاستحمام، بينما تمنح درجات الأسطح الحجرية '
+                            'المتباينة كل جزء حضوره. وتضيف الإضاءة المحيطية الدافئة والنيش المضيء هدوءًا إلى الخطوط '
+                            'الواضحة للشاور وحوض الاستحمام.'}},
+            {'image': 'villa-3e7ab2b8', 'label': {'en': 'The Terrace', 'ar': 'التراس'},
+             'text': {'en': 'At dusk, the terrace opens onto a view of the surrounding homes and pool. A warm lantern in '
+                            'the foreground meets the deep blue evening sky, bringing the villa’s journey through '
+                            'light to a quiet close.',
+                      'ar': 'مع حلول المساء، ينفتح التراس على مشهد المنازل المحيطة وحمام السباحة. ويلتقي الضوء الدافئ '
+                            'للمصباح بزرقة السماء العميقة، لتختتم رحلة الضوء في الفيلا بلحظة هادئة.'}},
+        ],
+        'media': [
+            # Entrance & reception: the entrance hall, the reception, the reception from the stairs.
+            {'image': 'villa-44769fca', 'group': 'entrance',
+             'caption': {'en': 'Entrance hall', 'ar': 'بهو المدخل'}, 'alt': {
+                 'en': 'A wood-panelled hall leading to the front door, with the kitchen and a glass display cabinet on the left.',
+                 'ar': 'ممر مكسو بالخشب يقود إلى باب المدخل، والمطبخ وخزانة عرض زجاجية على اليسار.'}},
+            {'image': 'villa-396ea57f', 'group': 'entrance',
+             'caption': {'en': 'Reception hall', 'ar': 'صالة الاستقبال'}, 'alt': {
+                 'en': 'An open reception hall with two crystal chandeliers, track lights and tall windows.',
+                 'ar': 'صالة استقبال مفتوحة بنجفتين من الكريستال وإضاءة مسارية ونوافذ طويلة.'}},
+            {'image': 'villa-cf76fe9b', 'group': 'entrance',
+             'caption': {'en': 'Reception from the stairs', 'ar': 'الاستقبال من الدرج'}, 'alt': {
+                 'en': 'The reception hall seen past the glass balustrade of the stairs: a wood-clad wall, chandeliers and cove lighting.',
+                 'ar': 'صالة الاستقبال من خلف درابزين الدرج الزجاجي: حائط مكسو بالخشب ونجفات وإضاءة مخفية.'}},
+            # Kitchen: overall views, then the island, the cabinets, the details.
+            {'image': 'villa-63aed22b', 'group': 'kitchen',
+             'caption': {'en': 'Kitchen overview', 'ar': 'المطبخ'}, 'alt': {
+                 'en': 'The kitchen: tall glass display cabinets lit from within, built-in appliances and a dark stone island with lines of light.',
+                 'ar': 'المطبخ: خزائن عرض زجاجية طويلة مضاءة من الداخل، وأجهزة مدمجة، وجزيرة من الحجر الداكن بخطوط من الضوء.'}},
+            {'image': 'villa-85018c79', 'group': 'kitchen',
+             'caption': {'en': 'Kitchen from the island', 'ar': 'المطبخ من الجزيرة'}, 'alt': {
+                 'en': 'The kitchen seen from the end of the island: grey cabinets, built-in ovens and lit cabinets along the ceiling.',
+                 'ar': 'المطبخ من طرف الجزيرة: خزائن رمادية وأفران مدمجة وخزائن مضاءة على امتداد السقف.'}},
+            {'image': 'villa-a530da02', 'group': 'kitchen',
+             'caption': {'en': 'Island and ceiling light', 'ar': 'الجزيرة وإضاءة السقف'}, 'alt': {
+                 'en': 'The kitchen island with lines of light reflected in its dark stone top, under a lit frame in the ceiling.',
+                 'ar': 'جزيرة المطبخ وخطوط الضوء تنعكس على سطحها الحجري الداكن، أسفل إطار مضاء في السقف.'}},
+            {'image': 'villa-50cac651', 'group': 'kitchen',
+             'caption': {'en': 'Along the island', 'ar': 'بمحاذاة الجزيرة'}, 'alt': {
+                 'en': 'Along the wood-faced kitchen island towards the window, with lit cabinets above.',
+                 'ar': 'بمحاذاة جزيرة المطبخ المكسوة بالخشب نحو النافذة، والخزائن المضاءة في الأعلى.'}},
+            {'image': 'villa-026ca8ba', 'group': 'kitchen',
+             'caption': {'en': 'Display cabinets', 'ar': 'خزائن العرض'}, 'alt': {
+                 'en': 'Lit wood and glass display cabinets beside the island, with the reception hall beyond.',
+                 'ar': 'خزائن عرض مضاءة من الخشب والزجاج بجانب الجزيرة، وصالة الاستقبال في العمق.'}},
+            {'image': 'villa-196fb278', 'group': 'kitchen',
+             'caption': {'en': 'Counter corner', 'ar': 'ركن الرخامة'}, 'alt': {
+                 'en': 'A corner of the kitchen counter in dark stone, with light lines in the ceiling and cabinets.',
+                 'ar': 'ركن من رخامة المطبخ الحجرية الداكنة، وخطوط ضوء في السقف والخزائن.'}},
+            {'image': 'villa-9b90c92c', 'group': 'kitchen',
+             'caption': {'en': 'Oven column', 'ar': 'عمود الأفران'}, 'alt': {
+                 'en': 'A built-in oven and microwave in grey cabinetry.',
+                 'ar': 'فرن وميكروويف مدمجان في خزائن رمادية.'}},
+            # Staircase and chandelier: the staircase, the chandelier, the stairwell, details.
+            {'image': 'villa-ddba2016', 'group': 'stairs',
+             'caption': {'en': 'Staircase', 'ar': 'الدرج'}, 'alt': {
+                 'en': 'The staircase from the ground floor: light stone steps, a glass balustrade and pendant lights.',
+                 'ar': 'الدرج من الطابق الأرضي: درجات من الحجر الفاتح ودرابزين زجاجي وإضاءة معلّقة.'}},
+            {'image': 'villa-4e987bed', 'group': 'stairs',
+             'caption': {'en': 'Chandelier and glass staircase', 'ar': 'النجفة والدرج الزجاجي'}, 'alt': {
+                 'en': 'A cascading chandelier of lit links hanging through the stairwell, beside the glass balustrade.',
+                 'ar': 'ثريا متدلية من حلقات مضيئة في بئر الدرج، بجانب الدرابزين الزجاجي.'}},
+            {'image': 'villa-0449b0f4', 'group': 'stairs',
+             'caption': {'en': 'Down the stairwell', 'ar': 'نظرة إلى أسفل الدرج'}, 'alt': {
+                 'en': 'Looking down the stairwell past the chandelier and the glass balustrade.',
+                 'ar': 'نظرة إلى أسفل بئر الدرج بجوار النجفة والدرابزين الزجاجي.'}},
+            {'image': 'villa-1b473d43', 'group': 'stairs',
+             'caption': {'en': 'Lit steps', 'ar': 'الدرجات المضاءة'}, 'alt': {
+                 'en': 'Looking up the stairwell: each step lit from below.',
+                 'ar': 'نظرة إلى أعلى بئر الدرج: كل درجة مضاءة من أسفلها.'}},
+            {'image': 'villa-9d2616d8', 'group': 'stairs',
+             'caption': {'en': 'Chandelier from below', 'ar': 'النجفة من أسفل'}, 'alt': {
+                 'en': 'Looking up through the chandelier to the upper floors of the stairwell.',
+                 'ar': 'نظرة إلى أعلى عبر النجفة نحو الطوابق العليا لبئر الدرج.'}},
+            {'image': 'villa-bbf489ef', 'group': 'stairs',
+             'caption': {'en': 'Chandelier detail', 'ar': 'تفاصيل النجفة'}, 'alt': {
+                 'en': 'The lit links of the chandelier, close up.',
+                 'ar': 'حلقات النجفة المضيئة عن قرب.'}},
+            # Doors and corridors: the upper hall, the doors, a detail.
+            {'image': 'villa-7750873b', 'group': 'doors',
+             'caption': {'en': 'Upper hall', 'ar': 'الصالة العلوية'}, 'alt': {
+                 'en': 'An upper hall with wood-clad doors, track lights and the glass balustrade of the stairs.',
+                 'ar': 'صالة علوية بأبواب مكسوة بالخشب وإضاءة مسارية ودرابزين الدرج الزجاجي.'}},
+            {'image': 'villa-8a3b7f60', 'group': 'doors',
+             'caption': {'en': 'Doors on the landing', 'ar': 'الأبواب على البسطة'}, 'alt': {
+                 'en': 'Tall wood doors with black inlays on the landing, beside the glass balustrade of the stairs.',
+                 'ar': 'أبواب خشبية طويلة بتطعيمات سوداء على البسطة، بجانب درابزين الدرج الزجاجي.'}},
+            {'image': 'villa-f7e821a2', 'group': 'doors',
+             'caption': {'en': 'Wood doors', 'ar': 'الأبواب الخشبية'}, 'alt': {
+                 'en': 'Two wood doors with a black vertical inlay, set in wood-clad walls.',
+                 'ar': 'بابان خشبيان بتطعيم أسود رأسي في جدران مكسوة بالخشب.'}},
+            {'image': 'villa-4fd6edc7', 'group': 'doors',
+             'caption': {'en': 'Door detail', 'ar': 'تفاصيل باب'}, 'alt': {
+                 'en': 'A door with a dark panel in a wood frame, in afternoon sunlight.',
+                 'ar': 'باب بلوح داكن في إطار خشبي، في ضوء شمس العصر.'}},
+            # Bathrooms: each bathroom's photos together, overall view first.
+            {'image': 'villa-6cc5e965', 'group': 'bathrooms',
+             'caption': {'en': 'Bathroom with bathtub and shower', 'ar': 'حمّام بحوض ودُش'}, 'alt': {
+                 'en': 'A bathroom with a bathtub, a walk-in shower with a stone bench, a dark veined stone wall and lit niches.',
+                 'ar': 'حمّام بحوض استحمام ودُش مفتوح بمقعد حجري، وحائط من حجر داكن معرّق وتجاويف مضاءة.'}},
+            {'image': 'villa-c9a23790', 'group': 'bathrooms',
+             'caption': {'en': 'Walk-in shower', 'ar': 'الدُش المفتوح'}, 'alt': {
+                 'en': 'The walk-in shower of the same bathroom: a rain shower, a stone bench and a lit niche.',
+                 'ar': 'الدُش المفتوح في الحمّام نفسه: دُش مطري ومقعد حجري وتجويف مضاء.'}},
+            {'image': 'villa-a32d2d56', 'group': 'bathrooms',
+             'caption': {'en': 'Lit stone niche', 'ar': 'تجويف حجري مضاء'}, 'alt': {
+                 'en': 'The shower niche close up: dark veined stone lit along its edges.',
+                 'ar': 'تجويف الدُش عن قرب: حجر داكن معرّق مضاء على امتداد حوافه.'}},
+            {'image': 'villa-1504c80c', 'group': 'bathrooms',
+             'caption': {'en': 'Bathroom with glass shower', 'ar': 'حمّام بدُش زجاجي'}, 'alt': {
+                 'en': 'A bathroom with travertine-look walls, a glass shower with lit niches and a wall-hung toilet.',
+                 'ar': 'حمّام بجدران تشبه الترافرتين، ودُش زجاجي بتجاويف مضاءة، ومرحاض معلّق.'}},
+            {'image': 'villa-98b46f9a', 'group': 'bathrooms',
+             'caption': {'en': 'Glass shower', 'ar': 'الدُش الزجاجي'}, 'alt': {
+                 'en': 'The same bathroom from the vanity: the glass shower, lit niches and a wall-hung toilet.',
+                 'ar': 'الحمّام نفسه من جهة الحوض: الدُش الزجاجي والتجاويف المضاءة والمرحاض المعلّق.'}},
+            {'image': 'villa-a752bb03', 'group': 'bathrooms',
+             'caption': {'en': 'Shower area', 'ar': 'منطقة الدُش'}, 'alt': {
+                 'en': 'A shower area in light veined stone with a dark veined floor and a lit cove, with its fittings still exposed.',
+                 'ar': 'منطقة دُش من حجر فاتح معرّق بأرضية داكنة معرّقة وإضاءة مخفية، وتجهيزاتها ما زالت ظاهرة.'}},
+            {'image': 'villa-d5bc9550', 'group': 'bathrooms',
+             'caption': {'en': 'Shower floor', 'ar': 'أرضية الدُش'}, 'alt': {
+                 'en': 'The same shower area: the dark veined stone floor and the light walls.',
+                 'ar': 'منطقة الدُش نفسها: الأرضية الحجرية الداكنة المعرّقة والجدران الفاتحة.'}},
+            {'image': 'villa-47624f42', 'group': 'bathrooms',
+             'caption': {'en': 'Washroom', 'ar': 'دورة مياه'}, 'alt': {
+                 'en': 'A washroom in grey veined stone with a black toilet, a stone basin and a lit cove.',
+                 'ar': 'دورة مياه من حجر رمادي معرّق بمرحاض أسود وحوض حجري وإضاءة مخفية.'}},
+            {'image': 'villa-fe4b86ef', 'group': 'bathrooms',
+             'caption': {'en': 'Bathroom with freestanding bath', 'ar': 'حمّام بحوض قائم'}, 'alt': {
+                 'en': 'A bathroom with a freestanding bathtub, a glass shower screen and a dark wood-slat wall.',
+                 'ar': 'حمّام بحوض استحمام قائم وحاجز دُش زجاجي وحائط من شرائح خشبية داكنة.'}},
+            # Terrace.
+            {'image': 'villa-3e7ab2b8', 'group': 'terrace',
+             'caption': {'en': 'Terrace at night', 'ar': 'التراس ليلًا'}, 'alt': {
+                 'en': 'The terrace at dusk: a lit lantern on the parapet, a black railing and the lights of the neighbourhood beyond.',
+                 'ar': 'التراس عند الغسق: فانوس مضاء على السور، ودرابزين أسود، وأضواء الحي في الخلفية.'}},
+        ],
+        'thumbnail': 'villa-4e987bed',
+        # Portrait photo in the homepage's landscape frame: the chandelier and the glass.
+        'focus': '50% 42%',
     },
     {
         'slug': 'project-3',
@@ -278,11 +466,12 @@ def _build(project, number, lang):
         tiles = (media + [{'kind': 'placeholder'}] * TILES)[:TILES]
     first = next((item for item in project.get('media', []) if item.get('image')), None)
     thumb_key = project.get('thumbnail') or (first or {}).get('image')
+    layout = project.get('layout') or ''
     for i, photo in enumerate(photos):
         photo['index'] = i  # position in the photo gallery
         photo['number'] = f'{i + 1:02d}'
     # The interactive gallery: every medium a captioned photo.
-    interactive = bool(photos) and len(photos) == len(media) and all(p['caption'] for p in photos)
+    interactive = not layout and bool(photos) and len(photos) == len(media) and all(p['caption'] for p in photos)
     if interactive:
         position = {item['image']: i for i, item in enumerate(project['media'])}
         for photo, item in zip(photos, project['media']):
@@ -292,6 +481,8 @@ def _build(project, number, lang):
                                   'edge': 'right' if spot['x'] > 70 else 'left' if spot['x'] < 30 else ''}
                                  for spot in item.get('hotspots', [])]
     concept = project.get('concept') if interactive else None
+    light = _light(project, photos, lang) if layout == 'light' else None
+    cover = project.get('cover')
     return {
         'slug': project['slug'],
         'number': f'{number:02d}',
@@ -302,7 +493,8 @@ def _build(project, number, lang):
         'description': _text(project.get('description'), lang),
         'focus': project.get('focus') or '50% 50%',
         # Homepage carousel.
-        'image': photos[0]['image'] if photos else None,
+        'image': resolve(cover, _text(next(i['alt'] for i in project['media'] if i.get('image') == cover), lang))
+                 if cover else photos[0]['image'] if photos else None,
         'thumbnail': resolve(thumb_key) if thumb_key else None,
         # Projects page and project page.
         'media': media,
@@ -311,6 +503,9 @@ def _build(project, number, lang):
         'more': max(0, len([m for m in media if m['kind'] != 'placeholder'])
                     - len([t for t in tiles if t['kind'] != 'placeholder'])),
         'interactive': interactive,
+        'layout': layout,
+        'light': light,
+        'comparison': project.get('comparison') if interactive else None,
         'concept': {'note': _text(concept.get('note'), lang),
                     'images': [{'image': resolve(item['image'], _text(item.get('alt'), lang)),
                                 'caption': _text(item.get('caption'), lang), 'index': i, 'number': f'{i + 1:02d}'}
@@ -318,6 +513,33 @@ def _build(project, number, lang):
         'index_url': index_url(project['slug'], lang),
         'detail_url': detail_url(project['slug'], lang),
     }
+
+
+def _light(project, photos, lang):
+    """The "Follow the Light" page: the five moments and the carousel's groups."""
+    groups = [{'id': gid, 'label': _text(label, lang), 'photos': []} for gid, label in project['groups']]
+    by_id = {g['id']: g for g in groups}
+    position = {}
+    for photo, item in zip(photos, [i for i in project['media'] if i.get('image')]):
+        group = by_id[item['group']]
+        photo['group'] = group['id']
+        photo['group_label'] = group['label']
+        photo['group_index'] = len(group['photos'])
+        group['photos'].append(photo)
+        position[item['image']] = photo
+    for g in groups:
+        g['first'] = g['photos'][0]['index']
+        g['count'] = len(g['photos'])
+    moments = []
+    for n, m in enumerate(project['moments'], start=1):
+        photo = position[m['image']]
+        moments.append({'number': f'{n:02d}', 'total': f"{len(project['moments']):02d}",
+                        'label': _text(m['label'], lang), 'text': _text(m.get('text'), lang), 'photo': photo,
+                        'role': 'hero' if n == 1 else 'a' if n % 2 == 0 else 'b',
+                        'landscape': photo['image']['width'] > photo['image']['height']})
+    # The hero, then the others two by two (one section each).
+    pairs = [moments[i:i + 2] for i in range(1, len(moments), 2)]
+    return {'moments': moments, 'hero': moments[0], 'pairs': pairs, 'groups': groups}
 
 
 def for_language(lang):
@@ -367,6 +589,21 @@ def validate():
                     problems.append(f"{slug!r}: image {item['image']!r} is not in images.py")
                 if not _text(item.get('alt'), 'en'):
                     problems.append(f"{slug!r}: image {item['image']!r} without alt text")
+        if project.get('comparison'):
+            from . import vision
+            if project['comparison'] not in [v.get('id') for v in vision.VISIONS]:
+                problems.append(f"{slug!r}: comparison {project['comparison']!r} is not in vision.py")
+        if project.get('cover') and project['cover'] not in keys:
+            problems.append(f"{slug!r}: cover {project['cover']!r} is not one of its photos")
+        if project.get('layout') == 'light':
+            group_ids = [g for g, _ in project.get('groups', [])]
+            order = [item.get('group') for item in media]
+            if any(g not in group_ids for g in order) or not all(_text(i.get('caption'), 'en') for i in media):
+                problems.append(f'{slug!r}: every photo needs a known group and a caption')
+            elif order != sorted(order, key=group_ids.index):
+                problems.append(f'{slug!r}: photos must follow the order of the groups')
+            if len(project.get('moments', [])) != 5 or any(m.get('image') not in keys for m in project.get('moments', [])):
+                problems.append(f'{slug!r}: needs five moments, each one of its photos')
         concept = project.get('concept')
         if concept:
             if not concept.get('images'):
