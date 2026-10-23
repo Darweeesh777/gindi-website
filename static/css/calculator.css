@@ -830,6 +830,21 @@ select.cf__input {
   font-size: 0.9375rem;
 }
 
+/* A second main figure (plaster: sand beside cement), a step smaller. */
+.ckpi--second .ckpi__v {
+  font-size: clamp(2.25rem, 1.8rem + 1.6vw, 3rem);
+}
+
+/* A value that follows another field (plaster: the spatter dash's area and waste). */
+.cf__box--linked {
+  border-style: dashed;
+  background: var(--gindi-ivory);
+}
+
+.cf__box--linked .cf__input {
+  color: var(--navy-75);
+}
+
 .ckpis {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

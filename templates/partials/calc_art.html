@@ -1,7 +1,7 @@
 {% comment %}
 Faint background drawing for a calculator's workspace (decorative; opacity in
 css/calculator.css, about 5%). It shows only in the space around the white
-panels. Parameter: slug (wire, tiles, bricks, paint).
+panels. Parameter: slug (wire, tiles, bricks, paint, plaster).
 {% endcomment %}
 <svg class="calc-art" aria-hidden="true" focusable="false" width="100%" height="100%">
   <defs>
@@ -39,6 +39,16 @@ panels. Parameter: slug (wire, tiles, bricks, paint).
         <rect x="300" y="40" width="96" height="30" rx="15"/>
         <path d="M396 55h14v34h-58v26M352 115v55"/>
         <path d="M0 250c40-30 80 30 120 0" opacity=".5"/>
+      </pattern>
+    {% elif slug == "plaster" %}
+      {# Coats of plaster: smoothed bands with trowel arcs, and the stipple of the spatter dash. #}
+      <pattern id="calc-art-p" width="360" height="260" patternUnits="userSpaceOnUse">
+        <path d="M0 40c60-14 120 14 180 0s120 14 180 0M0 120c60-14 120 14 180 0s120 14 180 0" opacity=".8"/>
+        <path d="M30 200a70 70 0 0 1 120 0M60 200a40 40 0 0 1 60 0" opacity=".7"/>
+        <path d="M220 180h80l18-18h-80z"/>
+        <path d="M268 162v-16"/>
+        <circle cx="210" cy="80" r="2"/><circle cx="232" cy="72" r="1.5"/><circle cx="250" cy="88" r="2.5"/><circle cx="276" cy="76" r="1.5"/>
+        <circle cx="296" cy="92" r="2"/><circle cx="318" cy="70" r="1.5"/><circle cx="224" cy="96" r="1.5"/><circle cx="262" cy="64" r="2"/>
       </pattern>
     {% endif %}
   </defs>

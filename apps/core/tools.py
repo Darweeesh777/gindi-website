@@ -65,6 +65,18 @@ TOOLS = [
                               'from the area and the products you choose.',
                         'ar': 'قدّر كميات مراحل الدهان وعدد العبوات والتكلفة حسب المساحة والمنتجات المختارة.'},
     },
+    {
+        'slug': 'plaster',
+        'name': {'en': 'Plaster Cement & Sand Calculator', 'ar': 'حاسبة أسمنت ورمل المحارة والطرطشة'},
+        'short_name': {'en': 'Plaster Calculator', 'ar': 'حاسبة المحارة'},
+        'planning': {'en': 'Estimate cement bags and sand for plastering.',
+                     'ar': 'قدّر شكاير الأسمنت والرمل لأعمال المحارة.'},
+        'teaser': {'en': 'Estimate plaster cement and sand.',
+                   'ar': 'قدّر أسمنت ورمل المحارة.'},
+        'description': {'en': 'Calculate the cement bags and sand to buy for plastering and the spatter dash, '
+                              'including waste and purchase rounding.',
+                        'ar': 'احسب شكاير الأسمنت وكمية الرمل اللازمة للمحارة والطرطشة، شاملة الهالك وتقريب الشراء.'},
+    },
 ]
 
 

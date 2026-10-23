@@ -45,7 +45,9 @@
     tiles: { ids: ['sumArea', 'sumSk', 'kCartons', 'kRange', 'kArea', 'kCost', 'kSupL'], dyn: /^(tp|m|g)\d+$/, list: 'cmp' },
     wire: { ids: ['sumLen', 'tLen', 'tAfter', 'tMin', 'tAvg', 'tMax', 'tCost', 'kTotal', 'kRange', 'kLen', 'kLenL', 'cElec', 'cRange', 'cDiff'],
             dyn: /^(g|L|D|E|F|G|I)\d+$/ },
-    paint: { ids: ['areaInfo', 'sumArea', 'kTotal', 'kMat', 'kMatL', 'kM2'], dyn: /^[mgr]\d+$/, list: 'buyList' }
+    paint: { ids: ['areaInfo', 'sumArea', 'kTotal', 'kMat', 'kMatL', 'kM2'], dyn: /^[mgr]\d+$/, list: 'buyList' },
+    // plaster: also the spatter dash's linked (read-only) area and waste, which calc() writes.
+    plaster: { ids: ['kBags', 'kBagsL', 'kSand', 'kSandL', 'kCem', 'kSandC'], dyn: /^[pt][mg]$/, list: 'cmp', values: ['ta', 'tw'] }
   };
 
   // States carried by wording alone (no figures): the original's text, the new page's data-state.
@@ -77,6 +79,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[id]'), function (el) {
       if (o.dyn.test(el.id) && !/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(el.tagName)) out.dyn[el.id] = tokens(text(el));
     });
+    if (o.values) out.values = o.values.map(function (id) { return byId(id).value; });
     if (o.list) out.list = Array.prototype.map.call(byId(o.list).children, function (c) { return tokens(text(c)); });
     var rows = document.querySelectorAll('[data-row]');
     out.rows = Array.prototype.map.call(rows, function (r) {

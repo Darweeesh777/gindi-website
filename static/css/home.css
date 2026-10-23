@@ -231,6 +231,24 @@
   grid-row: 2 / span 2;
 }
 
+/* Free Services has five tools: its own rows (two, two, then the fifth across both
+   columns), a little more compact, instead of the 2 x 2 rows it shares with Studio Services. */
+.home .svc-panel--free .svc-cells {
+  grid-template-rows: none;
+}
+
+.home .svc-panel--free .svc-cell {
+  padding-block: calc(var(--svc-v) * 0.62);
+}
+
+.home .svc-panel--free .svc-cell:nth-child(2n)::before {
+  inset-block: calc(var(--svc-v) * 0.4);
+}
+
+.home .svc-panel--free .svc-cell:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .home .svc-cell {
   position: relative;
   display: grid;

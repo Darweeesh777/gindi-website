@@ -503,15 +503,15 @@ class HomepageTests(SimpleTestCase):
             tools = html[html.index('class="sp-tools'):html.index('class="footer-cta')]
             self.assertIn('id="free-tools"', tools)  # the calculators' "back" links land here
             start = 'Start calculating' if prefix == '' else 'ابدأ الحساب'
-            for slug in ('wire', 'tiles', 'bricks', 'paint'):
+            for slug in ('wire', 'tiles', 'bricks', 'paint', 'plaster'):
                 self.assertIn(f'<a class="sp-tool__link" href="{prefix}/free-tools/{slug}/">{start}', tools)
-            self.assertEqual(tools.count('class="sp-tool__link"'), 4)
+            self.assertEqual(tools.count('class="sp-tool__link"'), 5)
             self.assertNotIn('sp-tool__status', tools)
             self.assertNotIn('Coming soon', tools)
             self.assertNotIn('قريبًا', tools)
-            self.assertNotIn('cement', tools)
+            self.assertNotIn('/free-tools/cement/', tools)  # the old Cement Estimator card is gone
             self.assertIn('Paint Quantity &amp; Cost Calculator' if prefix == '' else 'حاسبة كميات وتكلفة الدهانات', tools)
-            self.assertEqual(tools.count('class="sp-tool__icon"'), 4)
+            self.assertEqual(tools.count('class="sp-tool__icon"'), 5)
             self.assertIn('class="sp-tools__mark"', tools)  # the monogram watermark, decorative
             # Get Quotation opens the existing quotation form.
             self.assertRegex(html, r'class="btn footer-cta__btn" href="[^"]*#contact" aria-haspopup="dialog" data-quote>')
@@ -614,11 +614,11 @@ class HomepageTests(SimpleTestCase):
         from .tools import TOOLS
 
         slugs = [tool['slug'] for tool in TOOLS]
-        self.assertEqual(slugs, ['wire', 'tiles', 'bricks', 'paint'])
+        self.assertEqual(slugs, ['wire', 'tiles', 'bricks', 'paint', 'plaster'])
         for name, prefix in (('core:free_tools', ''), ('core:free_tools_ar', '/ar')):
             html = self.get(name)
             # Every card starts its calculator; nothing is "coming soon".
-            self.assertEqual(html.count('tool-card__cta'), 4)
+            self.assertEqual(html.count('tool-card__cta'), 5)
             for slug in slugs:
                 self.assertIn(f'class="btn btn--primary tool-card__cta" href="{prefix}/free-tools/{slug}/"', html)
             self.assertNotIn('tool-card__status', html)
@@ -637,6 +637,9 @@ class HomepageTests(SimpleTestCase):
             'paint': (('Paint Quantity &amp; Cost Calculator', 'Estimate the quantities for each painting stage, the number of packs and the cost, '
                        'from the area and the products you choose.'),
                       ('حاسبة كميات وتكلفة الدهانات', 'قدّر كميات مراحل الدهان وعدد العبوات والتكلفة حسب المساحة والمنتجات المختارة.')),
+            'plaster': (('Plaster Cement &amp; Sand Calculator', 'Calculate the cement bags and sand to buy for plastering and the spatter dash, '
+                         'including waste and purchase rounding.'),
+                        ('حاسبة أسمنت ورمل المحارة والطرطشة', 'احسب شكاير الأسمنت وكمية الرمل اللازمة للمحارة والطرطشة، شاملة الهالك وتقريب الشراء.')),
         }
         for slug, langs in expected.items():
             for (title, intro), prefix in zip(langs, ('', '/ar')):
@@ -676,6 +679,7 @@ class HomepageTests(SimpleTestCase):
             'tiles': ('ceramic-calculator.txt', '49abfc48fe02596ca6198cc697bd7d4e', ('var TYPES = [', 'var $ =')),
             'wire': ('wire-calculator.txt', '6fa41a02581895acef5125d2efa19d91', ('var TYPES = [', 'var $ =')),
             'paint': ('paint-calculator.txt', '5a33720980b4a1b77a9655b8c13e6e0f', ('var PRODUCTS = [', 'var BRANDS')),
+            'plaster': ('plaster-calculator.txt', '659d4227fe8a85ee2d9c46f324fe8b1e', ('var STAGES = [', 'var $ =')),
         }
         # Lines of each original's calc() that must appear unchanged in its module.
         formulas = {
@@ -703,6 +707,11 @@ class HomepageTests(SimpleTestCase):
                       'var qty = area * coats / p[2] * (1 + waste), packs = up(qty / p[3]);',
                       'var lab = labour === null ? 0 : total * labour, grand = mat + lab;',
                       'var anyPrice = mat > 0 || labour !== null;'],
+            'plaster': ['var mortar = a * th / 1000, dry = mortar * f, parts = c + s;',
+                        'var cemVol = parts ? dry * c / parts : 0, sand0 = parts ? dry * s / parts : 0;',
+                        'var kg0 = cemVol * dens, kg = kg0 * (1 + w), bags = bag ? kg / bag : 0, sand = sand0 * (1 + w);',
+                        'var a = g("a"), th = g("th"), c = g("c"), s = g("s"), w = g("w") / 100, f = g("f");',
+                        'var buyBags = up(bags), buySand = step ? up(sand / step) * step : sand;'],
         }
         for slug, (name, md5, (first, last)) in originals.items():
             with open(os.path.join(tools_dir, name), 'rb') as f:
@@ -752,10 +761,10 @@ class HomepageTests(SimpleTestCase):
                 self.assertIn(f'<a class="svc-cell__link" href="{prefix}/services/#{service["slug"]}">', section)
             self.assertIn(f'<a class="svc-panel__more" href="{prefix}/services/">', section)  # Explore services
             # Free Services: each tool opens its calculator.
-            for slug in ('wire', 'tiles', 'bricks', 'paint'):
+            for slug in ('wire', 'tiles', 'bricks', 'paint', 'plaster'):
                 self.assertIn(f'<a class="svc-cell__link" href="{prefix}/free-tools/{slug}/">', section)
             self.assertNotIn('svc-cell__status', section)
-            self.assertEqual(section.count('class="svc-cell__icon"'), 4)
+            self.assertEqual(section.count('class="svc-cell__icon"'), 5)
             self.assertIn(f'<a class="svc-panel__more" href="{prefix}/free-tools/">', section)  # Explore free tools
             header = html[html.index('<header class="site-header'):html.index('</header>')]
             footer = html[html.index('<footer'):html.index('</footer>')]
@@ -779,7 +788,7 @@ class HomepageTests(SimpleTestCase):
         self.assertEqual(re.findall(r'<a class="svc-cell__link" href="/services/#[^"]+">([^<]+)<', en),
                          ['2D Design', '3D Design', 'Interior Finishing', 'Fit-Out'])
         self.assertEqual(re.findall(r'<a class="svc-cell__link" href="/free-tools/[^"]+">([^<]+)<', en),
-                         ['Wire Calculator', 'Tile Calculator', 'Brick Calculator', 'Paint Calculator'])
+                         ['Wire Calculator', 'Tile Calculator', 'Brick Calculator', 'Paint Calculator', 'Plaster Calculator'])
         ar = self.get('core:home_ar')
         for text in ('خدماتنا', 'تصميم مدروس. تنفيذ متكامل.', 'خدمات الاستوديو', 'الخدمات المجانية',
                      'حاسبة الأسلاك', 'احسب كميات الطوب المبدئية.', 'حاسبة الدهانات', 'استكشف الأدوات المجانية'):
@@ -892,17 +901,18 @@ class HomepageTests(SimpleTestCase):
         self.assertIn('Then we arrange a free site visit to see the space in person.', en)
         self.assertIn('we review them with you and follow through on the adjustments.', en)
 
-    def test_no_live_contact_links(self):
+    def test_only_confirmed_contact_links(self):
+        # The business email is the only confirmed contact link; no phone links.
         for name in ('core:home', 'core:home_ar'):
             html = self.get(name)
-            self.assertNotIn('mailto:', html)
+            self.assertEqual(set(re.findall(r'mailto:[^"]*', html)), {'mailto:Gindistudio@outlook.com'})
             self.assertNotIn('tel:', html)
 
 class PublicContentTests(SimpleTestCase):
     """What visitors see by default: no editorial notes, no dummy blocks, honest states."""
 
     PAGES = ['/', '/ar/', '/about/', '/ar/about/', '/services/', '/ar/services/', '/free-tools/', '/ar/free-tools/',
-             *[f'{p}/free-tools/{s}/' for p in ('', '/ar') for s in ('wire', 'tiles', 'bricks', 'paint')]]
+             *[f'{p}/free-tools/{s}/' for p in ('', '/ar') for s in ('wire', 'tiles', 'bricks', 'paint', 'plaster')]]
     # Editing notes and temporary-content annotations, English and Arabic.
     # (word boundary: "temporary" alone, not inside the style name "Contemporary".)
     EDITORIAL = re.compile(r'(?i)placeholder|ph-badge|to be (?:added|confirmed)|\btemporary|published here|'
@@ -951,14 +961,28 @@ class PublicContentTests(SimpleTestCase):
             self.assertNotIn('/projects/', self.client.get(f'{prefix}/no-such-page/').content.decode())
             self.assertNotIn('/projects/', self.client.get(f'{prefix}/about/').content.decode())
 
-    def test_contact_shows_no_unconfirmed_details(self):
-        for path, title in (('/', 'Let’s discuss your project.'), ('/ar/', 'خلّينا نتكلم عن مشروعك.'),
-                            ('/services/', 'Let’s discuss your project.'), ('/ar/about/', 'خلّينا نتكلم عن مشروعك.')):
+    def test_contact_shows_only_confirmed_details(self):
+        mail = 'href="mailto:Gindistudio@outlook.com" dir="ltr"'
+        for path, title, label in (('/', 'Let’s discuss your project.', 'Email'), ('/ar/', 'خلّينا نتكلم عن مشروعك.', 'البريد الإلكتروني'),
+                                   ('/services/', 'Let’s discuss your project.', 'Email'),
+                                   ('/ar/about/', 'خلّينا نتكلم عن مشروعك.', 'البريد الإلكتروني')):
             html = self.client.get(path).content.decode()
             self.assertEqual(html.count('id="contact"'), 1, path)  # the shared call to action, on every page
             self.assertIn(f'id="footer-cta-title">{title}</h2>', html)
-            self.assertNotIn('footer-cta__details', html)  # no confirmed contact details yet
+            # The one confirmed detail: the business email, linked, in the call to action and the footer.
+            cta = html[html.index('id="contact"'):html.index('<footer')]
+            self.assertEqual(cta.count('<div><dt'), 1)
+            self.assertIn(f'<dt class="label">{label}</dt><dd><a class="footer-cta__link" {mail}>Gindistudio@outlook.com</a></dd>', cta)
+            footer = html[html.index('<footer'):html.index('</footer>')]
+            self.assertIn(f'<a class="site-footer__mail" {mail}>', footer)
             self.assertLess(html.index('id="contact"'), html.index('<footer'))
+        # The Contact page has no call to action: the email is in its panel, and in the footer.
+        for path, label in (('/contact/', 'Email'), ('/ar/contact/', 'البريد الإلكتروني')):
+            html = self.client.get(path).content.decode()
+            self.assertNotIn('footer-cta__details', html)
+            self.assertIn(f'<span class="cp-panel__mail-label label">{label}</span>', html)
+            self.assertIn(f'<a class="cp-panel__mail-link" {mail}>Gindistudio@outlook.com</a>', html)
+            self.assertIn('class="site-footer__mail"', html)
 
     def test_unfinished_features_stay_honest(self):
         services = self.client.get('/services/').content.decode()
@@ -968,7 +992,7 @@ class PublicContentTests(SimpleTestCase):
         self.assertIn('إرسال الاستفسارات عبر الموقع غير متاح بعد', self.client.get('/ar/services/').content.decode())
         # The calculators work, so none of them says "Coming soon" any more.
         for prefix in ('', '/ar'):
-            for slug in ('wire', 'tiles', 'bricks', 'paint'):
+            for slug in ('wire', 'tiles', 'bricks', 'paint', 'plaster'):
                 tool = self.client.get(f'{prefix}/free-tools/{slug}/').content.decode()
                 self.assertNotIn('Coming soon', tool)
                 self.assertNotIn('قريبًا', tool)
@@ -1213,7 +1237,7 @@ class StaticExportTests(SimpleTestCase):
             published = tmp / 'published' / 'dist'
             for page in ('projects/index.html', 'projects/project-1/index.html', 'ar/projects/project-4/index.html'):
                 self.assertTrue((published / page).is_file(), page)
-            self.assertEqual(len(list(published.rglob('index.html'))), 30)
+            self.assertEqual(len(list(published.rglob('index.html'))), 32)
             dist = tmp / 'dist'
             for page in ('index.html', 'ar/index.html', 'about/index.html', 'services/index.html',
                          'contact/index.html', 'ar/contact/index.html', 'free-tools/index.html', 'free-tools/wire/index.html', 'ar/free-tools/paint/index.html',
@@ -1222,7 +1246,7 @@ class StaticExportTests(SimpleTestCase):
             # Projects switched off: no project pages at all.
             self.assertFalse((dist / 'projects').exists())
             self.assertFalse((dist / 'ar' / 'projects').exists())
-            self.assertEqual(len(list(dist.rglob('index.html'))), 20)
+            self.assertEqual(len(list(dist.rglob('index.html'))), 22)
             # The Design Studio: both pages, its modules by bare name (import map) and its assets.
             studio_page = (dist / 'design-studio' / 'index.html').read_text(encoding='utf-8')
             self.assertTrue((dist / 'ar' / 'design-studio' / 'index.html').is_file())
@@ -1246,7 +1270,8 @@ class StaticExportTests(SimpleTestCase):
             self.assertIn('/free-tools/cement/ /free-tools/ 302', redirects)
             self.assertIn('/ar/free-tools/cement/ /ar/free-tools/ 302', redirects)
             # The calculators' scripts are published; the reference originals (static/Tools/) are not.
-            for name in ('calc-ui', 'bricks-calc', 'bricks', 'tiles-calc', 'tiles', 'wire-calc', 'wire', 'paint-calc', 'paint'):
+            for name in ('calc-ui', 'bricks-calc', 'bricks', 'tiles-calc', 'tiles', 'wire-calc', 'wire', 'paint-calc', 'paint',
+                         'plaster-calc', 'plaster'):
                 self.assertTrue(list((dist / 'static' / 'js' / 'tools').glob(f'{name}.*.js')), name)
             self.assertFalse((dist / 'static' / 'Tools').exists())
             self.assertRegex(redirects, r'/favicon.ico /static/images/brand/favicon-32\.[0-9a-f]{12}\.png 302')

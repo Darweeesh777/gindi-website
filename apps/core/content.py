@@ -15,6 +15,11 @@ Rules:
 # homepage but is no longer in the menu; the Philosophy section was removed.
 NAV_SECTIONS = ('projects', 'services', 'about', 'contact')
 
+# The studio's public business email (Contact page, the call to action above
+# the footer, the footer). Shown and linked as mailto:; it is not where the
+# forms send (see QUOTATION_EMAIL and the form backend's CONTACT_TO_EMAIL).
+BUSINESS_EMAIL = 'Gindistudio@outlook.com'
+
 CONTENT = {
     'en': {
         'meta': {
@@ -507,10 +512,12 @@ CONTENT = {
             'eyebrow': 'Contact',
             'title': 'Let’s begin with a conversation.',
             'intro': 'Share a little about your space and what you imagine for it.',
-            # Real contact details only, e.g. {'label': 'Email', 'value': '…'}. While
-            # the list is empty (none confirmed yet) neither the Contact section nor
-            # the footer shows a details block. 'social': a confirmed link text.
-            'details': [],
+            # Real contact details only: {'label', 'value', and optionally 'href'
+            # (the value becomes a link)}. Empty: no details block. 'social': a
+            # confirmed link text. 'email': the business email, linked.
+            'email': BUSINESS_EMAIL,
+            'email_label': 'Email',
+            'details': [{'label': 'Email', 'value': BUSINESS_EMAIL, 'href': 'mailto:' + BUSINESS_EMAIL}],
             'social_label': 'Follow',
             'social': '',
         },
@@ -986,7 +993,9 @@ CONTENT = {
             'title': 'لنبدأ بحديث.',
             'intro': 'حدّثنا قليلًا عن مساحتك وما تتخيّله لها.',
             # Real contact details only (see the English block); empty: not shown.
-            'details': [],
+            'email': BUSINESS_EMAIL,
+            'email_label': 'البريد الإلكتروني',
+            'details': [{'label': 'البريد الإلكتروني', 'value': BUSINESS_EMAIL, 'href': 'mailto:' + BUSINESS_EMAIL}],
             'social_label': 'تابعنا',
             'social': '',
         },

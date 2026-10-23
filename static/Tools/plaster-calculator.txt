@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<title>حاسبة أسمنت ورمل المحارة والطرطشة | Eng/ Mostafa Elgindi</title>
+<meta name="description" content="احسب شكاير الأسمنت وكمية الرمل اللي محتاجها للمحارة والطرطشة، شامل الهالك وتقريب الشراء. إعداد Eng/ Mostafa Elgindi - Gindi Innovations">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A; --orange:#F5A623; --cream:#F3D9A4;
+    --input-bg:#FFF8E1; --input-bd:#E8CF85; --input-fg:#0000FF;
+    --green-bg:#E2F0D9; --green-fg:#2E6B1F; --red:#C00000;
+    --bg:#F3F5F9; --card:#FFFFFF; --text:#1B2433; --muted:#6B7280; --line:#E3E7EE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--navy);border-radius:14px;overflow:hidden;color:#fff}
+  header .top{padding:22px 20px 16px}
+  header h1{margin:0;font-size:24px;font-weight:800}
+  header p{margin:4px 0 0;color:var(--cream);font-size:14px}
+  header .brand{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--orange);color:var(--navy);padding:6px 20px;font-size:13px;font-weight:700}
+  .card{background:var(--card);border-radius:14px;padding:18px;margin-top:14px;border-top:4px solid var(--orange);box-shadow:0 1px 3px rgba(11,31,58,.08)}
+  .card h2{margin:0 0 4px;font-size:17px;color:var(--navy);padding-bottom:6px;border-bottom:2px solid var(--navy)}
+  .hint{margin:8px 0 12px;color:var(--muted);font-size:13px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
+  input[type=number],select{width:100%;min-width:0;font:inherit;font-weight:700;color:var(--input-fg);background:var(--input-bg);border:1.5px solid var(--input-bd);border-radius:8px;padding:8px;text-align:center;-moz-appearance:textfield}
+  input.linked{background:var(--green-bg);color:var(--green-fg);border-color:var(--green-bg);cursor:default}
+  input:focus,select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,166,35,.25)}
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .size{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--green-bg);color:var(--green-fg);font-weight:700;font-size:13.5px}
+
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#F9FAFC}
+  .item .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+  .item .head b{color:var(--navy);font-size:15px}
+  .item .head small{color:var(--muted);font-size:12px;display:block;font-weight:400}
+  .item .head .tot{background:var(--green-bg);color:var(--green-fg);font-weight:800;border-radius:8px;padding:4px 10px;white-space:nowrap;font-size:14px}
+  .item .head .right{display:flex;align-items:center;gap:6px}
+  .add{display:block;width:100%;margin-top:8px;font:inherit;font-weight:700;font-size:14px;color:var(--navy);background:transparent;border:1.5px dashed var(--orange);border-radius:10px;padding:8px;cursor:pointer}
+  .add:hover,.add:focus-visible{background:var(--input-bg);outline:none}
+  .del{font:inherit;font-weight:800;font-size:18px;line-height:1;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--red);cursor:pointer}
+  .item .f{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .item .f label{font-size:11.5px;color:var(--navy);font-weight:600;display:block;margin-bottom:2px;white-space:nowrap}
+  .sumline{display:flex;justify-content:space-between;margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700}
+  .sumline span:last-child{color:var(--orange);font-size:18px}
+
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{border-radius:12px;padding:14px;background:var(--green-bg);color:var(--green-fg)}
+  .kpi.hero{grid-column:1/-1;background:var(--navy);color:#fff;text-align:center}
+  .kpi .v{font-size:26px;font-weight:800;line-height:1.2}
+  .kpi.hero .v{font-size:44px;color:var(--orange)}
+  .kpi .l{font-size:13px;font-weight:600}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px}
+  .cmp div{padding:8px 12px;border-radius:8px;background:#F3F5F9;font-size:14px}
+  .cmp div:nth-child(odd){font-weight:700;color:var(--navy)}
+  .cmp div:nth-child(even){background:var(--green-bg);color:var(--green-fg);font-weight:700;text-align:center}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .warn{color:var(--red);font-size:12.5px;margin-top:10px}
+  dl{margin:10px 0 0;display:grid;grid-template-columns:120px 1fr;gap:8px 12px;font-size:13.5px}
+  dt{font-weight:700;color:var(--navy);background:#F3F5F9;border-radius:6px;padding:4px 8px;align-self:start}
+  dd{margin:0;padding:4px 0}
+  footer{margin:16px 0 8px;text-align:center;font-size:12.5px;color:var(--muted)}
+  footer b{color:var(--navy)}
+  .pdf{display:block;width:100%;margin-top:14px;font:inherit;font-weight:800;font-size:16px;color:#fff;background:var(--navy);border:0;border-radius:10px;padding:12px;cursor:pointer;border-bottom:4px solid var(--orange)}
+  .pdf:hover,.pdf:focus-visible{filter:brightness(1.15);outline:none}
+  #report{display:none}
+  .back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:8px;color:var(--navy);font-weight:700;font-size:14px;text-decoration:none}
+  .back:hover,.back:focus-visible{text-decoration:underline;text-decoration-color:var(--orange);text-underline-offset:4px}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;color:#1B2433;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wrap > *:not(#report){display:none!important}
+    .wrap{max-width:none;padding:0}
+    #report{display:block;font-size:12px}
+    #report .r-head{display:flex;justify-content:space-between;align-items:center;background:#0B1F3A;color:#fff;padding:12px 16px;border-radius:8px;border-bottom:4px solid #F5A623}
+    #report h1{margin:0;font-size:20px}
+    #report .r-head p{margin:2px 0 0;color:#F3D9A4;font-size:12px}
+    #report .r-brand{background:#F5A623;color:#0B1F3A;font-weight:800;padding:6px 10px;border-radius:6px;text-align:center;direction:ltr;font-size:11px}
+    #report .r-kpis{display:flex;gap:8px;margin:12px 0}
+    #report .r-kpis div{flex:1;background:#E2F0D9;color:#2E6B1F;border-radius:8px;padding:8px;text-align:center}
+    #report .r-kpis div:first-child{background:#0B1F3A;color:#fff}
+    #report .r-kpis div:first-child b{color:#F5A623}
+    #report .r-kpis b{display:block;font-size:20px}
+    #report .r-kpis span{font-size:10.5px}
+    #report h2{font-size:14px;color:#0B1F3A;border-bottom:2px solid #0B1F3A;padding-bottom:3px;margin:14px 0 6px}
+    #report table{width:100%;border-collapse:collapse;font-size:11.5px;margin:0;page-break-inside:auto}
+    #report tr{page-break-inside:avoid}
+    #report th{background:#0B1F3A;color:#fff;padding:5px 4px}
+    #report td{padding:4px;text-align:center;border-bottom:1px solid #E3E7EE}
+    #report td.l{text-align:right}
+    #report td.hi{background:#E2F0D9;color:#2E6B1F;font-weight:800}
+    #report tfoot td{font-weight:800;border-top:2px solid #0B1F3A}
+    #report .r-note{color:#6B7280;font-size:10.5px;margin:4px 0 0}
+    #report .r-warn{color:#C00000;font-size:10.5px;margin-top:12px}
+    #report .r-foot{text-align:center;color:#6B7280;font-size:10.5px;border-top:1px solid #E3E7EE;padding-top:6px;margin-top:10px}
+  }
+  @media (max-width:560px){
+    .grid3{grid-template-columns:1fr 1fr}
+    .item .f{grid-template-columns:repeat(2,1fr)}
+    .kpi.hero .v{font-size:38px}
+    dl{grid-template-columns:1fr}
+    dt{justify-self:start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="../index.html#services">الرجوع لخدمات Gindi Innovations</a>
+
+  <header>
+    <div class="top">
+      <h1>حاسبة أسمنت ورمل المحارة والطرطشة</h1>
+      <p>تقدير كميات الشراء لأعمال المحارة والطرطشة</p>
+    </div>
+    <div class="brand"><span>Eng/ Mostafa Elgindi</span><span>Gindi Innovations</span></div>
+  </header>
+
+  <section class="card">
+    <h2>١ — مدخلات كل مرحلة</h2>
+    <p class="hint">الخانات الصفرا بخط أزرق مدخلات تقدر تغيّرها، والنتيجة بتتحسب لوحدها وانت بتكتب. المساحة = صافي مسطح الحوائط والأسقف اللي هتتنفذ، مش مساحة الشقة على الأرض، وهي والهالك بيتكتبوا مرة واحدة في المحارة والطرطشة بتاخدهم تلقائي.</p>
+    <div id="stages"></div>
+    <p class="note">سُمك المحارة مش شامل الطرطشة، والطبقتين بيتحسبوا منفصلين. سُمك الطرطشة = متوسط سُمك مكافئ موزع على المساحة، مش ارتفاع الحبيبات. نسب الخلط بالحجم مش بالوزن، وقيم الطرطشة الافتراضية مثال وتتعدّل حسب التنفيذ.</p>
+  </section>
+
+  <section class="card">
+    <h2>٢ — مدخلات عامة</h2>
+    <div class="grid3">
+      <div class="field"><label for="bag">وزن الشيكارة (كجم)</label><input type="number" id="bag" min="0" inputmode="decimal" value="50"></div>
+      <div class="field"><label for="dens">كثافة الأسمنت (كجم/م³)</label><input type="number" id="dens" min="0" inputmode="decimal" value="1440"></div>
+      <div class="field"><label for="step">تقريب الرمل (م³)</label><input type="number" id="step" min="0" inputmode="decimal" value="0.5"></div>
+    </div>
+    <p class="note">كثافة الأسمنت السائب قيمة تقريبية. تقريب الرمل مثلًا 0.5 أو 1 م³ حسب طريقة توريد الرمل عندك.</p>
+  </section>
+
+  <section class="card">
+    <h2>٣ — النتيجة</h2>
+    <div class="kpis" style="margin-top:12px">
+      <div class="kpi hero"><div class="v" id="kBags">0</div><div class="l" id="kBagsL">شيكارة أسمنت للشراء</div></div>
+      <div class="kpi hero"><div class="v" id="kSand">0</div><div class="l" id="kSandL">م³ رمل للشراء</div></div>
+      <div class="kpi"><div class="v" id="kCem">0</div><div class="l">كجم أسمنت شامل الهالك (حسابي)</div></div>
+      <div class="kpi"><div class="v" id="kSandC">0</div><div class="l">م³ رمل شامل الهالك (حسابي)</div></div>
+    </div>
+    <div class="cmp" id="cmp"></div>
+    <button type="button" class="pdf" id="pdfBtn">تصدير التقرير PDF</button>
+    <p class="note" style="text-align:center">هتفتحلك نافذة الطباعة، اختار منها «حفظ كـ PDF» (Save as PDF).</p>
+    <p class="warn">الحسبة تقديرية وبتتغير حسب استواء الحيطان ونوع الرمل وطريقة الخلط والتنفيذ، ولازم يعتمدها مهندس مدني مختص.</p>
+  </section>
+
+  <section class="card">
+    <h2>منطق الحسبة</h2>
+    <dl>
+      <dt>حجم المونة</dt><dd>المساحة × السُمك بالمم ÷ 1000 (م³).</dd>
+      <dt>الخامات الجافة</dt><dd>حجم المونة × معامل التحويل (1.27)، لأن المونة المبلولة بتنكمش عن الخامات الجافة. المعامل مش شامل هالك.</dd>
+      <dt>الأسمنت</dt><dd>الخامات الجافة × أجزاء الأسمنت ÷ مجموع الأجزاء، وبعدين × كثافة الأسمنت السائب عشان يبقى كجم.</dd>
+      <dt>الرمل</dt><dd>الخامات الجافة × أجزاء الرمل ÷ مجموع الأجزاء (م³).</dd>
+      <dt>الهالك</dt><dd>10% افتراضيًا، خانة واحدة للمرحلتين، وبيتضاف مرة واحدة بس على الأسمنت والرمل.</dd>
+      <dt>الشراء</dt><dd>الشكاير = إجمالي الأسمنت ÷ وزن الشيكارة متقرّب لأعلى. الرمل = الإجمالي متقرّب لأعلى لأقرب خطوة تقريب. التقريب على الإجمالي بس.</dd>
+      <dt>معدل الفرد</dt><dd>مساحة المرحلة ÷ شكايرها قبل التقريب (م² لكل شيكارة مع حصتها من الرمل)، لكل مرحلة لوحدها لأن الطرطشة والمحارة على نفس الحيطان.</dd>
+    </dl>
+  </section>
+
+  <section id="report" aria-hidden="true"></section>
+  <footer>إعداد: <b>Eng/ Mostafa Elgindi</b> | Gindi Innovations | الحسبة تقديرية وتُعتمد من مهندس مدني مختص<br>© Gindi Innovations — ممنوع إعادة النشر أو النسخ بدون إذن كتابي</footer>
+</div>
+
+<script>
+(function(){
+  // Same logic as Eng_Mostafa_Elgindi_Plaster_Calculator.xlsx (sheet «الحسبة»)
+  // [key, name, area m², thickness mm, cement parts, sand parts, waste %, dry factor]
+  var STAGES = [
+    ["p", "المحارة", 300, 20, 1, 4, 10, 1.27],
+    ["t", "الطرطشة", 300, 3, 1, 2, 10, 1.27]
+  ];
+  var FIELDS = [
+    ["a", "المساحة (م²)"], ["th", "السُمك (مم)"], ["c", "أجزاء الأسمنت"],
+    ["s", "أجزاء الرمل"], ["w", "الهالك %"], ["f", "معامل التحويل"]
+  ];
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n, d){ return n.toLocaleString("en-US", {maximumFractionDigits: d || 0}); };
+  var num = function(el){ var v = parseFloat(el.value); return isFinite(v) && v >= 0 ? v : null; };
+  var up = function(x){ return Math.ceil(x - 1e-9); }; // ROUNDUP(x,0) for x >= 0
+
+  $("stages").innerHTML = STAGES.map(function(st){
+    return '<div class="item"><div class="head"><div><b>' + st[1] + '</b><small id="' + st[0] + 'm">0 م³ مونة</small></div>' +
+      '<div class="tot" id="' + st[0] + 'g">0 شيكارة</div></div><div class="f">' +
+      FIELDS.map(function(f, k){
+        // spatter shares the plaster's area and waste
+        var linked = st[0] === "t" && (f[0] === "a" || f[0] === "w");
+        return '<div><label for="' + st[0] + f[0] + '">' + f[1] + (linked ? ' = المحارة' : '') + '</label><input type="number" min="0" inputmode="decimal" id="' + st[0] + f[0] + '" value="' + st[k + 2] + '"' +
+          (linked ? ' class="linked" readonly tabindex="-1" title="نفس قيمة المحارة"' : '') + '></div>';
+      }).join("") + '</div></div>';
+  }).join("");
+
+  function calc(){
+    var bag = num($("bag")), dens = num($("dens")) || 0, step = num($("step"));
+    $("ta").value = num($("pa")) || 0;
+    $("tw").value = num($("pw")) || 0;
+    var S = STAGES.map(function(st){
+      var k = st[0], g = function(f){ return num($(k + f)) || 0; };
+      var a = g("a"), th = g("th"), c = g("c"), s = g("s"), w = g("w") / 100, f = g("f");
+      var mortar = a * th / 1000, dry = mortar * f, parts = c + s;
+      var cemVol = parts ? dry * c / parts : 0, sand0 = parts ? dry * s / parts : 0;
+      var kg0 = cemVol * dens, kg = kg0 * (1 + w), bags = bag ? kg / bag : 0, sand = sand0 * (1 + w);
+      $(k + "m").textContent = fmt(mortar, 2) + " م³ مونة · خلطة " + fmt(c, 2) + ":" + fmt(s, 2);
+      $(k + "g").textContent = fmt(bags, 2) + " شيكارة";
+      return {name: st[1], a: a, th: th, c: c, s: s, w: w, f: f, mortar: mortar, dry: dry, kg: kg, bags: bags, sand: sand};
+    });
+    var kg = 0, bags = 0, sand = 0;
+    S.forEach(function(x){ kg += x.kg; bags += x.bags; sand += x.sand; });
+    var buyBags = up(bags), buySand = step ? up(sand / step) * step : sand;
+
+    $("kBags").textContent = fmt(buyBags);
+    $("kBagsL").textContent = bag ? "شيكارة " + fmt(bag, 2) + " كجم = " + fmt(buyBags * bag) + " كجم مشتراة" : "اكتب وزن الشيكارة";
+    $("kSand").textContent = fmt(buySand, 2);
+    $("kSandL").textContent = "م³ رمل للشراء (مقرّب لأعلى كل " + fmt(step || 0, 2) + " م³)";
+    $("kCem").textContent = fmt(kg, 2);
+    $("kSandC").textContent = fmt(sand, 2);
+    $("cmp").innerHTML = S.map(function(x){
+      return "<div>" + x.name + "</div><div>" + fmt(x.bags, 2) + " شيكارة · " + fmt(x.sand, 2) + " م³ رمل</div>";
+    }).join("") + "<div>الشكاير قبل التقريب</div><div>" + fmt(bags, 2) + " شيكارة</div>" +
+      S.map(function(x){
+        return "<div>معدل فرد شيكارة " + x.name + "</div><div>" + (x.bags ? fmt(x.a / x.bags, 2) + " م²/شيكارة" : "—") + "</div>";
+      }).join("");
+
+    buildReport(S, kg, bags, sand, buyBags, buySand, bag, dens, step);
+  }
+
+  function buildReport(S, kg, bags, sand, buyBags, buySand, bag, dens, step){
+    var d = new Date(), date = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+    var row = function(label, f, unit, dg){
+      return "<tr><td class='l'>" + label + "</td>" + S.map(function(x){ return "<td>" + fmt(f(x), dg) + "</td>"; }).join("") +
+        "<td class='hi'>" + fmt(S.reduce(function(t, x){ return t + f(x); }, 0), dg) + "</td><td>" + unit + "</td></tr>";
+    };
+    var inRow = function(label, f, unit){
+      return "<tr><td class='l'>" + label + "</td>" + S.map(function(x){ return "<td>" + f(x) + "</td>"; }).join("") + "<td>" + unit + "</td></tr>";
+    };
+    $("report").innerHTML =
+      "<div class='r-head'><div><h1>تقرير أسمنت ورمل المحارة والطرطشة</h1><p>حاسبة أسمنت ورمل المحارة والطرطشة · " + date + "</p></div>" +
+      "<div class='r-brand'>Eng/ Mostafa Elgindi<br>Gindi Innovations</div></div>" +
+      "<div class='r-kpis'><div><b>" + fmt(buyBags) + "</b><span>شيكارة أسمنت للشراء</span></div>" +
+      "<div><b>" + fmt(buySand, 2) + "</b><span>م³ رمل للشراء</span></div>" +
+      "<div><b>" + fmt(kg, 2) + "</b><span>كجم أسمنت شامل الهالك</span></div></div>" +
+      "<p class='r-note'>وزن الشيكارة " + fmt(bag || 0, 2) + " كجم · كثافة الأسمنت " + fmt(dens) + " كجم/م³ · تقريب الرمل " + fmt(step || 0, 2) + " م³</p>" +
+      "<h2>المدخلات</h2><table><thead><tr><th>المدخل</th>" + S.map(function(x){ return "<th>" + x.name + "</th>"; }).join("") + "<th>الوحدة</th></tr></thead><tbody>" +
+      inRow("المساحة", function(x){ return fmt(x.a, 2); }, "م²") +
+      inRow("السُمك", function(x){ return fmt(x.th, 2); }, "مم") +
+      inRow("الخلطة (أسمنت:رمل)", function(x){ return fmt(x.c, 2) + ":" + fmt(x.s, 2); }, "بالحجم") +
+      inRow("الهالك", function(x){ return fmt(x.w * 100, 1) + "%"; }, "") +
+      inRow("معامل التحويل", function(x){ return fmt(x.f, 2); }, "") +
+      "</tbody></table>" +
+      "<h2>النتائج</h2><table><thead><tr><th>البند</th>" + S.map(function(x){ return "<th>" + x.name + "</th>"; }).join("") + "<th>الإجمالي</th><th>الوحدة</th></tr></thead><tbody>" +
+      row("حجم المونة", function(x){ return x.mortar; }, "م³", 2) +
+      row("الخامات الجافة", function(x){ return x.dry; }, "م³", 2) +
+      row("الأسمنت شامل الهالك", function(x){ return x.kg; }, "كجم", 2) +
+      row("الشكاير قبل التقريب", function(x){ return x.bags; }, "شيكارة", 2) +
+      row("الرمل شامل الهالك", function(x){ return x.sand; }, "م³", 2) +
+      "</tbody></table>" +
+      "<p class='r-note'>الشراء: " + fmt(bags, 2) + " شيكارة متقرّبة لأعلى = " + fmt(buyBags) + " شيكارة، و" + fmt(sand, 2) + " م³ رمل متقرّب لأعلى = " + fmt(buySand, 2) + " م³." +
+      S.map(function(x){ return x.bags ? " معدل فرد شيكارة " + x.name + " " + fmt(x.a / x.bags, 2) + " م²." : ""; }).join("") + "</p>" +
+      "<p class='r-warn'>الحسبة تقديرية وبتتغير حسب استواء الحيطان ونوع الرمل وطريقة الخلط والتنفيذ، ولازم يعتمدها مهندس مدني مختص.</p>" +
+      "<p class='r-foot'>إعداد: Eng/ Mostafa Elgindi | Gindi Innovations</p>";
+  }
+
+  $("pdfBtn").addEventListener("click", function(){ calc(); window.print(); });
+  document.addEventListener("input", calc);
+  document.addEventListener("change", calc);
+  calc();
+})();
+</script>
+</body>
+</html>

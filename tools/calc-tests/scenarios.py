@@ -186,4 +186,41 @@ def paint_products(options):
     return out
 
 
-ALL = {'bricks': bricks, 'tiles': tiles, 'wire': wire, 'paint': paint}
+def plaster():
+    return {
+        'defaults': [],
+        'typical': _sets([['pa', '420'], ['pth', '25'], ['pw', '12'], ['tth', '4']]),
+        'linked-area-and-waste': _sets([['pa', '185.5'], ['pw', '7.5']]),
+        'linked-empty': _sets([['pa', ''], ['pw', '']]),
+        'linked-negative': _sets([['pa', '-50'], ['pw', '-5']]),
+        'mix-ratios': _sets([['pc', '1'], ['ps', '3'], ['tc', '2'], ['ts', '3']]),
+        'mix-zero-parts': _sets([['pc', '0'], ['ps', '0']]),
+        'mix-cement-only': _sets([['tc', '1'], ['ts', '0']]),
+        'thickness-zero': _sets([['tth', '0']]),
+        'thickness-empty': _sets([['pth', '']]),
+        'factor-changed': _sets([['pf', '1.33'], ['tf', '1.2']]),
+        'factor-empty': _sets([['pf', ''], ['tf', '0']]),
+        'bag-25': _sets([['bag', '25']]),
+        'bag-empty': _sets([['bag', '']]),
+        'bag-zero': _sets([['bag', '0']]),
+        'density-empty': _sets([['dens', '']]),
+        'density-changed': _sets([['dens', '1500']]),
+        'sand-step-1': _sets([['step', '1']]),
+        'sand-step-0.25': _sets([['step', '0.25']]),
+        'sand-step-empty': _sets([['step', '']]),
+        'sand-step-zero': _sets([['step', '0']]),
+        'area-zero': _sets([['pa', '0']]),
+        'small-job': _sets([['pa', '12'], ['pth', '15']]),
+        'large-job': _sets([['pa', '2750'], ['pth', '30'], ['pw', '15'], ['step', '1']]),
+        'negative-values': _sets([['pth', '-20'], ['ts', '-2'], ['bag', '-50'], ['dens', '-1'], ['step', '-1']]),
+        # Rounding: bags and sand exactly on a whole bag / a step, and just above.
+        'rounding-exact': _sets([['pa', '100'], ['pth', '10'], ['pc', '1'], ['ps', '0'], ['pw', '0'], ['pf', '1'],
+                                 ['tth', '0'], ['dens', '1000'], ['bag', '50'], ['step', '0.5']]),
+        'rounding-tiny-above': _sets([['pa', '100'], ['pth', '10'], ['pc', '1'], ['ps', '0'], ['pw', '0.0001'], ['pf', '1'],
+                                      ['tth', '0'], ['dens', '1000'], ['bag', '50'], ['step', '0.5']]),
+        'sand-rounding-exact': _sets([['pa', '100'], ['pth', '10'], ['pc', '0'], ['ps', '1'], ['pw', '0'], ['pf', '1'],
+                                      ['tth', '0'], ['step', '0.5']]),
+    }
+
+
+ALL = {'bricks': bricks, 'tiles': tiles, 'wire': wire, 'paint': paint, 'plaster': plaster}

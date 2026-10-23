@@ -123,5 +123,29 @@
   eq('paint: GLC finish default', P.PRODUCTS[P.idx(P.BRANDS.GLC)][0], 'GLC سوبر بلاتين لاكشري مط 7000 — 9 لتر');
   eq('paint: the finish stage lists only finishes', P.productsFor('Jotun', ['finish']).every(function (i) { return P.PRODUCTS[i][5] === 'finish' && P.brandOf(P.PRODUCTS[i]) === 'Jotun'; }), true);
 
+  /* ---------- Plaster ---------- */
+  var PL = G.plaster;
+  var pst = function (o, t) { var a = { a: '300', th: '20', c: '1', s: '4', w: '10', f: '1.27' }, b = { a: '999', th: '3', c: '1', s: '2', w: '99', f: '1.27' }, k;
+    for (k in o || {}) a[k] = o[k]; for (k in t || {}) b[k] = t[k]; return [a, b]; };
+  var pin = function (o, a, b) { var x = { bag: '50', dens: '1440', step: '0.5', stages: pst(a, b) }; for (var k in o || {}) x[k] = o[k]; return x; };
+  var pl = PL.compute(pin());
+  eq('plaster default: plaster mortar = area × thickness ÷ 1000', pl.S[0].mortar, 6);
+  eq('plaster default: dry materials = mortar × 1.27', pl.S[0].dry, 7.62);
+  eq('plaster default: plaster cement incl. waste (kg)', pl.S[0].kg, 7.62 / 5 * 1440 * 1.1);
+  eq('plaster default: plaster sand incl. waste (m³)', pl.S[0].sand, 7.62 * 4 / 5 * 1.1);
+  eq('plaster default: spatter dash takes the plaster area, not its own', pl.S[1].a, 300);
+  eq('plaster default: spatter dash takes the plaster waste', pl.S[1].w, 0.1);
+  eq('plaster default: spatter dash bags', pl.S[1].bags, 0.9 * 1.27 / 3 * 1440 * 1.1 / 50);
+  eq('plaster default: bags to buy (rounded up)', pl.buyBags, 61);
+  eq('plaster default: sand to buy (up to the next 0.5 m³)', pl.buySand, 8);
+  pl = PL.compute(pin({ step: '' }));
+  eq('plaster: no sand rounding step, the exact total', pl.buySand, pl.sand);
+  pl = PL.compute(pin({ bag: '' }));
+  eq('plaster: no bag weight, no bags', pl.bags, 0);
+  pl = PL.compute(pin({}, { c: '0', s: '0' }));
+  eq('plaster: no mix parts, no materials', pl.S[0].kg + pl.S[0].sand, 0);
+  pl = PL.compute(pin({ dens: '1000', step: '0.5' }, { th: '10', c: '1', s: '0', w: '0', f: '1', a: '100' }, { th: '0' }));
+  eq('plaster: exactly 20 bags stays 20', pl.buyBags, 20);
+
   window.__pure = { lines: lines, passed: passed, failed: failed };
 })();

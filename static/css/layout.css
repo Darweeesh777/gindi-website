@@ -365,6 +365,19 @@
   color: var(--gindi-gold);
 }
 
+/* A linked detail (the business email): underlined, so it reads as a link. */
+.footer-cta__link {
+  color: var(--gindi-navy);
+  text-decoration: underline;
+  text-decoration-color: var(--gindi-gold);
+  text-underline-offset: 0.3em;
+  overflow-wrap: anywhere;
+}
+
+.footer-cta__link:hover {
+  text-decoration-thickness: 2px;
+}
+
 .footer-cta__btn {
   gap: 0.625rem;
   border-color: var(--gindi-gold);
@@ -530,8 +543,34 @@
 
 .site-footer__utils {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: 0 1rem;
+}
+
+/* The business email, beside the language switch (as "Back to top"). */
+.site-footer__mail {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.site-footer__mail:hover {
+  color: var(--gindi-ivory);
+}
+
+/* Phones: the row wraps, so no dividers (one would be left hanging at a line's end). */
+@media (max-width: 30rem) {
+  .site-footer__utils {
+    gap: 0 1.5rem;
+  }
+
+  .site-footer__sep {
+    display: none;
+  }
 }
 
 .site-footer .lang-switch {

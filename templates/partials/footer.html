@@ -12,10 +12,10 @@ Styles: layout.css (Footer).
   <div class="container footer-cta__inner">
     <div class="footer-cta__copy">
       <h2 class="footer-cta__title" id="footer-cta-title">{{ c.footer.cta_title }}</h2>
-      {# Confirmed contact details only (content.py → contact); none yet, so nothing is shown. #}
+      {# Confirmed contact details only (content.py → contact); an item with an href is a link. #}
       {% if c.contact.details or c.contact.social %}
         <dl class="footer-cta__details">
-          {% for item in c.contact.details %}<div><dt class="label">{{ item.label }}</dt><dd>{{ item.value }}</dd></div>{% endfor %}
+          {% for item in c.contact.details %}<div><dt class="label">{{ item.label }}</dt><dd>{% if item.href %}<a class="footer-cta__link" href="{{ item.href }}" dir="ltr">{{ item.value }}</a>{% else %}{{ item.value }}{% endif %}</dd></div>{% endfor %}
           {% if c.contact.social %}<div><dt class="label">{{ c.contact.social_label }}</dt><dd>{{ c.contact.social }}</dd></div>{% endif %}
         </dl>
       {% endif %}
@@ -57,6 +57,10 @@ Styles: layout.css (Footer).
     <div class="site-footer__bottom">
       <p>&copy; <span class="num">{% now "Y" %}</span> Gindi Innovations. {{ c.ui.rights }}</p>
       <p class="site-footer__utils">
+        {% if c.contact.email %}
+          <a class="site-footer__mail" href="mailto:{{ c.contact.email }}" dir="ltr"><span class="visually-hidden">{{ c.contact.email_label }}: </span>{{ c.contact.email }}</a>
+          <span class="site-footer__sep" aria-hidden="true"></span>
+        {% endif %}
         {% include "partials/lang_switch.html" %}
         <span class="site-footer__sep" aria-hidden="true"></span>
         <a class="site-footer__top" href="#top">{{ c.ui.back_to_top }}

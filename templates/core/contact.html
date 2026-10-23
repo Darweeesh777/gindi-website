@@ -62,6 +62,13 @@ claims the enquiry was delivered, and nothing is stored in the browser.
                 </li>
               {% endfor %}
             </ul>
+            {% if c.contact.email %}
+              {# The business email (content.py → BUSINESS_EMAIL), for writing directly. #}
+              <p class="cp-panel__mail">
+                <span class="cp-panel__mail-label label">{{ c.contact.email_label }}</span>
+                <a class="cp-panel__mail-link" href="mailto:{{ c.contact.email }}" dir="ltr">{{ c.contact.email }}</a>
+              </p>
+            {% endif %}
             {# The official monogram (transparent version), very faint and cropped at the bottom. #}
             <img class="cp-panel__mark" src="{% static 'images/brand/gindi-monogram-transparent.png' %}"
                  width="1109" height="1419" alt="" aria-hidden="true" decoding="async">

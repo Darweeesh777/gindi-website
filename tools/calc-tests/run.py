@@ -27,7 +27,7 @@ from cdp import Session  # noqa: E402
 import scenarios  # noqa: E402
 
 ORIGINALS = {'bricks': 'brick-calculator.txt', 'tiles': 'ceramic-calculator.txt',
-             'wire': 'wire-calculator.txt', 'paint': 'paint-calculator.txt'}
+             'wire': 'wire-calculator.txt', 'paint': 'paint-calculator.txt', 'plaster': 'plaster-calculator.txt'}
 WORK = os.path.join(HERE, 'work')
 BASE = os.path.join(HERE, 'baselines')
 HARNESS = open(os.path.join(HERE, 'harness.js'), encoding='utf-8').read()
@@ -134,7 +134,7 @@ def diff(a, b, path=''):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('mode', choices=['record', 'check', 'originals', 'pure'])
-    ap.add_argument('--tool', action='append', choices=list(ORIGINALS))
+    ap.add_argument('--tool', action='append', choices=list(ORIGINALS))  # noqa: E501
     ap.add_argument('--chrome')
     ap.add_argument('--only', help='scenario name prefix')
     args = ap.parse_args()
