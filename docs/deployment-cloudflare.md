@@ -69,7 +69,7 @@ and Secrets, type **Secret**; kept across deploys, never in the repository):
 |---|---|
 | `RESEND_API_KEY` | Resend API key (`re_…`), "Sending access" |
 | `TURNSTILE_SECRET_KEY` | The Turnstile widget's **secret** key |
-| `CONTACT_TO_EMAIL` | Where requests go. With the test sender: the email of your Resend account |
+| `CONTACT_TO_EMAIL` | Where requests go: `Gindistudio@outlook.com`. Also the Reply-To of client confirmations |
 
 **Worker variables** are in `wrangler.jsonc` (`vars`): `MAIL_FROM`,
 `DEFAULT_COUNTRY_CODE` (`20`: a local `010…` number becomes `+20 10…` in the
@@ -80,10 +80,12 @@ WhatsApp link), `TIME_ZONE`.
 address. So while it is set, the client's confirmation also goes to
 `CONTACT_TO_EMAIL`, with the subject starting `[TEST — for client@…]`.
 
-**With your own domain:** verify it in Resend (Domains), then set `MAIL_FROM`
-in `wrangler.jsonc` to e.g. `Gindi Innovations <hello@your-domain>` and push.
-Confirmations then go to the clients. Add the domain to the Turnstile
-widget's hostnames too.
+**With your own domain (current):** `gindi-studio.com` is verified in Resend
+and `MAIL_FROM` is `Gindi Innovations <requests@gindi-studio.com>`.
+Confirmations go to the clients, with Reply-To `CONTACT_TO_EMAIL`. The
+`RESEND_API_KEY` must belong to the Resend team where the domain is verified,
+with sending access to it. The domain must also be in the Turnstile widget's
+hostnames.
 
 **Free plan limits:** Workers 100,000 requests a day (only `/api/*` counts);
 Resend free 100 emails a day and 3,000 a month (each request uses 2 when the

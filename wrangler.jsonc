@@ -19,10 +19,11 @@
   // Not secret. The secrets (RESEND_API_KEY, TURNSTILE_SECRET_KEY,
   // CONTACT_TO_EMAIL) are set in the Cloudflare dashboard, never here.
   "vars": {
-    // Resend's test sender: it delivers only to your Resend account's email, so
-    // client confirmations go to CONTACT_TO_EMAIL, marked [TEST]. After
-    // verifying your domain: "Gindi Innovations <hello@your-domain>".
-    "MAIL_FROM": "Gindi Innovations <onboarding@resend.dev>",
+    // The sender, on gindi-studio.com (verified in Resend). Requests go to
+    // CONTACT_TO_EMAIL; each client's confirmation goes to the client, with
+    // Reply-To set to CONTACT_TO_EMAIL. (With Resend's test sender
+    // onboarding@resend.dev, confirmations went to CONTACT_TO_EMAIL, marked [TEST].)
+    "MAIL_FROM": "Gindi Innovations <requests@gindi-studio.com>",
     // Added to local numbers ("010…") for the WhatsApp link (Egypt: 20).
     "DEFAULT_COUNTRY_CODE": "20",
     "TIME_ZONE": "Africa/Cairo"
