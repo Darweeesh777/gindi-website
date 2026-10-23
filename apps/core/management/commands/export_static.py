@@ -103,7 +103,7 @@ class Command(BaseCommand):
                     raise CommandError(f'Expected a 404 page for /{prefix}, got {response.status_code}.')
                 self._write(out, prefix + '404.html', response.content)
 
-            redirects.append(('/favicon.ico', static('images/brand/favicon-32.png'), 302))
+            redirects.append(('/favicon.ico', static('images/brand/favicon-g-32.png'), 302))
 
         lines = []
         for source, target, status in redirects:

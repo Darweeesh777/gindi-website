@@ -1163,7 +1163,7 @@ class DeploymentTests(SimpleTestCase):
     def test_favicon_redirects_to_the_brand_icon(self):
         response = self.client.get('/favicon.ico')
         self.assertEqual(response.status_code, 302)
-        self.assertIn('images/brand/favicon-32.png', response['Location'])
+        self.assertIn('images/brand/favicon-g-32.png', response['Location'])
 
     def test_branded_404_in_both_languages(self):
         for path, lang, heading in (('/no-such-page/', 'en', 'This page could not be found.'),
@@ -1274,7 +1274,7 @@ class StaticExportTests(SimpleTestCase):
                          'plaster-calc', 'plaster'):
                 self.assertTrue(list((dist / 'static' / 'js' / 'tools').glob(f'{name}.*.js')), name)
             self.assertFalse((dist / 'static' / 'Tools').exists())
-            self.assertRegex(redirects, r'/favicon.ico /static/images/brand/favicon-32\.[0-9a-f]{12}\.png 302')
+            self.assertRegex(redirects, r'/favicon.ico /static/images/brand/favicon-g-32\.[0-9a-f]{12}\.png 302')
             headers = (dist / '_headers').read_text()
             self.assertIn('X-Robots-Tag: noindex, nofollow', headers)
             self.assertIn('X-Frame-Options: DENY', headers)

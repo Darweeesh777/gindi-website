@@ -24,7 +24,7 @@ CONTENT = {
     'en': {
         'meta': {
             # PLACEHOLDER: page title and description to be confirmed.
-            'title': 'Gindi Innovations — Interior Design Studio',
+            'title': 'Gindi-Studio — Interior Design Studio',
             'description': (
                 'Gindi Innovations is an interior design studio serving clients '
                 'in Egypt and internationally.'
@@ -89,7 +89,7 @@ CONTENT = {
         },
         'services_page': {
             # Services page (/services/). The services: apps/core/services.py.
-            'meta_title': 'Services — Gindi Innovations',
+            'meta_title': 'Services — Gindi-Studio',
             'meta_description': '2D design, 3D design, interior finishing and fit-out by Gindi Innovations.',
             'eyebrow': 'Our Services',
             'title': 'Your space. Every detail considered.',
@@ -255,7 +255,7 @@ CONTENT = {
         },
         'studio_page': {
             # /design-studio/ (templates/core/design_studio.html). Catalogue: apps/core/studio.py.
-            'meta_title': 'Design Studio — Gindi Innovations',
+            'meta_title': 'Design Studio — Gindi-Studio',
             'meta_description': 'Choose Classic, Modern or Organic Modern, then make it yours: upholstery, natural stone and finishes.',
             'eyebrow': 'GINDI Design Studio',
             'title': 'Your Space. Your Signature.',
@@ -319,7 +319,7 @@ CONTENT = {
             # /contact/ (templates/core/contact.html). The form shares its lists,
             # field rules and messages with the quotation form (quote, above);
             # these are the page's own words. Sending: static/js/quote-form.js.
-            'meta_title': 'Contact — Gindi Innovations',
+            'meta_title': 'Contact — Gindi-Studio',
             'meta_description': 'Tell Gindi Innovations about your space: design and visualization, interior finishing and fit-out.',
             'eyebrow': 'Contact Us',
             'title': 'Let’s talk about your space.',
@@ -358,7 +358,7 @@ CONTENT = {
         },
         'tools_page': {
             # /free-tools/ and /free-tools/<slug>/. The tools: apps/core/tools.py.
-            'meta_title': 'Free Tools — Gindi Innovations',
+            'meta_title': 'Free Tools — Gindi-Studio',
             'meta_description': 'Free calculators for electrical wire, tiles, bricks and paint: quantities and cost from your own details.',
             'eyebrow': 'Free Planning Tools',
             'title': 'Free tools',
@@ -372,7 +372,7 @@ CONTENT = {
         },
         'projects_page': {
             # Projects page and project pages. The projects: apps/core/projects.py.
-            'meta_title': 'Projects — Gindi Innovations',
+            'meta_title': 'Projects — Gindi-Studio',
             'meta_description': 'Interior design projects by Gindi Innovations.',
             'eyebrow': 'Our Projects',
             'title': 'Spaces & Stories',
@@ -533,7 +533,7 @@ CONTENT = {
     'ar': {
         'meta': {
             # PLACEHOLDER: page title and description to be confirmed.
-            'title': 'Gindi Innovations — استوديو تصميم داخلي',
+            'title': 'Gindi-Studio — استوديو تصميم داخلي',
             'description': 'Gindi Innovations استوديو للتصميم الداخلي يخدم عملاءه في مصر وخارجها.',
         },
         'ui': {
@@ -592,7 +592,7 @@ CONTENT = {
         },
         'services_page': {
             # Services page (/services/). The services: apps/core/services.py.
-            'meta_title': 'الخدمات — Gindi Innovations',
+            'meta_title': 'الخدمات — Gindi-Studio',
             'meta_description': 'التصميم ثنائي وثلاثي الأبعاد والتشطيبات الداخلية والتجهيز من Gindi Innovations.',
             'eyebrow': 'خدماتنا',
             'title': 'مساحتك. وكل تفصيلة مدروسة.',
@@ -751,7 +751,7 @@ CONTENT = {
             'of': 'من',
         },
         'studio_page': {
-            'meta_title': 'استوديو التصميم — Gindi Innovations',
+            'meta_title': 'استوديو التصميم — Gindi-Studio',
             'meta_description': 'اختر كلاسيك أو مودرن أو مودرن عضوي ثم اجعله خاصًا بك: التنجيد والحجر الطبيعي والتشطيبات.',
             'eyebrow': 'استوديو جيندي للتصميم',
             'title': 'مساحتك. بصمتك.',
@@ -812,7 +812,7 @@ CONTENT = {
             'legacy_link': 'هذا الرابط من إصدار سابق للاستوديو ولم تعد غرفته متاحة. نعرض لك {style} بدلًا منها.',
         },
         'contact_page': {
-            'meta_title': 'تواصل معنا — Gindi Innovations',
+            'meta_title': 'تواصل معنا — Gindi-Studio',
             'meta_description': 'احكيلنا عن مساحتك: التصميم والتصوّر، التشطيبات الداخلية، والتجهيز الداخلي.',
             'eyebrow': 'تواصل معنا',
             'title': 'خلّينا نتكلم عن مساحتك.',
@@ -850,7 +850,7 @@ CONTENT = {
         },
         'tools_page': {
             # /free-tools/ and /free-tools/<slug>/. The tools: apps/core/tools.py.
-            'meta_title': 'الأدوات المجانية — Gindi Innovations',
+            'meta_title': 'الأدوات المجانية — Gindi-Studio',
             'meta_description': 'حاسبات مجانية لأسلاك الكهرباء والبلاط والطوب والدهانات: الكميات والتكلفة وفق بياناتك.',
             'eyebrow': 'أدوات تخطيط مجانية',
             'title': 'الأدوات المجانية',
@@ -864,7 +864,7 @@ CONTENT = {
         },
         'projects_page': {
             # Projects page and project pages. The projects: apps/core/projects.py.
-            'meta_title': 'المشاريع — Gindi Innovations',
+            'meta_title': 'المشاريع — Gindi-Studio',
             'meta_description': 'مشاريع التصميم الداخلي من Gindi Innovations.',
             'eyebrow': 'مشاريعنا',
             'title': 'مساحات وحكايات',

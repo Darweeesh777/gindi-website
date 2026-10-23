@@ -244,7 +244,7 @@ def robots_txt(request):
 
 def favicon(request):
     """Browsers request /favicon.ico regardless of the <link rel="icon">."""
-    return redirect(static('images/brand/favicon-32.png'))
+    return redirect(static('images/brand/favicon-g-32.png'))
 
 
 def page_not_found(request, exception):

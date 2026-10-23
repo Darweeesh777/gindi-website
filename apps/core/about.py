@@ -13,7 +13,7 @@ dates, team members, awards or project totals.
 from .images import resolve
 
 ABOUT = {
-    'meta_title': {'en': 'About — Gindi Innovations', 'ar': 'من نحن — Gindi Innovations'},
+    'meta_title': {'en': 'About — Gindi-Studio', 'ar': 'من نحن — Gindi-Studio'},
     'meta_description': {
         'en': 'Gindi Innovations: from an idea to a finished space — who we are, what we do and how we work.',
         'ar': 'Gindi Innovations: من الفكرة إلى مساحة مكتملة — من نحن وماذا نقدّم وكيف نعمل.',
