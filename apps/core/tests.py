@@ -896,8 +896,8 @@ class HomepageTests(SimpleTestCase):
             self.assertEqual(re.findall(r'step__index">(\d+)<', section), ['01', '02', '03', '04', '05', '06'])
             self.assertEqual(re.findall(r'<h3 class="step__title">([^<]+)</h3>', section), titles)
         en = self.get('core:home')
-        self.assertIn('We work through every stage with you—from understanding your needs and refining the '
-                      'design to approving materials and completing the work.', en)
+        self.assertIn('You stay involved at every step: you approve the design, choose the materials and agree '
+                      'each price before any work begins, and we stay with you after handover.', en)
         self.assertIn('Then we arrange a free site visit to see the space in person.', en)
         self.assertIn('we review them with you and follow through on the adjustments.', en)
 

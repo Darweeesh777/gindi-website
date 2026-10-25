@@ -466,8 +466,8 @@ CONTENT = {
             'eyebrow': 'Process',
             # The studio's confirmed workflow (six steps, numbered 01–06 by the template).
             'title': 'From Our First Call to After Handover',
-            'intro': 'We work through every stage with you—from understanding your needs and refining the '
-                     'design to approving materials and completing the work.',
+            'intro': 'You stay involved at every step: you approve the design, choose the materials and agree '
+                     'each price before any work begins, and we stay with you after handover.',
             'steps': [
                 {'title': 'A Call & a Free Site Visit',
                  'text': 'We start with a call to learn about your property—whether it’s a house, villa, '
