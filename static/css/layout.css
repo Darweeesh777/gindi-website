@@ -553,7 +553,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
-  color: var(--muted);
+  color: var(--gindi-gold);
   overflow-wrap: anywhere;
   transition: color var(--dur-fast) var(--ease-out);
 }
