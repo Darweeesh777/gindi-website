@@ -147,5 +147,30 @@
   pl = PL.compute(pin({ dens: '1000', step: '0.5' }, { th: '10', c: '1', s: '0', w: '0', f: '1', a: '100' }, { th: '0' }));
   eq('plaster: exactly 20 bags stays 20', pl.buyBags, 20);
 
+  /* ---------- Gypsum board ---------- */
+  var Gy = G.gypsum, gRoom = 'غرفة', gBath = 'حمام', gKit = 'مطبخ';
+  var gp = ['10', '20', '30', '40', '50', '60', '70'];
+  var gq = function (o) { var q = ['0', '0', '0', '0', '0', '0', '0'], k; for (k in o) q[k] = o[k]; return q; };
+  eq('gypsum: 7 items, 3 units, 3 types, 8 starting places', [Gy.ITEMS.length, Gy.UNITS.length, Gy.TYPES.length, Gy.ROOMS.length].join(), '7,3,3,8');
+  var gy = Gy.compute({ prices: gp, rooms: [
+    { name: 'a', type: gRoom, q: gq({ 0: '1', 3: '2' }) },
+    { name: 'b', type: gRoom, q: gq({ 0: '3.5' }) },
+    { name: 'c', type: gBath, q: gq({ 1: '2', 6: '1' }) },
+    { name: 'd', type: gKit, q: gq({ 2: '1' }) }
+  ] });
+  eq('gypsum: room cost = sum of quantity × unit price', gy.rooms[0].cost, 90);
+  eq('gypsum: decimal quantity', gy.rooms[1].cost, 35);
+  eq('gypsum: item quantity over all rooms', gy.Q[0], 4.5);
+  eq('gypsum: item cost = quantity × unit price', gy.C[0], 45);
+  eq('gypsum: total', gy.T, 265);
+  eq('gypsum: rooms cost and count', gy.byT[gRoom].join(), '125,2');
+  eq('gypsum: bathrooms cost and count', gy.byT[gBath].join(), '110,1');
+  eq('gypsum: kitchen cost and count', gy.byT[gKit].join(), '30,1');
+  gy = Gy.compute({ prices: ['-10', '', 'x', '0', '0', '0', '0'], rooms: [{ name: 'a', type: gRoom, q: gq({ 0: '5', 1: '-5', 2: '' }) }] });
+  eq('gypsum: negative or empty prices count as 0', gy.T, 0);
+  eq('gypsum: negative or empty quantities count as 0', gy.Q[1] + gy.Q[2], 0);
+  gy = Gy.compute({ prices: gp, rooms: [] });
+  eq('gypsum: no rooms, no cost', gy.T, 0);
+
   window.__pure = { lines: lines, passed: passed, failed: failed };
 })();

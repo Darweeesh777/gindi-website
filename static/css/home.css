@@ -231,8 +231,8 @@
   grid-row: 2 / span 2;
 }
 
-/* Free Services has five tools: its own rows (two, two, then the fifth across both
-   columns), a little more compact, instead of the 2 x 2 rows it shares with Studio Services. */
+/* Free Services has six tools: its own rows of two (an odd last one would go across
+   both columns), a little more compact, instead of the 2 x 2 rows it shares with Studio Services. */
 .home .svc-panel--free .svc-cells {
   grid-template-rows: none;
 }

@@ -27,7 +27,8 @@ from cdp import Session  # noqa: E402
 import scenarios  # noqa: E402
 
 ORIGINALS = {'bricks': 'brick-calculator.txt', 'tiles': 'ceramic-calculator.txt',
-             'wire': 'wire-calculator.txt', 'paint': 'paint-calculator.txt', 'plaster': 'plaster-calculator.txt'}
+             'wire': 'wire-calculator.txt', 'paint': 'paint-calculator.txt', 'plaster': 'plaster-calculator.txt',
+             'gypsum': 'gypsum-board-calculator.txt'}
 WORK = os.path.join(HERE, 'work')
 BASE = os.path.join(HERE, 'baselines')
 HARNESS = open(os.path.join(HERE, 'harness.js'), encoding='utf-8').read()

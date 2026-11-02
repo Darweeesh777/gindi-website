@@ -77,6 +77,7 @@
     return '<div class="cf' + (o.cls ? ' ' + o.cls : '') + '">' +
       '<label class="cf__label" for="' + o.id + '">' + o.label + '</label>' +
       '<div class="cf__box"><input class="cf__input cf__input--text" type="text" id="' + o.id + '"' +
+        (o.value ? ' value="' + esc(o.value) + '"' : '') +
         (o.placeholder ? ' placeholder="' + esc(o.placeholder) + '"' : '') + ' autocomplete="off"></div></div>';
   }
 

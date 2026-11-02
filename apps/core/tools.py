@@ -77,6 +77,18 @@ TOOLS = [
                               'including waste and purchase rounding.',
                         'ar': 'احسب شكاير الأسمنت وكمية الرمل اللازمة للمحارة والطرطشة، شاملة الهالك وتقريب الشراء.'},
     },
+    {
+        'slug': 'gypsum',
+        'name': {'en': 'Gypsum Board Cost Calculator', 'ar': 'حاسبة تكلفة الجبسوم بورد'},
+        'short_name': {'en': 'Gypsum Calculator', 'ar': 'حاسبة الجبسوم بورد'},
+        'planning': {'en': 'Estimate the cost of gypsum board work, room by room.',
+                     'ar': 'قدّر تكلفة أعمال الجبسوم بورد لكل غرفة.'},
+        'teaser': {'en': 'Estimate gypsum board work cost.',
+                   'ar': 'قدّر تكلفة أعمال الجبسوم بورد.'},
+        'description': {'en': 'Calculate the cost of gypsum board work for each room, bathroom and kitchen: '
+                              'flat, green and red board, light coves, curtain boxes, pelmets and shadow gaps.',
+                        'ar': 'احسب تكلفة أعمال الجبسوم بورد لكل غرفة وحمام ومطبخ: الفلات والأخضر والأحمر وبيت النور وبيت الستارة والكمام والشادو جاب.'},
+    },
 ]
 
 

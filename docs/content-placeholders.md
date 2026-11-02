@@ -164,7 +164,7 @@ request filled in. **Neither is configured yet**, so both buttons are disabled
 and say so.
 
 **Free calculators** are listed in **`apps/core/tools.py`** (`TOOLS`):
-wire, tiles, bricks, paint. Pages: `/free-tools/` (overview) and
+wire, tiles, bricks, paint, plaster, gypsum. Pages: `/free-tools/` (overview) and
 `/free-tools/<slug>/`; `/free-estimate/` redirects to the overview and the
 earlier `/free-tools/cement/` page to it as well. They run entirely in the
 browser:

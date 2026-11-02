@@ -359,7 +359,7 @@ CONTENT = {
         'tools_page': {
             # /free-tools/ and /free-tools/<slug>/. The tools: apps/core/tools.py.
             'meta_title': 'Free Tools — Gindi-Studio',
-            'meta_description': 'Free calculators for electrical wire, tiles, bricks and paint: quantities and cost from your own details.',
+            'meta_description': 'Free calculators for electrical wire, tiles, bricks, paint, plaster and gypsum board: quantities and cost from your own details.',
             'eyebrow': 'Free Planning Tools',
             'title': 'Free tools',
             'lead': 'Initial estimates for your project, each based on your own details.',
@@ -851,7 +851,7 @@ CONTENT = {
         'tools_page': {
             # /free-tools/ and /free-tools/<slug>/. The tools: apps/core/tools.py.
             'meta_title': 'الأدوات المجانية — Gindi-Studio',
-            'meta_description': 'حاسبات مجانية لأسلاك الكهرباء والبلاط والطوب والدهانات: الكميات والتكلفة وفق بياناتك.',
+            'meta_description': 'حاسبات مجانية لأسلاك الكهرباء والبلاط والطوب والدهانات والمحارة والجبسوم بورد: الكميات والتكلفة وفق بياناتك.',
             'eyebrow': 'أدوات تخطيط مجانية',
             'title': 'الأدوات المجانية',
             'lead': 'تقديرات مبدئية لمشروعك، كلٌّ منها بناءً على تفاصيلك.',

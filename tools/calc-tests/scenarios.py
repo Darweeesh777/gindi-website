@@ -223,4 +223,36 @@ def plaster():
     }
 
 
-ALL = {'bricks': bricks, 'tiles': tiles, 'wire': wire, 'paint': paint, 'plaster': plaster}
+def gypsum():
+    prices = _sets([['p0', '450'], ['p1', '550'], ['p2', '650'], ['p3', '180'], ['p4', '200'], ['p5', '150'], ['p6', '120']])
+    remove = lambda n: ['click', f'#rooms .room-box:nth-child({n}) .del']
+    return {
+        'defaults': [],
+        'prices': prices,
+        'one-price': _sets([['p0', '450']]),
+        'price-decimals': _sets([['p0', '449.75'], ['p6', '12.5']]),
+        'price-only-unused-item': _sets([['p1', '0'], ['p2', '0'], ['p0', '0'], ['p3', '10']]),
+        'units-changed': _sets([['u5', 'عدد'], ['u0', 'م.ط']]) + prices,
+        'quantities-changed': prices + _sets([['q1_0', '42.5'], ['q1_3', '26'], ['q6_1', '6.25'], ['q8_2', '14']]),
+        'names-changed': prices + _sets([['n1', 'Hall 7'], ['n2', 'غرفة الضيوف']]),
+        'name-empty': prices + _sets([['n3', '']]),
+        'name-markup': prices + _sets([['n1', '<b>A & B</b> 9']]),
+        'type-changed': prices + _sets([['t1', 'حمام'], ['t6', 'مطبخ'], ['t8', 'غرفة']]),
+        'room-added': prices + [['click', '#addRoom']] + _sets([['n9', 'Office 2'], ['q9_0', '18'], ['q9_6', '17']]),
+        'room-added-empty': [['click', '#addRoom']] + prices,
+        'rooms-added-as-bathroom': prices + [['click', '#addRoom'], ['click', '#addRoom']] +
+            _sets([['t9', 'حمام'], ['q9_1', '6'], ['t10', 'مطبخ'], ['q10_2', '12']]),
+        'room-removed': prices + [remove(2)],
+        'rooms-removed-first-and-last': prices + [remove(8), remove(1)],
+        'room-removed-then-added': prices + [remove(3), ['click', '#addRoom']] + _sets([['q9_0', '5']]),
+        'all-rooms-removed': prices + [remove(1) for _ in range(8)],
+        'all-rooms-removed-then-added': prices + [remove(1) for _ in range(8)] + [['click', '#addRoom']] + _sets([['q9_0', '10']]),
+        'quantities-empty': prices + _sets([['q1_0', ''], ['q2_3', '']]),
+        'negative-values': _sets([['p0', '-450'], ['q1_0', '-30'], ['p3', '180'], ['q1_3', '-22']]),
+        'zero-price': _sets([['p0', '0'], ['p1', '0'], ['p2', '0'], ['p3', '0'], ['p4', '0'], ['p5', '0'], ['p6', '0']]),
+        'price-empty': prices + _sets([['p0', ''], ['p6', '']]),
+        'large-job': _sets([['p0', '1250'], ['p3', '975.5'], ['q1_0', '12500'], ['q1_3', '8200.75']]),
+    }
+
+
+ALL = {'bricks': bricks, 'tiles': tiles, 'wire': wire, 'paint': paint, 'plaster': plaster, 'gypsum': gypsum}

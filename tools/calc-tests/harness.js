@@ -47,7 +47,10 @@
             dyn: /^(g|L|D|E|F|G|I)\d+$/ },
     paint: { ids: ['areaInfo', 'sumArea', 'kTotal', 'kMat', 'kMatL', 'kM2'], dyn: /^[mgr]\d+$/, list: 'buyList' },
     // plaster: also the spatter dash's linked (read-only) area and waste, which calc() writes.
-    plaster: { ids: ['kBags', 'kBagsL', 'kSand', 'kSandL', 'kCem', 'kSandC'], dyn: /^[pt][mg]$/, list: 'cmp', values: ['ta', 'tw'] }
+    plaster: { ids: ['kBags', 'kBagsL', 'kSand', 'kSandL', 'kCem', 'kSandC'], dyn: /^[pt][mg]$/, list: 'cmp', values: ['ta', 'tw'] },
+    // gypsum: each place's total and the units chosen; with no cost the original words kTot where the page shows "—".
+    gypsum: { ids: ['totC', 'kTot', 'kR', 'kRL', 'kB', 'kBL', 'kK', 'kKL'], dyn: /(?!)/, each: '.room-box .tot', blank: ['kTot'],
+              values: ['u0', 'u1', 'u2', 'u3', 'u4', 'u5', 'u6'] }
   };
 
   // States carried by wording alone (no figures): the original's text, the new page's data-state.
@@ -69,6 +72,8 @@
       st('kTotalL', function (t) { return t.indexOf('اكتب') === 0 ? 'none' : t.indexOf('ناقصة') >= 0 ? 'partial' : 'priced'; });
     } else if (tool === 'bricks') {
       st('kCostL', function (t) { return t.indexOf('اكتب') === 0 ? 'unpriced' : 'priced'; });
+    } else if (tool === 'gypsum') {
+      st('kTotL', function (t) { return t.indexOf('اكتب') === 0 ? 'none' : 'priced'; });
     }
     return p;
   }
@@ -79,6 +84,8 @@
     Array.prototype.forEach.call(document.querySelectorAll('[id]'), function (el) {
       if (o.dyn.test(el.id) && !/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(el.tagName)) out.dyn[el.id] = tokens(text(el));
     });
+    (o.blank || []).forEach(function (id) { if (!out.ids[id].length) out.ids[id] = ['—']; });
+    if (o.each) out.each = Array.prototype.map.call(document.querySelectorAll(o.each), function (el) { return tokens(text(el)); });
     if (o.values) out.values = o.values.map(function (id) { return byId(id).value; });
     if (o.list) out.list = Array.prototype.map.call(byId(o.list).children, function (c) { return tokens(text(c)); });
     var rows = document.querySelectorAll('[data-row]');

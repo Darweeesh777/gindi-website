@@ -308,7 +308,8 @@
 
 .sp-tools__list {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));   /* the five calculators in one row */
+  grid-template-columns: repeat(3, minmax(0, 1fr));   /* the six calculators in two rows of three */
+  row-gap: 2.5rem;
   margin-block-start: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
 }
 
@@ -325,6 +326,18 @@
 
 .sp-tool + .sp-tool {
   border-inline-start: 1px solid var(--ivory-18);
+}
+
+/* Two rows of three: each row starts flush, with no line before it. */
+@media (min-width: 64.01rem) {
+  .sp-tool:nth-child(3n + 1) {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+
+  .sp-tool:nth-child(3n) {
+    padding-inline-end: 0;
+  }
 }
 
 .sp-tool__icon {
