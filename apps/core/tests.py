@@ -606,6 +606,12 @@ class HomepageTests(SimpleTestCase):
                 for slug in slugs:
                     html = self.client.get(f'{prefix}/free-tools/{slug}/').content.decode()
                     self.assertRegex(html, r'<script src="/static/js/tools/calc-gate\.js[^"]*" defer></script>')
+                    # The unseen form behind "this calculator was opened", with its own security check.
+                    click = html[html.index('<form class="calc-click"'):]
+                    click = click[:click.index('</form>')]
+                    self.assertIn('aria-hidden="true" data-calc-click', click)
+                    self.assertIn('data-turnstile', click)
+                    self.assertIn('name="website" tabindex="-1"', click)
                     gate = html[html.index('<section class="cpanel calc-gate"'):]
                     gate = gate[:gate.index('</section>')]
                     self.assertIn(' hidden', gate[:gate.index('>')])  # shown by the script, so without it the tool stays open
@@ -614,7 +620,8 @@ class HomepageTests(SimpleTestCase):
                     self.assertIn('data-turnstile', gate)
                     self.assertIn('name="website" tabindex="-1"', gate)
                     self.assertIn(submit, gate)
-                    self.assertRegex(gate, r'<button class="btn calc__reset" type="button" data-gate-skip>[^<]+</button>')
+                    self.assertNotIn('data-gate-skip', gate)  # both fields are required: no way round them
+                    self.assertEqual(gate.count(' required'), 2)
                     self.assertNotIn('type="email"', gate)
                     self.assertNotIn('<textarea', gate)
                     self.assertNotRegex(gate[:gate.index('>')], r'data-error[-\w]*=""')  # the messages are there

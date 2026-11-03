@@ -372,10 +372,9 @@ CONTENT = {
             # The form that opens a calculator (partials/calc_gate.html).
             'gate': {
                 'title': 'Before you start',
-                'intro': 'Enter your name and number to open the calculator, or skip this step.',
+                'intro': 'Enter your name and number to open the calculator. You only need to do this once.',
                 'submit': 'Open the calculator',
-                'skip': 'Skip',
-                'failed': 'Sorry, your details could not be sent. Please try again, or skip this step.',
+                'failed': 'Sorry, your details could not be sent. Please try again.',
                 'privacy': 'Your name and number go to the Gindi Innovations team, who may contact you about your project.',
             },
         },
@@ -873,10 +872,9 @@ CONTENT = {
             # The form that opens a calculator (partials/calc_gate.html).
             'gate': {
                 'title': 'قبل أن تبدأ',
-                'intro': 'أدخل اسمك ورقمك لفتح الحاسبة، أو تخطَّ هذه الخطوة.',
+                'intro': 'أدخل اسمك ورقمك لفتح الحاسبة. يكفي أن تفعل ذلك مرة واحدة.',
                 'submit': 'افتح الحاسبة',
-                'skip': 'تخطّي',
-                'failed': 'عذرًا، تعذّر إرسال بياناتك. يُرجى المحاولة مرة أخرى أو تخطّي هذه الخطوة.',
+                'failed': 'عذرًا، تعذّر إرسال بياناتك. يُرجى المحاولة مرة أخرى.',
                 'privacy': 'يصل اسمك ورقمك إلى فريق Gindi Innovations، وقد يتواصل معك بخصوص مشروعك.',
             },
         },

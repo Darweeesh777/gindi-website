@@ -133,10 +133,12 @@ test('Resend not configured: the form fails plainly', async () => {
   assert.equal(emails.length, 0);
 });
 
-test('with a database, a click is saved instead of emailed, with nothing about who', async () => {
+test('with a database, a click is emailed and saved, with nothing about who', async () => {
   const response = await send({ ...CLICK, name: 'Sam', phone: '01012345678', email: 'x@example.com', message: 'hi' });
   assert.equal(response.status, 200);
-  assert.equal(emails.length, 0);
+  assert.equal(emails.length, 1);
+  assert.equal(emails[0].subject, 'Calculator click — bricks');
+  assert.match(emails[0].text, /someone opened it/);
   const [row] = rows();
   assert.equal(row.kind, 'click');
   assert.equal(row.tool, 'bricks');
@@ -185,12 +187,11 @@ test('the other forms still work without a database', async () => {
   assert.equal(emails.length, 2); // the request and its confirmation
 });
 
-test('a database failure: a contact is still emailed; a click is an error', async () => {
+test('a database failure: contacts and clicks are still emailed', async () => {
   env.DB.prepare = () => { throw new Error('D1 down'); };
   assert.equal((await send(LEAD)).status, 200);
-  assert.equal(emails.length, 1);
-  assert.equal((await send(CLICK)).status, 502);
-  assert.equal(emails.length, 1);
+  assert.equal((await send(CLICK)).status, 200);
+  assert.equal(emails.length, 2);
 });
 
 test('nothing of the dashboard without signing in', async () => {

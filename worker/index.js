@@ -4,12 +4,12 @@
  * Runs only for /api/* and /dashboard (wrangler.jsonc: assets.run_worker_first);
  * every other request is served straight from the static files in dist/, as before.
  *
- * The free calculators' form goes through the same first two checks. A contact
- * (form "calculator") is emailed to the studio; a skip (form "click") is too,
- * naming the calculator and nothing about the visitor. Once a D1 database is
- * bound as DB, contacts are also saved and skips are saved instead of emailed,
- * for the private dashboard (worker/dashboard.js). Without one, /dashboard says
- * it is not set up and everything else works.
+ * The free calculators go through the same first two checks. A contact (form
+ * "calculator") is emailed to the studio; so is each opening of a calculator
+ * (form "click"), naming the calculator and nothing about the visitor. Once a D1
+ * database is bound as DB, both are also saved for the private dashboard
+ * (worker/dashboard.js). Without one, /dashboard says it is not set up and
+ * everything else works.
  *
  * POST /api/contact — the quotation form, the Contact page form and the
  * enquiry drawer (static/js/form-backend.js sends them):
@@ -305,7 +305,7 @@ function calculatorEmail(e, env, now) {
   const contact = e.kind === 'lead';
   const rows = contact
     ? [['Name', e.name], ['Mobile / WhatsApp', link(`tel:+${e.wa}`, e.phone)], ['WhatsApp', link(`https://wa.me/${e.wa}`, 'Chat on WhatsApp')]]
-    : [['Event', 'Calculator click (skipped the form)']];
+    : [['Event', 'Calculator click (someone opened it)']];
   rows.push(['Calculator', e.tool], ['Language', e.lang === 'ar' ? 'Arabic' : 'English'], ['Page', e.page || '—'], ['Received', now]);
   const subject = line(contact ? `Calculator lead — ${e.name}` : `Calculator click — ${e.tool}`);
   const html = layout('en', `<h1 style="font-size:20px;margin:0 0 16px">${escapeHtml(subject)}</h1>${table(rows, false)}`);
@@ -385,16 +385,6 @@ async function handleContact(request, env, ctx) {
 
   if (data && CALCULATOR_FORMS.includes(data.form)) {
     const event = validateCalculator(data, env);
-    // A skip with a database is only counted, which keeps the email allowance for real requests.
-    if (event.kind === 'click' && env.DB) {
-      try {
-        await saveEvent(env, event);
-      } catch (err) {
-        console.error('calculator: click not saved', err && err.message || String(err));
-        throw new Problem(502, 'unavailable');
-      }
-      return json(200, { ok: true, confirmed: false });
-    }
     const email = calculatorEmail(event, env, now);
     await sendEmail(env, { from, to: [to], subject: email.subject, html: email.html, text: email.text }, `studio-${event.id}`);
     // The email is what must succeed; the dashboard's copy is best effort.
@@ -402,7 +392,7 @@ async function handleContact(request, env, ctx) {
       try {
         await saveEvent(env, event);
       } catch (err) {
-        console.error('calculator: contact emailed but not saved', err && err.message || String(err));
+        console.error('calculator: emailed but not saved', err && err.message || String(err));
       }
     }
     return json(200, { ok: true, confirmed: false });

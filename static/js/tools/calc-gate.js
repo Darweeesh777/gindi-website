@@ -1,40 +1,53 @@
 /*
- * The name-and-number form that opens the free calculators
- * (partials/calc_gate.html; loaded only with the form backend configured).
+ * The free calculators' page: tells the studio it was opened, and shows the
+ * name-and-number form that opens the calculator (partials/calc_gate.html;
+ * loaded only with the form backend configured).
  *
- * The visitor gives a name and a number once; form-backend.js sends them to the
- * Worker (worker/index.js, form "calculator"), which emails the studio through
- * Resend, and the calculator opens. This browser then remembers (localStorage),
- * so other calculators open directly.
+ * Every opening sends a "click" (worker/index.js, form "click"), naming the
+ * calculator and nothing about the visitor, once per calculator in this tab
+ * (sessionStorage), so a reload does not send another. It has its own unseen
+ * form and security check ([data-calc-click]), so it needs nothing from the visitor
+ * and never waits for, or gets in the way of, anything else on the page.
  *
- * Or the visitor skips: the Worker records a "click", naming the calculator and
- * nothing about the visitor (form "click"). This tab remembers the skip for that
- * calculator (sessionStorage), so a reload neither asks nor counts again;
- * another calculator, or a later visit, asks again.
+ * A name and a number are required to open the calculator (form "calculator").
+ * The visitor gives them once: this browser then remembers (localStorage), so
+ * other calculators open directly. If they cannot be sent, the visitor can try
+ * again, and the calculator stays closed until they are.
  *
- * It never breaks the tool: with no backend, or if this script fails, the
- * calculator is simply open; a skip opens it after SKIP_WAIT at the latest,
- * whether or not the click could be recorded.
+ * With no backend, or if this script fails, the calculator is simply open.
  */
 (function () {
   'use strict';
   var KEY = 'gindi-calc-lead';
-  var SKIP_WAIT = 4000;
   var gate = document.querySelector('[data-calc-gate]');
   var calc = document.querySelector('[data-calc]');
+  var pinger = document.querySelector('[data-calc-click]');
   var api = window.GindiForms;
-  if (!gate || !calc || !api) return;
+  if (!gate || !calc || !pinger || !api) return;
 
   var tool = calc.getAttribute('data-calc');
-  var SKIP_KEY = KEY + '-skipped-' + tool;
-  try {
-    if (localStorage.getItem(KEY) === '1' || sessionStorage.getItem(SKIP_KEY) === '1') return;
-  } catch (err) { /* storage unavailable: asked on each calculator */ }
+  var CLICK_KEY = 'gindi-calc-clicked-' + tool;
+
+  function stored(storage, key) {
+    try { return window[storage].getItem(key) === '1'; } catch (err) { return false; }
+  }
+
+  function store(storage, key) {
+    try { window[storage].setItem(key, '1'); } catch (err) { /* asked or counted again next time */ }
+  }
+
+  if (!stored('sessionStorage', CLICK_KEY)) {
+    var id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    api.send(pinger, { form: 'click', tool: tool, id: id }, function () {}).then(function () {
+      store('sessionStorage', CLICK_KEY);
+    }, function () { /* not counted; the next opening tries again */ });
+  }
+
+  if (stored('localStorage', KEY)) return;
 
   var form = gate.querySelector('form');
   var status = gate.querySelector('[data-gate-status]');
   var submit = gate.querySelector('[type="submit"]');
-  var skip = gate.querySelector('[data-gate-skip]');
   var attempted = false, sending = false;
 
   // Arabic-Indic and Persian digits to Western, as the other forms do.
@@ -86,13 +99,10 @@
     sending = busy;
     form.setAttribute('aria-busy', busy ? 'true' : 'false');
     submit.disabled = busy;
-    skip.disabled = busy;
   }
 
   calc.hidden = true;
   gate.hidden = false;
-  // The security check starts now, so a skip usually finds its token ready.
-  api.prepare(form);
 
   form.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -110,7 +120,7 @@
       name: val('name'),
       phone: westernDigits(val('phone'))
     }, function (text) { status.textContent = text; }).then(function () {
-      try { localStorage.setItem(KEY, '1'); } catch (err) { /* asked again next time */ }
+      store('localStorage', KEY);
       status.textContent = '';
       open();
     }, function (error) {
@@ -126,21 +136,6 @@
   form.addEventListener('input', function (event) {
     if (attempted && event.target.name && event.target.name !== 'website') showError(event.target.name, problem(event.target.name));
   });
-
-  skip.addEventListener('click', function () {
-    if (sending) return;
-    setBusy(true);
-    var done = false;
-    function finish() {
-      if (done) return;
-      done = true;
-      try { sessionStorage.setItem(SKIP_KEY, '1'); } catch (err) { /* asked again on a reload */ }
-      setBusy(false);
-      open();
-    }
-    // Its own id: a failed try at the form above must not make this look like a retry of it.
-    var id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
-    api.send(form, { form: 'click', tool: tool, id: id }, function () {}).then(finish, finish);
-    setTimeout(finish, SKIP_WAIT);
-  });
+  // The security check starts when the visitor begins filling the form.
+  form.addEventListener('focusin', function () { api.prepare(form); }, { once: true });
 })();

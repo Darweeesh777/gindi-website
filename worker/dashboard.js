@@ -1,10 +1,10 @@
 /*
  * Gindi Innovations — the free calculators' records and their private dashboard.
  *
- * saveEvent: stores what worker/index.js accepted from a calculator's form: a
- * "lead" (a name and a number) or a "click" (the form was skipped: which
- * calculator, and nothing about who). In the D1 database bound as DB; the tables
- * create themselves on first use.
+ * saveEvent: stores what worker/index.js accepted from a calculator's page: a
+ * "lead" (a name and a number) or a "click" (the calculator was opened: which
+ * one, and nothing about who). In the D1 database bound as DB; the tables create
+ * themselves on first use.
  *
  * /dashboard is the page; /dashboard/data its figures; /dashboard/leads.csv the
  * contacts as a file; /dashboard/login and /dashboard/logout the password. All
@@ -327,9 +327,8 @@ function dashboardPage(nonce) {
   <p class="error" id="error" role="alert" hidden></p>
   <section class="card stats" aria-label="Totals">
     <div class="stat hero"><p class="v" id="kLeads">—</p><p class="l">Contacts saved</p></div>
-    <div class="stat"><p class="v" id="kClicks">—</p><p class="l">Calculator clicks (skipped the form)</p></div>
-    <div class="stat"><p class="v" id="kAll">—</p><p class="l">Total (contacts + clicks)</p></div>
-    <div class="stat"><p class="v" id="kShare">—</p><p class="l">Left their details</p></div>
+    <div class="stat"><p class="v" id="kClicks">—</p><p class="l">Calculator clicks (times opened)</p></div>
+    <div class="stat"><p class="v" id="kShare">—</p><p class="l">Contacts per click</p></div>
   </section>
   <section class="card">
     <h2>By day</h2><p class="sub">Contacts and calculator clicks each day, Cairo time.</p>
@@ -459,11 +458,9 @@ const CLIENT = `(function () {
   }
 
   function render(data) {
-    var all = data.totals.leads + data.totals.clicks;
     $('kLeads').textContent = num(data.totals.leads);
     $('kClicks').textContent = num(data.totals.clicks);
-    $('kAll').textContent = num(all);
-    $('kShare').textContent = all ? Math.round(data.totals.leads / all * 100) + '%' : '—';
+    $('kShare').textContent = data.totals.clicks ? Math.round(data.totals.leads / data.totals.clicks * 100) + '%' : '—';
     drawChart(data.byDay);
     fillTable($('dayRows'), data.byDay.slice().reverse().filter(function (d) { return d.leads || d.clicks; }).map(function (d) {
       return [[shortDay(d.day)], [num(d.leads), 'num'], [num(d.clicks), 'num']];

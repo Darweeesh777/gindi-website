@@ -127,6 +127,17 @@
   outline: none;
 }
 
+/* The unseen security check behind "this calculator was opened": rendered, never seen or clicked. */
+.calc-click {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  width: 300px;
+  height: 65px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .calc__noscript {
   padding: 1.5rem;
   border: 1px solid var(--navy-15);

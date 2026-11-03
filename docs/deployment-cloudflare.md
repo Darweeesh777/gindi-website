@@ -98,13 +98,15 @@ there, never the keys).
 
 ## Calculator dashboard (Worker + D1)
 
-The form that opens each free calculator asks for a name and a number, or Skip.
-The Worker emails both to `CONTACT_TO_EMAIL` through Resend: `Calculator lead — <name>`
-and `Calculator click — <calculator>` (no personal details). Skips count towards
+Each opening of a free calculator (once per calculator in a browser tab) emails
+`CONTACT_TO_EMAIL` through Resend: `Calculator click — <calculator>`, with no
+personal details. The form that opens it requires a name and a number, which
+email `Calculator lead — <name>`; if they cannot be sent, the calculator stays
+closed until a retry succeeds. All of these count towards
 Resend's daily allowance, shared with the other forms.
 
-**Optional dashboard.** With a D1 database bound as `DB`, contacts are also saved
-and skips are saved instead of emailed, and `/dashboard` shows them behind a
+**Optional dashboard.** With a D1 database bound as `DB`, contacts and clicks are
+also saved, and `/dashboard` shows them behind a
 password: totals, by day, by calculator, by language, the contacts and a CSV.
 `worker/dashboard.js`; the tables create themselves on first use. Without it,
 `/dashboard` says it is not set up and the forms work as above.
