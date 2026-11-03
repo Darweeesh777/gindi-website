@@ -1,8 +1,15 @@
 /*
  * Gindi Innovations — form backend (Cloudflare Worker).
  *
- * Runs only for /api/* (wrangler.jsonc: assets.run_worker_first); every other
- * request is served straight from the static files in dist/, as before.
+ * Runs only for /api/* and /dashboard (wrangler.jsonc: assets.run_worker_first);
+ * every other request is served straight from the static files in dist/, as before.
+ *
+ * The free calculators' form goes through the same first two checks. A contact
+ * (form "calculator") is emailed to the studio; a skip (form "click") is too,
+ * naming the calculator and nothing about the visitor. Once a D1 database is
+ * bound as DB, contacts are also saved and skips are saved instead of emailed,
+ * for the private dashboard (worker/dashboard.js). Without one, /dashboard says
+ * it is not set up and everything else works.
  *
  * POST /api/contact — the quotation form, the Contact page form and the
  * enquiry drawer (static/js/form-backend.js sends them):
@@ -18,13 +25,17 @@
  *      CONTACT_TO_EMAIL instead, marked [TEST].
  *
  * Settings (never in the repository; see docs/deployment-cloudflare.md):
- *   secrets  RESEND_API_KEY, TURNSTILE_SECRET_KEY, CONTACT_TO_EMAIL
+ *   secrets  RESEND_API_KEY, TURNSTILE_SECRET_KEY, CONTACT_TO_EMAIL, DASHBOARD_PASSWORD
  *   vars     MAIL_FROM, DEFAULT_COUNTRY_CODE, TIME_ZONE (wrangler.jsonc)
+ *   binding  DB (optional: the D1 database, wrangler.jsonc)
  */
+import { handleDashboard, saveEvent } from './dashboard.js';
 
 const MAX_BODY = 32 * 1024;
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const FORMS = ['quote', 'contact', 'enquiry'];
+const CALCULATOR_FORMS = ['calculator', 'click'];
+const TOOL = /^[a-z0-9-]{1,40}$/;
 const METHODS = ['whatsapp', 'phone', 'email'];
 const LIMITS = { name: 120, phone: 40, email: 254, message: 5000, page: 300, label: 100, value: 1000, rows: 25 };
 
@@ -131,6 +142,40 @@ function whatsappNumber(phone, countryCode) {
 
 /* ---------- Checks ---------- */
 
+function validPhone(phone) {
+  const digits = westernDigits(phone).replace(/\D/g, '');
+  return /^\+?[\d\s().\-]+$/.test(westernDigits(phone)) && digits.length >= 8 && digits.length <= 15;
+}
+
+// A calculator's form: a contact, or a click that says nothing about who. Only
+// these fields are read, whatever else a request carries.
+function validateCalculator(data, env) {
+  const click = data.form === 'click';
+  if (typeof data.tool !== 'string' || !TOOL.test(data.tool)) throw new Problem(400, 'invalid');
+  const name = click ? '' : line(str(data.name, LIMITS.name));
+  const phone = click ? '' : str(data.phone, LIMITS.phone);
+  if (!click) {
+    const fields = [];
+    if (!name) fields.push('name');
+    if (!validPhone(phone)) fields.push('phone');
+    if (fields.length) {
+      const problem = new Problem(422, 'fields');
+      problem.fields = fields;
+      throw problem;
+    }
+  }
+  return {
+    id: typeof data.id === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(data.id) ? data.id : crypto.randomUUID(),
+    kind: click ? 'click' : 'lead',
+    tool: data.tool,
+    name,
+    phone: westernDigits(phone),
+    wa: click ? '' : whatsappNumber(phone, env.DEFAULT_COUNTRY_CODE || ''),
+    lang: data.lang === 'ar' ? 'ar' : 'en',
+    page: line(str(data.page, LIMITS.page)),
+  };
+}
+
 function validate(data) {
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Problem(400, 'invalid');
   const form = data.form;
@@ -148,10 +193,7 @@ function validate(data) {
 
   const fields = [];
   if (!name) fields.push('name');
-  if (phone || !enquiry) {
-    const digits = westernDigits(phone).replace(/\D/g, '');
-    if (!/^\+?[\d\s().\-]+$/.test(westernDigits(phone)) || digits.length < 8 || digits.length > 15) fields.push('phone');
-  }
+  if ((phone || !enquiry) && !validPhone(phone)) fields.push('phone');
   if (!METHODS.includes(contact)) fields.push('contact');
   if (email ? !EMAIL.test(email) : contact === 'email') fields.push('email');
   if (enquiry && !message) fields.push('message');
@@ -258,6 +300,18 @@ function studioEmail(s, env, now) {
   return { subject: line(`${kind} — ${s.name}`), html, text };
 }
 
+// The calculators' form: the same fields in the same order every time.
+function calculatorEmail(e, env, now) {
+  const contact = e.kind === 'lead';
+  const rows = contact
+    ? [['Name', e.name], ['Mobile / WhatsApp', link(`tel:+${e.wa}`, e.phone)], ['WhatsApp', link(`https://wa.me/${e.wa}`, 'Chat on WhatsApp')]]
+    : [['Event', 'Calculator click (skipped the form)']];
+  rows.push(['Calculator', e.tool], ['Language', e.lang === 'ar' ? 'Arabic' : 'English'], ['Page', e.page || '—'], ['Received', now]);
+  const subject = line(contact ? `Calculator lead — ${e.name}` : `Calculator click — ${e.tool}`);
+  const html = layout('en', `<h1 style="font-size:20px;margin:0 0 16px">${escapeHtml(subject)}</h1>${table(rows, false)}`);
+  return { subject, html, text: [subject, '', textRows(rows)].join('\n') };
+}
+
 function confirmationEmail(s) {
   const t = T[s.lang];
   const rtl = s.lang === 'ar';
@@ -301,10 +355,6 @@ async function handleContact(request, env, ctx) {
   if (request.method !== 'POST') {
     return new Response(null, { status: 405, headers: { Allow: 'POST', 'Cache-Control': 'no-store' } });
   }
-  if (!env.RESEND_API_KEY || !env.TURNSTILE_SECRET_KEY || !EMAIL.test(env.CONTACT_TO_EMAIL || '')) {
-    console.error('config: RESEND_API_KEY, TURNSTILE_SECRET_KEY and CONTACT_TO_EMAIL must all be set');
-    throw new Problem(503, 'unavailable');
-  }
   // Only the site's own pages (same scheme and host) may post.
   const origin = request.headers.get('Origin');
   if (!origin || origin !== new URL(request.url).origin) throw new Problem(403, 'origin');
@@ -322,13 +372,43 @@ async function handleContact(request, env, ctx) {
   // Honeypot filled: almost certainly a bot. Look successful, send nothing.
   if (data && typeof data.website === 'string' && data.website.trim()) return json(200, { ok: true });
 
+  if (!env.RESEND_API_KEY || !env.TURNSTILE_SECRET_KEY || !EMAIL.test(env.CONTACT_TO_EMAIL || '')) {
+    console.error('config: RESEND_API_KEY, TURNSTILE_SECRET_KEY and CONTACT_TO_EMAIL must all be set');
+    throw new Problem(503, 'unavailable');
+  }
   await verifyTurnstile(env, data && data.token, request.headers.get('CF-Connecting-IP'));
-  const s = validate(data);
 
   const to = env.CONTACT_TO_EMAIL;
   const from = env.MAIL_FROM || 'Gindi Innovations <onboarding@resend.dev>';
   const timeZone = env.TIME_ZONE || 'Africa/Cairo';
   const now = `${new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone }).format(new Date())} (${timeZone})`;
+
+  if (data && CALCULATOR_FORMS.includes(data.form)) {
+    const event = validateCalculator(data, env);
+    // A skip with a database is only counted, which keeps the email allowance for real requests.
+    if (event.kind === 'click' && env.DB) {
+      try {
+        await saveEvent(env, event);
+      } catch (err) {
+        console.error('calculator: click not saved', err && err.message || String(err));
+        throw new Problem(502, 'unavailable');
+      }
+      return json(200, { ok: true, confirmed: false });
+    }
+    const email = calculatorEmail(event, env, now);
+    await sendEmail(env, { from, to: [to], subject: email.subject, html: email.html, text: email.text }, `studio-${event.id}`);
+    // The email is what must succeed; the dashboard's copy is best effort.
+    if (env.DB) {
+      try {
+        await saveEvent(env, event);
+      } catch (err) {
+        console.error('calculator: contact emailed but not saved', err && err.message || String(err));
+      }
+    }
+    return json(200, { ok: true, confirmed: false });
+  }
+
+  const s = validate(data);
 
   // 1. The studio (must succeed).
   const studio = studioEmail(s, env, now);
@@ -360,6 +440,7 @@ async function handleContact(request, env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname === '/dashboard' || url.pathname.startsWith('/dashboard/')) return handleDashboard(request, env);
     try {
       if (url.pathname === '/api/contact' || url.pathname === '/api/contact/') return await handleContact(request, env, ctx);
       return json(404, { ok: false, error: 'not_found' });

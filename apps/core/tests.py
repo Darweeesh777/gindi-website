@@ -589,6 +589,39 @@ class HomepageTests(SimpleTestCase):
             self.assertIn(label, form)
             self.assertIn('data-turnstile', form)
 
+    def test_calculators_ask_for_a_name_and_number_once_configured(self):
+        from django.test import override_settings
+
+        from .tools import TOOLS
+
+        slugs = [tool['slug'] for tool in TOOLS]
+        # Not configured: the calculators are simply open.
+        for slug in slugs:
+            html = self.client.get(f'/free-tools/{slug}/').content.decode()
+            self.assertNotIn('data-calc-gate', html)
+            self.assertNotIn('calc-gate', html)
+
+        with override_settings(CONTACT_API_URL='/api/contact', TURNSTILE_SITE_KEY='1x00000000000000000000AA'):
+            for prefix, submit in (('', 'Open the calculator'), ('/ar', 'افتح الحاسبة')):
+                for slug in slugs:
+                    html = self.client.get(f'{prefix}/free-tools/{slug}/').content.decode()
+                    self.assertRegex(html, r'<script src="/static/js/tools/calc-gate\.js[^"]*" defer></script>')
+                    gate = html[html.index('<section class="cpanel calc-gate"'):]
+                    gate = gate[:gate.index('</section>')]
+                    self.assertIn(' hidden', gate[:gate.index('>')])  # shown by the script, so without it the tool stays open
+                    self.assertIn('name="name"', gate)
+                    self.assertIn('name="phone"', gate)
+                    self.assertIn('data-turnstile', gate)
+                    self.assertIn('name="website" tabindex="-1"', gate)
+                    self.assertIn(submit, gate)
+                    self.assertRegex(gate, r'<button class="btn calc__reset" type="button" data-gate-skip>[^<]+</button>')
+                    self.assertNotIn('type="email"', gate)
+                    self.assertNotIn('<textarea', gate)
+                    self.assertNotRegex(gate[:gate.index('>')], r'data-error[-\w]*=""')  # the messages are there
+            # Only the calculators ask.
+            self.assertNotIn('data-calc-gate', self.get('core:free_tools'))
+            self.assertNotIn('data-calc-gate', self.get('core:services'))
+
     def test_whatsapp_button(self):
         from urllib.parse import quote
 

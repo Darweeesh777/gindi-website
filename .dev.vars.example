@@ -7,3 +7,5 @@ TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 # The address that receives requests. With Resend's test sender it must be the
 # email you signed up to Resend with.
 CONTACT_TO_EMAIL=you@gmail.com
+# The password of the calculators' dashboard (/dashboard).
+DASHBOARD_PASSWORD=choose-a-long-password

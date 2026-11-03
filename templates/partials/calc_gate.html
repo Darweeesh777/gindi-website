@@ -1,0 +1,37 @@
+{% comment %}
+The form that opens a free calculator: a name and a number, or Skip, sent to
+the studio through Resend (static/js/tools/calc-gate.js → form-backend.js →
+worker/index.js). Included only with the form backend
+configured; hidden until the script shows it, so without the script the
+calculator is simply open. Copy: content.py → tools_page.gate, quote (both languages).
+{% endcomment %}
+<section class="cpanel calc-gate" aria-labelledby="calc-gate-title" data-calc-gate hidden
+         data-gate-failed="{{ c.tools_page.gate.failed }}"
+         data-error-name="{{ c.quote.js.errors.name }}" data-error-phone="{{ c.quote.js.errors.phone }}" data-error-phone-invalid="{{ c.quote.js.errors.phone_invalid }}">
+  <div class="cpanel__head">
+    <h2 class="cpanel__title" id="calc-gate-title">{{ c.tools_page.gate.title }}</h2>
+  </div>
+  <div class="cpanel__body">
+    <p class="cpanel__hint">{{ c.tools_page.gate.intro }}</p>
+    <form class="enquiry-form" novalidate>
+      <div class="enquiry-form__field" data-field="name">
+        <label for="g-name">{{ c.quote.name }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <input id="g-name" name="name" type="text" autocomplete="name" required aria-describedby="g-name-error">
+        <p class="quote-form__error" id="g-name-error" data-error hidden></p>
+      </div>
+      <div class="enquiry-form__field" data-field="phone">
+        <label for="g-phone">{{ c.quote.phone }} <span class="enquiry-form__req">({{ c.quote.required }})</span></label>
+        <input id="g-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" dir="ltr" required aria-describedby="g-phone-hint g-phone-error">
+        <p class="quote-form__hint" id="g-phone-hint">{{ c.quote.phone_hint }}</p>
+        <p class="quote-form__error" id="g-phone-error" data-error hidden></p>
+      </div>
+      {% include "partials/form_guard.html" %}
+      <div class="calc__actions">
+        <button class="btn btn--primary" type="submit">{{ c.tools_page.gate.submit }}</button>
+        <button class="btn calc__reset" type="button" data-gate-skip>{{ c.tools_page.gate.skip }}</button>
+      </div>
+      <p class="quote-form__status" role="status" aria-live="polite" data-gate-status></p>
+      <p class="cnote">{{ c.tools_page.gate.privacy }}</p>
+    </form>
+  </div>
+</section>

@@ -117,6 +117,16 @@
   stroke-width: 1.2;
 }
 
+/* The name-and-number form that opens the calculator (partials/calc_gate.html). */
+.calc-gate {
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.calc:focus {
+  outline: none;
+}
+
 .calc__noscript {
   padding: 1.5rem;
   border: 1px solid var(--navy-15);

@@ -49,7 +49,7 @@ address changes.
 `worker/index.js` runs **only for `/api/*`** (`run_worker_first` in
 `wrangler.jsonc`); every page and file is still a free static asset. It
 receives the quotation form, the Contact page form and the enquiry drawer
-(`POST /api/contact`):
+(`POST /api/contact`; the calculators' form: see "Calculator dashboard" below):
 
 - the same site only (Origin check), JSON up to 32 KB;
 - a hidden honeypot field, and a Cloudflare Turnstile check;
@@ -95,6 +95,39 @@ client gives an email); Turnstile free.
 there, never the keys).
 
 **Tests:** `node --test worker/index.test.mjs` (Turnstile and Resend mocked).
+
+## Calculator dashboard (Worker + D1)
+
+The form that opens each free calculator asks for a name and a number, or Skip.
+The Worker emails both to `CONTACT_TO_EMAIL` through Resend: `Calculator lead — <name>`
+and `Calculator click — <calculator>` (no personal details). Skips count towards
+Resend's daily allowance, shared with the other forms.
+
+**Optional dashboard.** With a D1 database bound as `DB`, contacts are also saved
+and skips are saved instead of emailed, and `/dashboard` shows them behind a
+password: totals, by day, by calculator, by language, the contacts and a CSV.
+`worker/dashboard.js`; the tables create themselves on first use. Without it,
+`/dashboard` says it is not set up and the forms work as above.
+
+Setting it up (needs D1 permission on the account that runs the Worker; once,
+in this order, **before** deploying code that has the binding):
+
+1. **Workers & Pages > D1 SQL Database > Create**, named `gindi-calculators`, and
+   copy its **Database ID** into `wrangler.jsonc`:
+   `"d1_databases": [{ "binding": "DB", "database_name": "gindi-calculators", "database_id": "…" }]`.
+   The ID is not a secret; a wrong one makes the deploy fail, and the previous
+   version stays live.
+2. **Workers & Pages > gindi-website > Settings > Variables and Secrets**: add the
+   secret `DASHBOARD_PASSWORD`, long and random. It protects visitors' names and
+   numbers, so share it carefully. Changing it signs everyone out.
+
+Ten wrong passwords from one address block it for 15 minutes. Contacts stay until
+deleted, in **D1 > gindi-calculators > Console**, for example:
+`DELETE FROM calculator_events WHERE phone = '…';`
+
+**Free plan limits:** D1 5 million rows read and 100,000 written a day, 5 GB.
+
+**Tests:** `node --test worker/index.test.mjs`.
 
 ## Cloudflare Pages settings (exact values)
 

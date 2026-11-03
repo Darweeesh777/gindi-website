@@ -93,7 +93,7 @@
       var body = Object.assign({}, fields, {
         lang: config.lang,
         page: location.pathname,
-        id: state.id,
+        id: fields.id || state.id,
         token: value,
         website: honeypot ? honeypot.value : ''
       });

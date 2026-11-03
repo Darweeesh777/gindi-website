@@ -369,6 +369,15 @@ CONTENT = {
             'back_services': 'Back to Services',
             'back_tools': 'Back to the planning tools',
             'noscript': 'This calculator works in your browser and needs JavaScript. Please turn it on to use it.',
+            # The form that opens a calculator (partials/calc_gate.html).
+            'gate': {
+                'title': 'Before you start',
+                'intro': 'Enter your name and number to open the calculator, or skip this step.',
+                'submit': 'Open the calculator',
+                'skip': 'Skip',
+                'failed': 'Sorry, your details could not be sent. Please try again, or skip this step.',
+                'privacy': 'Your name and number go to the Gindi Innovations team, who may contact you about your project.',
+            },
         },
         'projects_page': {
             # Projects page and project pages. The projects: apps/core/projects.py.
@@ -861,6 +870,15 @@ CONTENT = {
             'back_services': 'العودة إلى الخدمات',
             'back_tools': 'العودة إلى أدوات التخطيط',
             'noscript': 'تعمل هذه الحاسبة في متصفحك وتحتاج إلى JavaScript، يُرجى تفعيله لاستخدامها.',
+            # The form that opens a calculator (partials/calc_gate.html).
+            'gate': {
+                'title': 'قبل أن تبدأ',
+                'intro': 'أدخل اسمك ورقمك لفتح الحاسبة، أو تخطَّ هذه الخطوة.',
+                'submit': 'افتح الحاسبة',
+                'skip': 'تخطّي',
+                'failed': 'عذرًا، تعذّر إرسال بياناتك. يُرجى المحاولة مرة أخرى أو تخطّي هذه الخطوة.',
+                'privacy': 'يصل اسمك ورقمك إلى فريق Gindi Innovations، وقد يتواصل معك بخصوص مشروعك.',
+            },
         },
         'projects_page': {
             # Projects page and project pages. The projects: apps/core/projects.py.

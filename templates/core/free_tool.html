@@ -25,6 +25,7 @@ Styles: css/calculator.css.
   <script src="{% static 'js/tools/calc-ui.js' %}" defer></script>
   <script src="{% static 'js/tools/'|add:tool.slug|add:'-calc.js' %}" defer></script>
   <script src="{% static 'js/tools/'|add:tool.slug|add:'.js' %}" defer></script>
+  {% if forms_backend %}<script src="{% static 'js/tools/calc-gate.js' %}" defer></script>{% endif %}
 {% endblock %}
 
 {% block body %}
@@ -49,6 +50,7 @@ Styles: css/calculator.css.
     <section class="calc-work theme-light" aria-labelledby="tool-title" data-tool="{{ tool.slug }}">
       {% include "partials/calc_art.html" with slug=tool.slug %}
       <div class="container calc-work__inner">
+        {% if forms_backend %}{% include "partials/calc_gate.html" %}{% endif %}
         <div class="calc" data-calc="{{ tool.slug }}" data-logo="{% static 'images/brand/gindi-logo.png' %}">
           <noscript><p class="calc__noscript">{{ c.tools_page.noscript }}</p></noscript>
         </div>
